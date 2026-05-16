@@ -1,0 +1,10 @@
+# Tunlify managed cloudflared config
+# This file is managed by Tunlify. Edit via the dashboard.
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: tunlify.example.com
+    service: http://tunlify-frontend:80
+  - service: http_status:404

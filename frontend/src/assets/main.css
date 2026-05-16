@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  body {
+    @apply bg-void text-gray-200 font-mono antialiased;
+    background-image:
+      linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  ::selection {
+    @apply bg-neon/30 text-white;
+  }
+}
+
+@layer components {
+  .cyber-card {
+    @apply bg-surface border border-border p-5 relative;
+    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
+  }
+
+  .cyber-card-glow {
+    @apply cyber-card hover:border-neon hover:shadow-neon transition-all duration-150;
+  }
+
+  .cyber-btn {
+    @apply px-5 py-2.5 font-mono text-sm uppercase tracking-wider border-2 border-neon text-neon
+           hover:bg-neon hover:text-void hover:shadow-neon
+           active:translate-y-px transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed;
+    clip-path: polygon(0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px));
+  }
+
+  .cyber-btn-secondary {
+    @apply px-5 py-2.5 font-mono text-sm uppercase tracking-wider border border-border text-gray-300
+           hover:border-neon hover:text-neon hover:shadow-neon
+           active:translate-y-px transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed;
+    clip-path: polygon(0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px));
+  }
+
+  .cyber-btn-danger {
+    @apply px-5 py-2.5 font-mono text-sm uppercase tracking-wider border-2 border-danger text-danger
+           hover:bg-danger hover:text-void hover:shadow-[0_0_5px_#ff3366,0_0_20px_#ff336660]
+           active:translate-y-px transition-all duration-150;
+    clip-path: polygon(0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px));
+  }
+
+  .cyber-input {
+    @apply w-full bg-surface border border-border px-4 py-2.5 font-mono text-sm text-neon
+           placeholder:text-muted focus:outline-none focus:border-neon focus:shadow-neon transition-all duration-150;
+    clip-path: polygon(0 4px, 4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px));
+  }
+
+  .cyber-badge {
+    @apply inline-flex items-center px-2 py-0.5 font-mono text-xs uppercase tracking-wider border;
+  }
+
+  .scanlines {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.15) 2px, rgba(0, 0, 0, 0.15) 4px);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  }
+
+  .cyber-heading {
+    @apply font-display font-bold uppercase tracking-wider text-glow;
+  }
+}

@@ -1,0 +1,40 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: tunlify-cloudflared
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml --metrics 0.0.0.0:2000 run
+    volumes:
+      - ./cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - ./cloudflared/credentials.json:/etc/cloudflared/credentials.json:ro
+    networks:
+      - cloudflared
+
+  backend:
+    build: ./backend
+    container_name: tunlify-backend
+    restart: unless-stopped
+    expose:
+      - "3001"
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./cloudflared:/etc/cloudflared
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - cloudflared
+
+  frontend:
+    build: ./frontend
+    container_name: tunlify-frontend
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    networks:
+      - cloudflared
+
+networks:
+  cloudflared:
+    external: true

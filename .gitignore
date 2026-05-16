@@ -1,0 +1,28 @@
+# Environment
+.env
+
+# Data
+data/
+
+# Cloudflared credentials (never commit)
+cloudflared/credentials.json
+cloudflared/config.yml
+cloudflared/*.json
+
+# Backend
+backend/tmp/
+backend/server
+
+# Frontend
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
