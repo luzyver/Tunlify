@@ -52,6 +52,8 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	projectsSvc := service.NewProjects(database, cfg.SelfPath)
+
 	authHandler := handler.NewAuth(cfg, database, auditSvc)
 	statusHandler := handler.NewStatus(cfdSvc, cfg)
 	controlHandler := handler.NewControl(cfdSvc, auditSvc)
@@ -63,6 +65,7 @@ func main() {
 	metricsHandler := handler.NewMetrics(cfg)
 	settingsHandler := handler.NewSettings(database, auditSvc)
 	notifHandler := handler.NewNotifications("./data")
+	projectsHandler := handler.NewProjects(projectsSvc, auditSvc)
 
 	r.Post("/auth/login", authHandler.Login)
 	r.Get("/api/logs/ws", logsHandler.Stream)
@@ -97,13 +100,21 @@ func main() {
 		r.Get("/api/notifications", notifHandler.Get)
 		r.Put("/api/notifications", notifHandler.Update)
 		r.Post("/api/notifications/test", notifHandler.Test)
+
+		r.Get("/api/projects", projectsHandler.List)
+		r.Post("/api/projects", projectsHandler.Create)
+		r.Put("/api/projects/{id}", projectsHandler.Update)
+		r.Delete("/api/projects/{id}", projectsHandler.Delete)
+		r.Get("/api/projects/{id}/history", projectsHandler.History)
+		r.Get("/api/projects/{id}/output", projectsHandler.Output)
+		r.Post("/api/projects/{id}/{action}", projectsHandler.Action)
 	})
 
 	srv := &http.Server{
 		Addr:         cfg.ListenAddr,
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		WriteTimeout: 600 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
 

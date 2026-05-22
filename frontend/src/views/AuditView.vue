@@ -48,7 +48,7 @@ const actions = ['', 'login', 'logout', 'restart', 'config_edit']
             <td class="px-4 py-3">
               <span class="cyber-badge border-cyan text-cyan">{{ e.action }}</span>
             </td>
-            <td class="px-4 py-3 text-muted hidden md:table-cell">{{ e.detail || '—' }}</td>
+            <td class="px-4 py-3 text-muted hidden md:table-cell">{{ e.detail?.split('\n')[0] || '—' }}</td>
             <td class="px-4 py-3 text-muted hidden md:table-cell">{{ e.ip_address }}</td>
           </tr>
           <tr v-if="!entries.length">

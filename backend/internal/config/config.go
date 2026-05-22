@@ -12,6 +12,7 @@ type Config struct {
 	CloudflaredContainer string `envconfig:"CLOUDFLARED_CONTAINER" default:"tunlify-cloudflared"`
 	TunnelName          string `envconfig:"TUNNEL_NAME" default:""`
 	MetricsAddr         string `envconfig:"CLOUDFLARED_METRICS" default:"http://tunlify-cloudflared:2000/metrics"`
+	SelfPath            string `envconfig:"SELF_PATH" default:""`
 }
 
 func Load() (*Config, error) {

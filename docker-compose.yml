@@ -21,6 +21,7 @@ services:
       - ./data:/app/data
       - ./cloudflared:/etc/cloudflared
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PROJECTS_ROOT:-/opt/projects}:${PROJECTS_ROOT:-/opt/projects}
     networks:
       - cloudflared
 

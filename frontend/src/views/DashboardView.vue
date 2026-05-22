@@ -5,10 +5,15 @@ import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
 const status = ref<any>(null)
+const projects = ref<any[]>([])
 const actionLoading = ref('')
 
 async function fetchStatus() {
   try { status.value = await apiFetch('/api/status') } catch {}
+}
+
+async function fetchProjects() {
+  try { projects.value = await apiFetch('/api/projects') } catch {}
 }
 
 async function control(action: string) {
@@ -22,6 +27,7 @@ async function control(action: string) {
 }
 
 fetchStatus()
+fetchProjects()
 const interval = setInterval(fetchStatus, 5000)
 onUnmounted(() => clearInterval(interval))
 </script>
@@ -72,6 +78,16 @@ onUnmounted(() => clearInterval(interval))
 
     <div v-if="actionLoading" class="text-xs text-muted tracking-wider">
       > executing {{ actionLoading }}...<span class="animate-blink text-neon">_</span>
+    </div>
+
+    <div v-if="projects.length" class="cyber-card">
+      <h2 class="text-xs text-muted uppercase tracking-widest mb-3">// Projects ({{ projects.length }})</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <router-link v-for="p in projects" :key="p.id" to="/projects" class="flex items-center gap-2 px-3 py-2 bg-void border border-border/50 hover:border-neon/50 transition-colors">
+          <span class="w-1.5 h-1.5 bg-cyan shadow-neon"></span>
+          <span class="text-sm text-gray-200 font-mono truncate">{{ p.name }}</span>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>

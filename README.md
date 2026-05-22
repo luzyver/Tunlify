@@ -1,6 +1,6 @@
 # ☁️ Tunlify
 
-Self-hosted web dashboard to manage and monitor Cloudflare Tunnel (cloudflared).
+Self-hosted web dashboard to manage and monitor Cloudflare Tunnel (cloudflared) and Docker Compose projects.
 
 ![Go](https://img.shields.io/badge/backend-Go-00ADD8?logo=go)
 ![Vue](https://img.shields.io/badge/frontend-Vue_3-4FC08D?logo=vue.js)
@@ -19,6 +19,7 @@ Self-hosted web dashboard to manage and monitor Cloudflare Tunnel (cloudflared).
 - **Notifications** — webhook alerts (Discord, Telegram, Slack)
 - **Audit Log** — full history of all actions
 - **Auth** — JWT-based login with session management
+- **Projects** — manage Docker Compose projects (up, down, restart, deploy with git checkout), streaming build output, per-project action history
 
 ## Tech Stack
 
@@ -135,6 +136,12 @@ Tunlify/
 | PUT | `/api/notifications` | Update notification config |
 | GET | `/api/audit` | Audit log |
 | POST | `/api/settings/password` | Change password |
+| GET | `/api/projects` | List projects |
+| POST | `/api/projects` | Create project |
+| PUT | `/api/projects/{id}` | Update project |
+| DELETE | `/api/projects/{id}` | Delete project |
+| GET | `/api/projects/{id}/history` | Project action history |
+| POST | `/api/projects/{id}/{action}` | up / down / restart / deploy |
 
 ## Development
 

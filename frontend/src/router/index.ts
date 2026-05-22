@@ -14,6 +14,7 @@ const router = createRouter({
     { path: '/tcp-access', component: () => import('../views/TcpAccessView.vue') },
     { path: '/audit', component: () => import('../views/AuditView.vue') },
     { path: '/notifications', component: () => import('../views/NotificationsView.vue') },
+    { path: '/projects', component: () => import('../views/ProjectsView.vue') },
     { path: '/settings', component: () => import('../views/SettingsView.vue') },
   ],
 })

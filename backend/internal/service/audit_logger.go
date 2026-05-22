@@ -25,6 +25,24 @@ func (a *AuditLogger) Log(userID int, action, detail, ip string) {
 	a.db.Exec(`DELETE FROM audit_logs WHERE created_at < datetime('now', '-30 days')`)
 }
 
+func (a *AuditLogger) ByDetail(detail string, limit int) ([]AuditEntry, error) {
+	rows, err := a.db.Query(
+		`SELECT id, user_id, action, COALESCE(detail,''), COALESCE(ip_address,''), created_at FROM audit_logs WHERE detail LIKE ? AND action LIKE 'project_%' ORDER BY created_at DESC LIMIT ?`,
+		detail+"%", limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var entries []AuditEntry
+	for rows.Next() {
+		var e AuditEntry
+		rows.Scan(&e.ID, &e.UserID, &e.Action, &e.Detail, &e.IPAddress, &e.CreatedAt)
+		entries = append(entries, e)
+	}
+	return entries, nil
+}
+
 func (a *AuditLogger) List(limit, offset int, action string) ([]AuditEntry, int, error) {
 	var total int
 	query := `SELECT COUNT(*) FROM audit_logs`
