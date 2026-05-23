@@ -31,26 +31,25 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-bg p-6">
+  <div class="min-h-screen flex items-center justify-center bg-bg-alt p-6">
     <div class="w-full max-w-sm">
-      <div class="text-center mb-8">
-        <img src="/icon.png" alt="Tunlify" class="w-10 h-10 mx-auto mb-4" />
-        <h1 class="font-display text-3xl font-semibold text-text">Tunlify</h1>
-        <p class="text-sm text-text-muted mt-2">Sign in to your dashboard</p>
-      </div>
-
-      <div class="card p-6 space-y-6">
-        <div v-if="error" class="border border-red-200 bg-red-50 text-red-700 text-sm p-3 rounded-md">
-          {{ error }}
+      <div class="card p-6">
+        <div class="text-center mb-6">
+          <img src="/icon.png" alt="Tunlify" class="w-10 h-10 mx-auto mb-3" />
+          <h1 class="text-xl font-bold text-text">Sign in to Tunlify</h1>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
-          <div class="space-y-1.5">
+          <div v-if="error" class="bg-danger/10 border border-danger/20 text-danger text-sm p-3 rounded">
+            {{ error }}
+          </div>
+
+          <div class="space-y-1">
             <label class="text-sm font-medium text-text">Username</label>
             <input v-model="form.username" type="text" required class="input" placeholder="admin" autofocus />
           </div>
 
-          <div class="space-y-1.5">
+          <div class="space-y-1">
             <label class="text-sm font-medium text-text">Password</label>
             <input v-model="form.password" type="password" required class="input" placeholder="••••••••" />
           </div>

@@ -11,11 +11,9 @@ const actionLoading = ref('')
 async function fetchStatus() {
   try { status.value = await apiFetch('/api/status') } catch {}
 }
-
 async function fetchProjects() {
   try { projects.value = await apiFetch('/api/projects') } catch {}
 }
-
 async function control(action: string) {
   actionLoading.value = action
   try {
@@ -33,68 +31,57 @@ onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>
-  <div class="space-y-8">
-    <!-- Editorial title block -->
-    <header class="border-b border-border pb-8">
-      <p class="section-marker mb-3">STATUS</p>
-      <h1 class="editorial-h1">System Overview</h1>
-      <p class="text-lg text-text-muted mt-3 max-w-reading">Tunnel status, active hostnames, and resource metrics at a glance.</p>
-      <div class="flex items-center gap-4 mt-6">
-        <button @click="control('restart')" :disabled="!!actionLoading" class="btn-primary">
-          <RotateCcw class="w-4 h-4" :stroke-width="1.5" /> Restart Tunnel
-        </button>
-      </div>
-    </header>
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-tight">Status</h1>
+      <button @click="control('restart')" :disabled="!!actionLoading" class="btn-primary">
+        <RotateCcw class="w-4 h-4" /> Restart
+      </button>
+    </div>
 
-    <!-- Metrics grid -->
-    <div v-if="status" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-      <div class="card-hover">
-        <p class="text-xs text-text-dim uppercase tracking-wide">Uptime</p>
-        <p class="text-xl font-mono font-medium mt-1">{{ status.uptime || '—' }}</p>
+    <div v-if="status" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div class="card card-body">
+        <p class="text-2xs text-text-dim uppercase tracking-wide">Uptime</p>
+        <p class="metric-value mt-1">{{ status.uptime || '—' }}</p>
       </div>
-      <div class="card-hover">
-        <p class="text-xs text-text-dim uppercase tracking-wide">Tunnel</p>
-        <p class="text-sm text-text mt-1 truncate">{{ status.tunnel_name || 'n/a' }}</p>
+      <div class="card card-body">
+        <p class="text-2xs text-text-dim uppercase tracking-wide">Tunnel</p>
+        <p class="text-sm font-medium mt-1 truncate">{{ status.tunnel_name || 'n/a' }}</p>
       </div>
-      <div class="card-hover">
-        <p class="text-xs text-text-dim uppercase tracking-wide">Ingress</p>
-        <p class="text-xl font-mono font-medium mt-1 text-accent">{{ status.ingress_count || 0 }}</p>
+      <div class="card card-body">
+        <p class="text-2xs text-text-dim uppercase tracking-wide">Ingress</p>
+        <p class="metric-value mt-1 text-accent">{{ status.ingress_count || 0 }}</p>
       </div>
-      <div class="card-hover">
-        <p class="text-xs text-text-dim uppercase tracking-wide">Memory</p>
-        <p class="text-sm font-mono mt-1">{{ status.memory_usage || '—' }}</p>
+      <div class="card card-body">
+        <p class="text-2xs text-text-dim uppercase tracking-wide">Memory</p>
+        <p class="text-sm font-mono mt-1 tabular-nums">{{ status.memory_usage || '—' }}</p>
       </div>
-      <div class="card-hover">
-        <p class="text-xs text-text-dim uppercase tracking-wide">Version</p>
+      <div class="card card-body">
+        <p class="text-2xs text-text-dim uppercase tracking-wide">Version</p>
         <p class="text-sm font-mono mt-1">{{ status.version?.split(' ')[2] || '—' }}</p>
       </div>
     </div>
 
-    <!-- Hostnames -->
-    <section v-if="status?.hostnames?.length">
-      <p class="section-marker mb-4">HOSTNAMES</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div v-for="h in status.hostnames" :key="h" class="card-hover flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+    <div v-if="status?.hostnames?.length" class="card">
+      <div class="card-header">Active Hostnames</div>
+      <div class="card-body grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div v-for="h in status.hostnames" :key="h" class="flex items-center gap-2 px-3 py-2 bg-surface rounded">
+          <span class="w-2 h-2 rounded-full bg-success"></span>
           <span class="text-sm font-mono truncate">{{ h }}</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- Loading indicator -->
-    <p v-if="actionLoading" class="text-sm text-text-muted">
-      Executing {{ actionLoading }}…
-    </p>
+    <p v-if="actionLoading" class="text-sm text-text-muted">Running {{ actionLoading }}…</p>
 
-    <!-- Projects -->
-    <section v-if="projects.length">
-      <p class="section-marker mb-4">PROJECTS</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <router-link v-for="p in projects" :key="p.id" to="/projects" class="card-hover flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-accent"></span>
+    <div v-if="projects.length" class="card">
+      <div class="card-header">Projects ({{ projects.length }})</div>
+      <div class="card-body grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <router-link v-for="p in projects" :key="p.id" to="/projects" class="flex items-center gap-2 px-3 py-2 bg-surface rounded hover:bg-bg-alt transition-colors">
+          <span class="w-2 h-2 rounded-full bg-chart-5"></span>
           <span class="text-sm font-medium truncate">{{ p.name }}</span>
         </router-link>
       </div>
-    </section>
+    </div>
   </div>
 </template>

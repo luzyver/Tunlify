@@ -23,7 +23,7 @@ async function test() {
   testing.value = true
   try {
     await apiFetch('/api/notifications/test', { method: 'POST' })
-    message.value = { type: 'success', text: 'Test notification sent' }
+    message.value = { type: 'success', text: 'Test sent' }
   } catch (e: any) { message.value = { type: 'error', text: e.message } }
   finally { testing.value = false }
 }
@@ -33,40 +33,38 @@ load()
 
 <template>
   <div class="space-y-6">
-    <header class="border-b border-border pb-6">
-      <p class="section-marker mb-2">ALERTS</p>
-      <h1 class="editorial-h1 !text-3xl">Notifications</h1>
-    </header>
+    <h1 class="text-2xl font-bold tracking-tight">Notifications</h1>
 
-    <div class="card max-w-md space-y-4">
-      <div v-if="message" class="p-3 rounded-md text-sm border" :class="message.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'">
-        {{ message.text }}
-      </div>
-
-      <label class="flex items-center gap-3 text-sm">
-        <input type="checkbox" v-model="form.enabled" class="accent-accent w-4 h-4" />
-        <span class="text-text font-medium">Enable notifications</span>
-      </label>
-
-      <div class="space-y-1.5">
-        <label class="text-xs text-text-muted font-medium">Provider</label>
-        <div class="flex gap-4">
-          <label v-for="t in ['discord', 'telegram', 'slack']" :key="t" class="flex items-center gap-2 text-sm cursor-pointer" :class="form.type === t ? 'text-text font-medium' : 'text-text-muted'">
-            <input type="radio" v-model="form.type" :value="t" class="accent-accent" /> {{ t }}
-          </label>
+    <div class="card max-w-md">
+      <div class="card-header">Webhook Alerts</div>
+      <div class="card-body space-y-4">
+        <div v-if="message" class="p-3 rounded text-sm" :class="message.type === 'success' ? 'bg-success/10 text-emerald-800' : 'bg-danger/10 text-danger'">
+          {{ message.text }}
         </div>
-      </div>
 
-      <div class="space-y-1.5">
-        <label class="text-xs text-text-muted font-medium">Webhook URL</label>
-        <input v-model="form.webhook_url" placeholder="https://..." class="input" />
-      </div>
+        <label class="flex items-center gap-3 text-sm">
+          <input type="checkbox" v-model="form.enabled" class="accent-accent w-4 h-4" />
+          <span class="font-medium">Enable notifications</span>
+        </label>
 
-      <div class="flex gap-3">
-        <button @click="save" class="btn-primary">Save</button>
-        <button @click="test" :disabled="testing" class="btn-secondary">
-          {{ testing ? 'Sending…' : 'Send Test' }}
-        </button>
+        <div class="space-y-1">
+          <label class="text-xs font-medium text-text-muted">Provider</label>
+          <div class="flex gap-4">
+            <label v-for="t in ['discord', 'telegram', 'slack']" :key="t" class="flex items-center gap-2 text-sm cursor-pointer" :class="form.type === t ? 'text-accent font-medium' : 'text-text-muted'">
+              <input type="radio" v-model="form.type" :value="t" class="accent-accent" /> {{ t }}
+            </label>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-medium text-text-muted">Webhook URL</label>
+          <input v-model="form.webhook_url" placeholder="https://..." class="input" />
+        </div>
+
+        <div class="flex gap-2">
+          <button @click="save" class="btn-primary">Save</button>
+          <button @click="test" :disabled="testing" class="btn-secondary">{{ testing ? 'Sending…' : 'Test' }}</button>
+        </div>
       </div>
     </div>
   </div>

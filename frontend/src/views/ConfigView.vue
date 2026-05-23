@@ -52,7 +52,7 @@ async function save() {
 async function saveAndRestart() {
   await save()
   if (message.value?.type === 'success') {
-    try { await apiFetch('/api/control/restart', { method: 'POST' }); message.value = { type: 'success', text: 'Configuration saved & tunnel restarted' } }
+    try { await apiFetch('/api/control/restart', { method: 'POST' }); message.value = { type: 'success', text: 'Saved & tunnel restarted' } }
     catch (e: any) { message.value = { type: 'error', text: `Restart failed: ${e.message}` } }
   }
 }
@@ -62,54 +62,48 @@ loadConfig()
 
 <template>
   <div class="space-y-6">
-    <header class="border-b border-border pb-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <p class="section-marker mb-2">CONFIGURATION</p>
-          <h1 class="editorial-h1 !text-3xl">Ingress Rules</h1>
-        </div>
-        <button @click="addRule" class="btn-secondary">
-          <Plus class="w-4 h-4" :stroke-width="1.5" /> Add Rule
-        </button>
-      </div>
-    </header>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-tight">Ingress Config</h1>
+      <button @click="addRule" class="btn-secondary">
+        <Plus class="w-4 h-4" /> Add Rule
+      </button>
+    </div>
 
-    <div v-if="message" class="p-3 rounded-md text-sm border" :class="message.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'">
+    <div v-if="message" class="p-3 rounded text-sm" :class="message.type === 'success' ? 'bg-success/10 text-emerald-800 border border-success/20' : 'bg-danger/10 text-danger border border-danger/20'">
       {{ message.text }}
     </div>
 
     <div class="space-y-3">
-      <div v-for="(rule, i) in rules" :key="i" class="card flex gap-4 items-start">
+      <div v-for="(rule, i) in rules" :key="i" class="card card-body flex gap-4 items-start">
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="text-xs text-text-muted font-medium block mb-1">Hostname</label>
+            <label class="text-xs font-medium text-text-muted block mb-1">Hostname</label>
             <input v-model="rule.hostname" placeholder="app.example.com" class="input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
           </div>
           <div>
-            <label class="text-xs text-text-muted font-medium block mb-1">Service</label>
+            <label class="text-xs font-medium text-text-muted block mb-1">Service</label>
             <input v-model="rule.service" placeholder="http://container:port" class="input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
           </div>
           <label class="flex items-center gap-2 text-xs text-text-muted col-span-full">
             <input type="checkbox" v-model="rule.noTLSVerify" class="accent-accent" :disabled="isTunlifyRule(rule)" />
-            <span>Skip TLS verification</span>
+            Skip TLS verification
             <span v-if="isTunlifyRule(rule)" class="badge-muted ml-2">Locked</span>
           </label>
         </div>
-        <button v-if="!isTunlifyRule(rule)" @click="removeRule(i)" class="btn-danger !px-2 !py-2 mt-5">
-          <Trash2 class="w-4 h-4" :stroke-width="1.5" />
+        <button v-if="!isTunlifyRule(rule)" @click="removeRule(i)" class="btn-icon !border-danger/30 !text-danger mt-5">
+          <Trash2 class="w-4 h-4" />
         </button>
       </div>
-
-      <div v-if="!rules.length" class="card text-center text-text-muted py-8 text-sm">
+      <div v-if="!rules.length" class="card card-body text-center text-text-muted py-8 text-sm">
         No ingress rules configured
       </div>
     </div>
 
-    <p class="text-xs text-text-dim border-t border-border pt-4">
-      Catch-all rule <code class="font-mono text-accent">http_status:404</code> is auto-appended.
+    <p class="text-xs text-text-dim">
+      Catch-all <code class="font-mono text-accent">http_status:404</code> is auto-appended.
     </p>
 
-    <div class="flex flex-col sm:flex-row gap-3">
+    <div class="flex gap-3">
       <button @click="save" :disabled="saving" class="btn-secondary">Save</button>
       <button @click="saveAndRestart" :disabled="saving" class="btn-primary">
         {{ saving ? 'Saving…' : 'Save & Restart' }}

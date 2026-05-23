@@ -4,71 +4,104 @@
 
 @layer base {
   body {
-    @apply bg-bg text-text font-sans antialiased;
+    @apply bg-bg text-text font-sans antialiased text-base;
   }
-
   ::selection {
-    @apply bg-accent-soft text-text;
+    @apply bg-accent/20 text-text;
   }
 }
 
 @layer components {
-  .section-marker {
-    @apply text-xs font-sans font-medium uppercase tracking-[1px] text-accent;
-  }
-
-  .editorial-h1 {
-    @apply font-display font-semibold text-4xl lg:text-5xl text-text leading-tight;
-  }
-
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium
-           bg-text text-bg hover:bg-text/90 transition-colors
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-accent text-white text-sm font-medium
+           hover:bg-accent-hover transition-colors
            disabled:opacity-40 disabled:cursor-not-allowed;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium
-           bg-transparent border border-border text-text hover:border-border-strong transition-colors
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-white border border-border-strong text-text text-sm font-medium
+           hover:border-text-dim transition-colors
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-warning {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-warning text-text text-sm font-medium
+           hover:brightness-95 transition-colors
            disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium
-           bg-transparent border border-red-300 text-red-600 hover:bg-red-50 transition-colors
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded bg-white border border-danger/30 text-danger text-sm font-medium
+           hover:bg-danger/5 transition-colors
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded border border-border text-text-muted
+           hover:border-border-strong hover:text-text transition-colors
            disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   .card {
-    @apply bg-bg-alt border border-border rounded-lg p-4;
+    @apply bg-bg border border-border rounded-md;
   }
 
-  .card-hover {
-    @apply card hover:border-border-strong transition-colors;
+  .card-header {
+    @apply px-4 py-3 border-b border-border text-sm font-medium;
+  }
+
+  .card-body {
+    @apply p-4;
   }
 
   .input {
-    @apply w-full border border-border rounded-md px-3 py-2 text-sm text-text bg-bg
-           placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-shadow;
+    @apply w-full border border-border-strong rounded px-3 py-2 text-sm text-text bg-white
+           placeholder:text-text-dim
+           focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-1 transition-shadow;
   }
 
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md;
+    @apply inline-flex items-center px-2 py-0.5 text-2xs font-medium rounded;
   }
 
   .badge-success {
-    @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200;
+    @apply badge bg-success/15 text-emerald-800;
   }
 
   .badge-danger {
-    @apply badge bg-red-50 text-red-700 border border-red-200;
+    @apply badge bg-danger/15 text-danger;
   }
 
   .badge-muted {
-    @apply badge bg-surface text-text-muted border border-border;
+    @apply badge bg-surface text-text-muted;
   }
 
-  .pull-quote {
-    @apply font-display text-2xl font-medium pl-6 border-l-4 border-accent;
+  .badge-accent {
+    @apply badge bg-accent/10 text-accent;
+  }
+
+  .metric-value {
+    @apply font-mono text-xl font-bold tabular-nums;
+  }
+
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-wide text-text-muted;
+  }
+
+  .table-tight {
+    @apply w-full text-sm;
+  }
+
+  .table-tight th {
+    @apply text-left px-4 py-2 text-xs font-medium text-text-muted bg-surface border-b border-border sticky top-0;
+  }
+
+  .table-tight td {
+    @apply px-4 py-2 border-b border-border;
+  }
+
+  .table-tight tr:hover td {
+    @apply bg-bg-alt;
   }
 }

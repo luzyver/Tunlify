@@ -31,36 +31,31 @@ async function handleLogout() {
 </script>
 
 <template>
-  <aside class="w-[256px] h-full bg-bg border-r border-border flex flex-col">
-    <div class="px-6 py-6 border-b border-border">
-      <div class="flex items-center gap-2">
-        <img src="/icon.png" alt="Tunlify" class="w-6 h-6" />
-        <h1 class="text-base font-semibold text-text">Tunlify</h1>
-      </div>
-      <p class="text-xs text-text-dim mt-1">Tunnel Management</p>
+  <aside class="w-[240px] h-full bg-bg border-r border-border flex flex-col">
+    <div class="px-4 py-4 border-b border-border flex items-center gap-2">
+      <img src="/icon.png" alt="Tunlify" class="w-7 h-7" />
+      <span class="text-md font-bold tracking-tight text-text">Tunlify</span>
     </div>
 
-    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+    <nav class="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
       <router-link
         v-for="item in nav"
         :key="item.to"
         :to="item.to"
         @click="emit('navigate')"
-        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
-        active-class="!text-text !bg-surface font-medium"
+        class="flex items-center gap-3 px-3 py-[7px] rounded text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
+        active-class="!text-accent !bg-accent/5 font-medium"
       >
-        <component :is="item.icon" class="w-4 h-4" :stroke-width="1.5" />
+        <component :is="item.icon" class="w-4 h-4 shrink-0" :stroke-width="1.8" />
         {{ item.label }}
       </router-link>
     </nav>
 
-    <div class="px-6 py-4 border-t border-border">
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-text-muted">{{ authStore.username }}</span>
-        <button @click="handleLogout" class="text-text-dim hover:text-text transition-colors" title="Logout">
-          <LogOut class="w-4 h-4" :stroke-width="1.5" />
-        </button>
-      </div>
+    <div class="px-4 py-3 border-t border-border flex items-center justify-between">
+      <span class="text-sm text-text-muted truncate">{{ authStore.username }}</span>
+      <button @click="handleLogout" class="btn-icon !w-7 !h-7" title="Logout">
+        <LogOut class="w-3.5 h-3.5" :stroke-width="1.8" />
+      </button>
     </div>
   </aside>
 </template>

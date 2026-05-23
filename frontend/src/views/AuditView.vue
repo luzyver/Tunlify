@@ -25,37 +25,32 @@ const actions = ['', 'login', 'logout', 'restart', 'config_edit']
 
 <template>
   <div class="space-y-6">
-    <header class="border-b border-border pb-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <p class="section-marker mb-2">CHANGELOG</p>
-          <h1 class="editorial-h1 !text-3xl">Audit Log</h1>
-        </div>
-        <select v-model="filterAction" class="input !w-auto !py-1.5 !text-xs">
-          <option v-for="a in actions" :key="a" :value="a">{{ a || 'All actions' }}</option>
-        </select>
-      </div>
-    </header>
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold tracking-tight">Audit Log</h1>
+      <select v-model="filterAction" class="input !w-auto !py-1.5">
+        <option v-for="a in actions" :key="a" :value="a">{{ a || 'All actions' }}</option>
+      </select>
+    </div>
 
     <div class="card !p-0 overflow-hidden">
-      <table class="w-full text-sm">
+      <table class="table-tight">
         <thead>
-          <tr class="border-b border-border bg-surface">
-            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted">Time</th>
-            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted">Action</th>
-            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted hidden md:table-cell">Detail</th>
-            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted hidden md:table-cell">IP</th>
+          <tr>
+            <th>Time</th>
+            <th>Action</th>
+            <th class="hidden md:table-cell">Detail</th>
+            <th class="hidden md:table-cell">IP</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in entries" :key="e.id" class="border-b border-border/50 hover:bg-surface">
-            <td class="px-4 py-3 text-xs text-text-muted font-mono">{{ e.created_at }}</td>
-            <td class="px-4 py-3"><span class="badge-muted font-mono">{{ e.action }}</span></td>
-            <td class="px-4 py-3 text-xs text-text-muted hidden md:table-cell">{{ e.detail?.split('\n')[0] || '—' }}</td>
-            <td class="px-4 py-3 text-xs text-text-dim font-mono hidden md:table-cell">{{ e.ip_address }}</td>
+          <tr v-for="e in entries" :key="e.id">
+            <td class="font-mono tabular-nums text-text-muted text-xs">{{ e.created_at }}</td>
+            <td><span class="badge-accent">{{ e.action }}</span></td>
+            <td class="text-text-muted text-xs hidden md:table-cell">{{ e.detail?.split('\n')[0] || '—' }}</td>
+            <td class="font-mono text-text-dim text-xs hidden md:table-cell">{{ e.ip_address }}</td>
           </tr>
           <tr v-if="!entries.length">
-            <td colspan="4" class="px-4 py-12 text-center text-text-muted text-sm">No entries</td>
+            <td colspan="4" class="text-center text-text-muted py-8">No entries</td>
           </tr>
         </tbody>
       </table>

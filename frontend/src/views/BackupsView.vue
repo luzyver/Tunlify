@@ -29,30 +29,43 @@ load()
 
 <template>
   <div class="space-y-6">
-    <header class="border-b border-border pb-6">
-      <p class="section-marker mb-2">RECOVERY</p>
-      <h1 class="editorial-h1 !text-3xl">Config Backups</h1>
-    </header>
+    <h1 class="text-2xl font-bold tracking-tight">Config Backups</h1>
 
-    <div v-if="message" class="p-3 rounded-md text-sm border border-emerald-200 bg-emerald-50 text-emerald-700">{{ message }}</div>
+    <div v-if="message" class="p-3 rounded text-sm bg-success/10 text-emerald-800 border border-success/20">{{ message }}</div>
 
-    <div class="space-y-3">
-      <div v-for="b in backups" :key="b.id" class="card-hover flex items-center justify-between">
-        <span class="text-sm text-text-muted font-mono">{{ b.created_at }}</span>
-        <div class="flex gap-2">
-          <button @click="showPreview(b.id)" class="btn-secondary !px-3 !py-1.5 !text-xs">View</button>
-          <button @click="restore(b.id)" class="btn-primary !px-3 !py-1.5 !text-xs">Restore</button>
-        </div>
-      </div>
-      <div v-if="!backups.length" class="card text-center text-text-muted py-8 text-sm">No backups available</div>
+    <div class="card !p-0 overflow-hidden">
+      <table class="table-tight">
+        <thead>
+          <tr>
+            <th>Created</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="b in backups" :key="b.id">
+            <td class="font-mono tabular-nums text-sm">{{ b.created_at }}</td>
+            <td class="text-right">
+              <div class="flex gap-2 justify-end">
+                <button @click="showPreview(b.id)" class="btn-secondary !px-3 !py-1 !text-xs">View</button>
+                <button @click="restore(b.id)" class="btn-primary !px-3 !py-1 !text-xs">Restore</button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="!backups.length">
+            <td colspan="2" class="text-center text-text-muted py-8">No backups</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div v-if="preview" class="card">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-text-muted font-medium">Preview</p>
+      <div class="card-header flex items-center justify-between">
+        <span>Preview</span>
         <button @click="preview = ''" class="btn-secondary !px-3 !py-1 !text-xs">Close</button>
       </div>
-      <pre class="font-mono text-xs text-text bg-surface p-4 rounded-md overflow-auto max-h-64">{{ preview }}</pre>
+      <div class="card-body">
+        <pre class="font-mono text-xs text-text bg-surface p-4 rounded overflow-auto max-h-64">{{ preview }}</pre>
+      </div>
     </div>
   </div>
 </template>
