@@ -13,6 +13,7 @@ const search = ref('')
 const autoScroll = ref(true)
 const wsStatus = ref<'connecting' | 'connected' | 'disconnected'>('connecting')
 const scrollEl = ref<HTMLElement | null>(null)
+const expanded = ref<Set<string>>(new Set())
 
 const wsUrl = `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/api/logs/ws?token=${authStore.token}`
 let ws: WebSocket | null = null
@@ -48,7 +49,7 @@ const filtered = computed(() => {
 const rowVirtualizer = useVirtualizer({
   get count() { return filtered.value.length },
   getScrollElement: () => scrollEl.value,
-  estimateSize: () => 24,
+  estimateSize: () => 26,
   overscan: 12,
 })
 
@@ -74,7 +75,37 @@ function formatTime(t?: string) {
   return t?.split('T')[1]?.slice(0, 8) || '—'
 }
 
-function clear() { logs.value = [] }
+function logKey(e: LogEntry) {
+  return `${e.time}|${e.message}`
+}
+
+function isExpanded(e: LogEntry) {
+  return expanded.value.has(logKey(e))
+}
+
+function toggle(e: LogEntry) {
+  const k = logKey(e)
+  const next = new Set(expanded.value)
+  if (next.has(k)) next.delete(k)
+  else next.add(k)
+  expanded.value = next
+}
+
+function expandAll() {
+  expanded.value = new Set(filtered.value.map(logKey))
+}
+function collapseAll() {
+  expanded.value = new Set()
+}
+
+function clear() {
+  logs.value = []
+  expanded.value = new Set()
+}
+
+function setRowRef(el: Element | null) {
+  if (el instanceof HTMLElement) rowVirtualizer.value.measureElement(el)
+}
 </script>
 
 <template>
@@ -111,12 +142,26 @@ function clear() { logs.value = [] }
         placeholder="Search…"
         class="input !py-1.5 max-w-[260px]"
       />
-      <label class="ml-auto flex items-center gap-2 text-xs text-text-muted">
-        <input type="checkbox" v-model="autoScroll" class="accent-accent" /> Tail
-      </label>
-      <span class="text-2xs text-text-dim font-mono tabular-nums">
-        {{ filtered.length }} / {{ logs.length }}
-      </span>
+      <div class="ml-auto flex items-center gap-3">
+        <button
+          v-if="expanded.size"
+          type="button"
+          class="text-xs text-text-muted hover:text-text transition-colors"
+          @click="collapseAll"
+        >Collapse all</button>
+        <button
+          v-else-if="filtered.length"
+          type="button"
+          class="text-xs text-text-muted hover:text-text transition-colors"
+          @click="expandAll"
+        >Expand all</button>
+        <label class="flex items-center gap-2 text-xs text-text-muted">
+          <input type="checkbox" v-model="autoScroll" class="accent-accent" /> Tail
+        </label>
+        <span class="text-2xs text-text-dim font-mono tabular-nums">
+          {{ filtered.length }} / {{ logs.length }}
+        </span>
+      </div>
     </div>
 
     <div class="card flex-1 overflow-hidden flex flex-col min-h-0">
@@ -134,17 +179,24 @@ function clear() { logs.value = [] }
           <div
             v-for="vrow in rowVirtualizer.getVirtualItems()"
             :key="vrow.key"
-            class="absolute inset-x-0 grid items-center border-b border-border hover:bg-surface-alt"
-            :style="{
-              transform: `translateY(${vrow.start}px)`,
-              height: vrow.size + 'px',
-              gridTemplateColumns: '120px 1fr',
-            }"
+            :ref="(el) => setRowRef(el as Element | null)"
+            :data-index="vrow.index"
+            class="absolute inset-x-0 grid items-start border-b border-border cursor-pointer transition-colors"
+            :class="isExpanded(filtered[vrow.index]) ? 'bg-surface-alt' : 'hover:bg-surface-alt'"
+            :style="{ transform: `translateY(${vrow.start}px)`, gridTemplateColumns: '120px 1fr' }"
+            tabindex="0"
+            @click="toggle(filtered[vrow.index])"
+            @keydown.enter.prevent="toggle(filtered[vrow.index])"
+            @keydown.space.prevent="toggle(filtered[vrow.index])"
           >
-            <div class="px-4 num text-xs text-text-dim">{{ formatTime(filtered[vrow.index].time) }}</div>
-            <div class="px-4 font-mono text-xs leading-5 truncate" :class="levelClass(filtered[vrow.index].message)">
-              {{ filtered[vrow.index].message }}
-            </div>
+            <div class="px-4 py-1 num text-xs text-text-dim">{{ formatTime(filtered[vrow.index].time) }}</div>
+            <div
+              class="px-4 py-1 font-mono text-xs leading-5"
+              :class="[
+                levelClass(filtered[vrow.index].message),
+                isExpanded(filtered[vrow.index]) ? 'whitespace-pre-wrap break-words' : 'truncate'
+              ]"
+            >{{ filtered[vrow.index].message }}</div>
           </div>
         </div>
         <div v-else class="text-center text-text-muted py-12 text-sm">
