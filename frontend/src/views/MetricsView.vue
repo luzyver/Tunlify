@@ -1,155 +1,83 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
 import { RefreshCw } from 'lucide-vue-next'
-import VueApexCharts from 'vue3-apexcharts'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
 const metrics = ref<any>(null)
 const loading = ref(false)
 
-interface Point { x: number; y: number }
-const series = ref<Point[]>([])
-const lastTotal = ref<number | null>(null)
-const lastTime = ref<number | null>(null)
-const MAX_POINTS = 60
-const POLL_MS = 10_000
-
 async function fetchMetrics() {
   loading.value = true
-  try {
-    const data: any = await apiFetch('/api/metrics')
-    metrics.value = data
-    const total = Number(data?.total_requests ?? 0)
-    const now = Date.now()
-    if (lastTotal.value !== null && lastTime.value !== null) {
-      const elapsedSec = Math.max(1, (now - lastTime.value) / 1000)
-      const delta = Math.max(0, total - lastTotal.value)
-      const rate = delta / elapsedSec
-      series.value = [...series.value, { x: now, y: rate }].slice(-MAX_POINTS)
-    }
-    lastTotal.value = total
-    lastTime.value = now
-  } catch {}
+  try { metrics.value = await apiFetch('/api/metrics') } catch {}
   finally { loading.value = false }
 }
-
 fetchMetrics()
-const interval = setInterval(fetchMetrics, POLL_MS)
+const interval = setInterval(fetchMetrics, 10_000)
 onUnmounted(() => clearInterval(interval))
 
-const chartSeries = computed(() => [{ name: 'Requests / sec', data: series.value }])
+interface CodeRow {
+  code: string
+  count: number
+  pct: number
+  scale: number
+  bar: string
+  klass: string
+  label: string
+}
 
-const chartOptions = computed(() => ({
-  chart: {
-    type: 'area',
-    height: 360,
-    fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
-    background: 'transparent',
-    foreColor: '#5a5548',
-    toolbar: { show: false },
-    zoom: { enabled: false },
-    animations: {
-      enabled: true,
-      easing: 'easeinout',
-      speed: 400,
-      animateGradually: { enabled: false },
-      dynamicAnimation: { enabled: true, speed: 350 },
-    },
-    sparkline: { enabled: false },
-  },
-  colors: ['#5266eb'],
-  stroke: {
-    curve: 'smooth',
-    width: 2,
-    lineCap: 'round',
-  },
-  fill: {
-    type: 'gradient',
-    gradient: {
-      shadeIntensity: 1,
-      opacityFrom: 0.18,
-      opacityTo: 0,
-      stops: [0, 100],
-      colorStops: [
-        { offset: 0, color: '#5266eb', opacity: 0.18 },
-        { offset: 100, color: '#5266eb', opacity: 0 },
-      ],
-    },
-  },
-  dataLabels: { enabled: false },
-  markers: {
-    size: 0,
-    colors: ['#5266eb'],
-    strokeColors: '#ffffff',
-    strokeWidth: 2,
-    hover: { size: 5 },
-  },
-  grid: {
-    borderColor: '#ded9ca',
-    strokeDashArray: 0,
-    xaxis: { lines: { show: false } },
-    yaxis: { lines: { show: true } },
-    padding: { left: 10, right: 10, top: 0, bottom: 0 },
-  },
-  xaxis: {
-    type: 'datetime',
-    labels: {
-      style: { colors: '#8a8478', fontFamily: 'Inter', fontSize: '11px' },
-      datetimeUTC: false,
-      format: 'HH:mm:ss',
-    },
-    axisBorder: { color: '#ded9ca' },
-    axisTicks: { color: '#ded9ca' },
-    crosshairs: {
-      stroke: { color: '#c9c3b3', width: 1, dashArray: 0 },
-    },
-  },
-  yaxis: {
-    min: 0,
-    forceNiceScale: true,
-    labels: {
-      style: { colors: '#8a8478', fontFamily: 'Inter', fontSize: '11px' },
-      formatter: (v: number) => {
-        if (v >= 1000) return (v / 1000).toFixed(1) + 'k'
-        return v.toFixed(2)
-      },
-    },
-  },
-  tooltip: {
-    enabled: true,
-    theme: 'light',
-    x: { format: 'HH:mm:ss' },
-    y: {
-      formatter: (v: number) => v.toFixed(2) + ' req/s',
-    },
-    style: { fontFamily: 'Inter', fontSize: '12px' },
-    marker: { show: false },
-  },
-  legend: { show: false },
-}))
+const SIGNAL: Record<string, { bar: string; klass: string; label: string }> = {
+  '2': { bar: 'bg-success', klass: 'text-success', label: 'Success' },
+  '3': { bar: 'bg-text-muted', klass: 'text-text-muted', label: 'Redirect' },
+  '4': { bar: 'bg-warning', klass: 'text-warning', label: 'Client error' },
+  '5': { bar: 'bg-danger', klass: 'text-danger', label: 'Server error' },
+}
+
+function meta(code: string) {
+  return SIGNAL[code[0]] || { bar: 'bg-text-dim', klass: 'text-text-dim', label: 'Other' }
+}
+
+const rows = computed<CodeRow[]>(() => {
+  const codes = metrics.value?.response_codes || {}
+  const entries = Object.entries(codes).map(([code, count]) => ({ code, count: Number(count) }))
+  if (!entries.length) return []
+  const max = Math.max(...entries.map((e) => e.count))
+  const total = entries.reduce((s, e) => s + e.count, 0)
+  return entries
+    .sort((a, b) => b.count - a.count)
+    .map((e) => {
+      const m = meta(e.code)
+      return {
+        code: e.code,
+        count: e.count,
+        pct: total ? (e.count / total) * 100 : 0,
+        scale: max ? (e.count / max) * 100 : 0,
+        bar: m.bar,
+        klass: m.klass,
+        label: m.label,
+      }
+    })
+})
 
 const totalRequests = computed(() => Number(metrics.value?.total_requests ?? 0))
-
-const currentRate = computed(() => {
-  const last = series.value[series.value.length - 1]
-  return last ? last.y : 0
-})
-
-const peakRate = computed(() => {
-  if (!series.value.length) return 0
-  return Math.max(...series.value.map((p) => p.y))
-})
+const totalCounted = computed(() => rows.value.reduce((s, r) => s + r.count, 0))
 
 function formatNumber(n: number) {
   if (n === undefined || n === null || Number.isNaN(n)) return '—'
   return n.toLocaleString('en-US')
 }
-function formatRate(n: number) {
-  if (n >= 100) return n.toFixed(0)
-  if (n >= 10) return n.toFixed(1)
-  return n.toFixed(2)
+
+function formatPct(p: number) {
+  if (p >= 10) return p.toFixed(1) + '%'
+  return p.toFixed(2) + '%'
 }
+
+const legend = [
+  { code: '2xx', label: 'Success', dot: 'bg-success' },
+  { code: '3xx', label: 'Redirect', dot: 'bg-text-muted' },
+  { code: '4xx', label: 'Client error', dot: 'bg-warning' },
+  { code: '5xx', label: 'Server error', dot: 'bg-danger' },
+]
 </script>
 
 <template>
@@ -165,40 +93,58 @@ function formatRate(n: number) {
       </button>
     </header>
 
-    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="account-tile">
         <span class="account-tile-label">Total requests</span>
         <span class="account-tile-value">{{ formatNumber(totalRequests) }}</span>
       </div>
       <div class="account-tile">
-        <span class="account-tile-label">Current rate</span>
-        <span class="account-tile-value">{{ formatRate(currentRate) }}</span>
-        <span class="account-tile-sub">requests / second</span>
-      </div>
-      <div class="account-tile">
-        <span class="account-tile-label">Peak rate</span>
-        <span class="account-tile-value">{{ formatRate(peakRate) }}</span>
-        <span class="account-tile-sub">since session start</span>
+        <span class="account-tile-label">Distinct codes</span>
+        <span class="account-tile-value">{{ rows.length }}</span>
       </div>
     </section>
 
     <section class="card overflow-hidden">
       <div class="card-header">
-        <span class="card-title">Request rate</span>
+        <span class="card-title">Response codes</span>
         <span class="text-2xs text-text-dim tabular-nums">
-          window {{ series.length }}/{{ MAX_POINTS }} · sample every {{ POLL_MS / 1000 }}s
+          {{ formatNumber(totalCounted) }} counted · auto-refresh 10s
         </span>
       </div>
-      <div class="px-2 py-2">
-        <VueApexCharts
-          v-if="series.length"
-          type="area"
-          height="360"
-          :options="chartOptions"
-          :series="chartSeries"
-        />
-        <div v-else class="text-center text-sm text-text-muted py-24">
-          Collecting samples… first datapoint after {{ POLL_MS / 1000 }}s.
+
+      <div v-if="rows.length" class="p-4 space-y-1">
+        <div
+          v-for="row in rows"
+          :key="row.code"
+          class="grid items-center gap-4 px-2 h-9 rounded-md hover:bg-surface-alt transition-colors"
+          style="grid-template-columns: 56px 130px 1fr 96px 76px;"
+        >
+          <span class="font-mono text-sm font-medium" :class="row.klass">{{ row.code }}</span>
+          <span class="text-xs text-text-muted hidden md:block truncate">{{ row.label }}</span>
+          <div class="relative h-2 bg-bg-alt rounded-full overflow-hidden">
+            <div
+              class="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out"
+              :class="row.bar"
+              :style="{ width: row.scale + '%' }"
+            ></div>
+          </div>
+          <span class="num text-sm text-text text-right">{{ formatNumber(row.count) }}</span>
+          <span class="num text-xs text-text-dim text-right">{{ formatPct(row.pct) }}</span>
+        </div>
+      </div>
+
+      <div v-else class="p-8 text-center text-sm text-text-muted">
+        {{ metrics ? 'No response codes recorded yet' : 'Loading metrics…' }}
+      </div>
+
+      <div
+        v-if="rows.length"
+        class="px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border"
+      >
+        <div v-for="cls in legend" :key="cls.code" class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-sm" :class="cls.dot"></span>
+          <span class="text-2xs text-text-muted font-mono">{{ cls.code }}</span>
+          <span class="text-2xs text-text-muted">· {{ cls.label }}</span>
         </div>
       </div>
     </section>
