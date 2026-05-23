@@ -33,61 +33,68 @@ onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <h1 class="cyber-heading text-xl lg:text-2xl">System Status</h1>
-      <div class="flex gap-2">
-        <button @click="control('restart')" :disabled="!!actionLoading" class="cyber-btn flex items-center gap-2">
-          <RotateCcw class="w-4 h-4" :stroke-width="1.5" /> Restart
+  <div class="space-y-8">
+    <!-- Editorial title block -->
+    <header class="border-b border-border pb-8">
+      <p class="section-marker mb-3">STATUS</p>
+      <h1 class="editorial-h1">System Overview</h1>
+      <p class="text-lg text-text-muted mt-3 max-w-reading">Tunnel status, active hostnames, and resource metrics at a glance.</p>
+      <div class="flex items-center gap-4 mt-6">
+        <button @click="control('restart')" :disabled="!!actionLoading" class="btn-primary">
+          <RotateCcw class="w-4 h-4" :stroke-width="1.5" /> Restart Tunnel
         </button>
       </div>
+    </header>
+
+    <!-- Metrics grid -->
+    <div v-if="status" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Uptime</p>
+        <p class="text-xl font-mono font-medium mt-1">{{ status.uptime || '—' }}</p>
+      </div>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Tunnel</p>
+        <p class="text-sm text-text mt-1 truncate">{{ status.tunnel_name || 'n/a' }}</p>
+      </div>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Ingress</p>
+        <p class="text-xl font-mono font-medium mt-1 text-accent">{{ status.ingress_count || 0 }}</p>
+      </div>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Memory</p>
+        <p class="text-sm font-mono mt-1">{{ status.memory_usage || '—' }}</p>
+      </div>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Version</p>
+        <p class="text-sm font-mono mt-1">{{ status.version?.split(' ')[2] || '—' }}</p>
+      </div>
     </div>
 
-    <div v-if="status" class="grid grid-cols-2 lg:grid-cols-5 gap-3">
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Uptime</p>
-        <p class="text-lg text-neon text-glow mt-1 font-mono">{{ status.uptime || '—' }}</p>
-      </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Tunnel</p>
-        <p class="text-sm text-gray-200 mt-1 truncate">{{ status.tunnel_name || 'n/a' }}</p>
-      </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Ingress</p>
-        <p class="text-lg text-cyan mt-1" style="text-shadow: 0 0 8px #00d4ff80">{{ status.ingress_count || 0 }}</p>
-      </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Memory</p>
-        <p class="text-sm text-gray-200 mt-1 font-mono">{{ status.memory_usage || '—' }}</p>
-      </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Version</p>
-        <p class="text-sm text-magenta mt-1" style="text-shadow: 0 0 8px #ff00ff80">{{ status.version?.split(' ')[2] || '—' }}</p>
-      </div>
-    </div>
-
-    <div v-if="status?.hostnames?.length" class="cyber-card">
-      <h2 class="text-xs text-muted uppercase tracking-widest mb-3">// Active Hostnames</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <div v-for="h in status.hostnames" :key="h" class="flex items-center gap-2 px-3 py-2 bg-void border border-border/50">
-          <span class="w-1.5 h-1.5 bg-neon shadow-neon animate-pulse"></span>
-          <span class="text-sm text-neon/80 font-mono truncate">{{ h }}</span>
+    <!-- Hostnames -->
+    <section v-if="status?.hostnames?.length">
+      <p class="section-marker mb-4">HOSTNAMES</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div v-for="h in status.hostnames" :key="h" class="card-hover flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span class="text-sm font-mono truncate">{{ h }}</span>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div v-if="actionLoading" class="text-xs text-muted tracking-wider">
-      > executing {{ actionLoading }}...<span class="animate-blink text-neon">_</span>
-    </div>
+    <!-- Loading indicator -->
+    <p v-if="actionLoading" class="text-sm text-text-muted">
+      Executing {{ actionLoading }}…
+    </p>
 
-    <div v-if="projects.length" class="cyber-card">
-      <h2 class="text-xs text-muted uppercase tracking-widest mb-3">// Projects ({{ projects.length }})</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        <router-link v-for="p in projects" :key="p.id" to="/projects" class="flex items-center gap-2 px-3 py-2 bg-void border border-border/50 hover:border-neon/50 transition-colors">
-          <span class="w-1.5 h-1.5 bg-cyan shadow-neon"></span>
-          <span class="text-sm text-gray-200 font-mono truncate">{{ p.name }}</span>
+    <!-- Projects -->
+    <section v-if="projects.length">
+      <p class="section-marker mb-4">PROJECTS</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <router-link v-for="p in projects" :key="p.id" to="/projects" class="card-hover flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full bg-accent"></span>
+          <span class="text-sm font-medium truncate">{{ p.name }}</span>
         </router-link>
       </div>
-    </div>
+    </section>
   </div>
 </template>

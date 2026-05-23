@@ -15,29 +15,32 @@ onUnmounted(() => clearInterval(interval))
 
 <template>
   <div class="space-y-6">
-    <h1 class="cyber-heading text-xl lg:text-2xl">Metrics</h1>
+    <header class="border-b border-border pb-6">
+      <p class="section-marker mb-2">BENCHMARK</p>
+      <h1 class="editorial-h1 !text-3xl">Metrics</h1>
+    </header>
 
     <div v-if="metrics" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Total Requests</p>
-        <p class="text-2xl text-neon text-glow mt-1 font-mono">{{ metrics.total_requests?.toLocaleString() || '0' }}</p>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Total Requests</p>
+        <p class="text-2xl font-mono font-medium mt-2">{{ metrics.total_requests?.toLocaleString() || '0' }}</p>
       </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Active Connections</p>
-        <p class="text-2xl text-cyan mt-1 font-mono" style="text-shadow: 0 0 8px #00d4ff80">{{ metrics.active_connections || '0' }}</p>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Active Connections</p>
+        <p class="text-2xl font-mono font-medium mt-2 text-accent">{{ metrics.active_connections || '0' }}</p>
       </div>
-      <div class="cyber-card-glow">
-        <p class="text-[10px] text-muted uppercase tracking-widest">Response Codes</p>
+      <div class="card-hover">
+        <p class="text-xs text-text-dim uppercase tracking-wide">Response Codes</p>
         <div class="mt-2 space-y-1">
           <div v-for="(count, code) in metrics.response_codes" :key="code" class="flex justify-between text-xs font-mono">
-            <span class="text-muted">{{ code }}</span>
-            <span :class="String(code).startsWith('2') ? 'text-neon' : String(code).startsWith('4') ? 'text-magenta' : 'text-danger'">{{ count }}</span>
+            <span class="text-text-muted">{{ code }}</span>
+            <span :class="String(code).startsWith('2') ? 'text-emerald-600' : String(code).startsWith('4') ? 'text-amber-600' : 'text-red-600'">{{ count }}</span>
           </div>
-          <p v-if="!Object.keys(metrics.response_codes || {}).length" class="text-muted text-xs">—</p>
+          <p v-if="!Object.keys(metrics.response_codes || {}).length" class="text-text-dim text-xs">—</p>
         </div>
       </div>
     </div>
 
-    <div v-else class="text-muted text-sm tracking-wider">// LOADING METRICS<span class="animate-blink text-neon">_</span></div>
+    <div v-else class="text-text-muted text-sm">Loading metrics…</div>
   </div>
 </template>

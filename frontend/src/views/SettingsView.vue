@@ -12,43 +12,44 @@ async function changePassword() {
     message.value = { type: 'error', text: 'Passwords do not match' }
     return
   }
-  loading.value = true
-  message.value = null
+  loading.value = true; message.value = null
   try {
     await apiFetch('/api/settings/password', { method: 'POST', body: JSON.stringify(form) })
-    message.value = { type: 'success', text: 'PASSWORD UPDATED' }
+    message.value = { type: 'success', text: 'Password updated' }
     form.current_password = ''; form.new_password = ''; form.confirm = ''
-  } catch (e: any) {
-    message.value = { type: 'error', text: e.message }
-  } finally { loading.value = false }
+  } catch (e: any) { message.value = { type: 'error', text: e.message } }
+  finally { loading.value = false }
 }
 </script>
 
 <template>
   <div class="space-y-6">
-    <h1 class="cyber-heading text-xl lg:text-2xl">Settings</h1>
+    <header class="border-b border-border pb-6">
+      <p class="section-marker mb-2">ACCOUNT</p>
+      <h1 class="editorial-h1 !text-3xl">Settings</h1>
+    </header>
 
-    <div class="cyber-card max-w-md space-y-4">
-      <h2 class="text-xs text-muted uppercase tracking-widest">// Change Password</h2>
+    <div class="card max-w-md space-y-4">
+      <p class="text-sm font-medium text-text">Change Password</p>
 
-      <div v-if="message" class="border p-3 text-sm font-mono" :class="message.type === 'success' ? 'border-neon text-neon bg-neon/5' : 'border-danger text-danger bg-danger/5'">
-        [{{ message.type === 'success' ? 'OK' : 'ERR' }}] {{ message.text }}
+      <div v-if="message" class="p-3 rounded-md text-sm border" :class="message.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'">
+        {{ message.text }}
       </div>
 
-      <div class="space-y-1">
-        <label class="text-[10px] text-muted uppercase tracking-widest">Current Password</label>
-        <input v-model="form.current_password" type="password" class="cyber-input" />
+      <div class="space-y-1.5">
+        <label class="text-xs text-text-muted font-medium">Current Password</label>
+        <input v-model="form.current_password" type="password" class="input" />
       </div>
-      <div class="space-y-1">
-        <label class="text-[10px] text-muted uppercase tracking-widest">New Password</label>
-        <input v-model="form.new_password" type="password" class="cyber-input" />
+      <div class="space-y-1.5">
+        <label class="text-xs text-text-muted font-medium">New Password</label>
+        <input v-model="form.new_password" type="password" class="input" />
       </div>
-      <div class="space-y-1">
-        <label class="text-[10px] text-muted uppercase tracking-widest">Confirm</label>
-        <input v-model="form.confirm" type="password" class="cyber-input" />
+      <div class="space-y-1.5">
+        <label class="text-xs text-text-muted font-medium">Confirm</label>
+        <input v-model="form.confirm" type="password" class="input" />
       </div>
-      <button @click="changePassword" :disabled="loading" class="cyber-btn">
-        {{ loading ? 'UPDATING...' : 'UPDATE' }}
+      <button @click="changePassword" :disabled="loading" class="btn-primary">
+        {{ loading ? 'Updating…' : 'Update Password' }}
       </button>
     </div>
   </div>

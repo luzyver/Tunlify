@@ -25,44 +25,47 @@ const actions = ['', 'login', 'logout', 'restart', 'config_edit']
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <h1 class="cyber-heading text-xl lg:text-2xl">Audit Log</h1>
-      <select v-model="filterAction" class="cyber-input !w-auto !py-1.5 !text-xs">
-        <option v-for="a in actions" :key="a" :value="a">{{ a || '// ALL' }}</option>
-      </select>
-    </div>
+    <header class="border-b border-border pb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p class="section-marker mb-2">CHANGELOG</p>
+          <h1 class="editorial-h1 !text-3xl">Audit Log</h1>
+        </div>
+        <select v-model="filterAction" class="input !w-auto !py-1.5 !text-xs">
+          <option v-for="a in actions" :key="a" :value="a">{{ a || 'All actions' }}</option>
+        </select>
+      </div>
+    </header>
 
-    <div class="cyber-card !p-0 overflow-hidden">
-      <table class="w-full text-xs font-mono">
+    <div class="card !p-0 overflow-hidden">
+      <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-border bg-chrome/50">
-            <th class="text-left px-4 py-3 text-muted uppercase tracking-widest">Time</th>
-            <th class="text-left px-4 py-3 text-muted uppercase tracking-widest">Action</th>
-            <th class="text-left px-4 py-3 text-muted uppercase tracking-widest hidden md:table-cell">Detail</th>
-            <th class="text-left px-4 py-3 text-muted uppercase tracking-widest hidden md:table-cell">Origin</th>
+          <tr class="border-b border-border bg-surface">
+            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted">Time</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted">Action</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted hidden md:table-cell">Detail</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-text-muted hidden md:table-cell">IP</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="e in entries" :key="e.id" class="border-b border-border/50 hover:bg-neon/5">
-            <td class="px-4 py-3 text-muted">{{ e.created_at }}</td>
-            <td class="px-4 py-3">
-              <span class="cyber-badge border-cyan text-cyan">{{ e.action }}</span>
-            </td>
-            <td class="px-4 py-3 text-muted hidden md:table-cell">{{ e.detail?.split('\n')[0] || '—' }}</td>
-            <td class="px-4 py-3 text-muted hidden md:table-cell">{{ e.ip_address }}</td>
+          <tr v-for="e in entries" :key="e.id" class="border-b border-border/50 hover:bg-surface">
+            <td class="px-4 py-3 text-xs text-text-muted font-mono">{{ e.created_at }}</td>
+            <td class="px-4 py-3"><span class="badge-muted font-mono">{{ e.action }}</span></td>
+            <td class="px-4 py-3 text-xs text-text-muted hidden md:table-cell">{{ e.detail?.split('\n')[0] || '—' }}</td>
+            <td class="px-4 py-3 text-xs text-text-dim font-mono hidden md:table-cell">{{ e.ip_address }}</td>
           </tr>
           <tr v-if="!entries.length">
-            <td colspan="4" class="px-4 py-12 text-center text-muted tracking-wider">// NO ENTRIES</td>
+            <td colspan="4" class="px-4 py-12 text-center text-text-muted text-sm">No entries</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="flex items-center justify-between">
-      <span class="text-xs text-muted tracking-wider">{{ total }} records</span>
+      <span class="text-xs text-text-muted">{{ total }} records</span>
       <div class="flex gap-2">
-        <button @click="page--" :disabled="page === 0" class="cyber-btn-secondary !px-3 !py-1.5 !text-[10px] disabled:opacity-30">PREV</button>
-        <button @click="page++" :disabled="(page + 1) * limit >= total" class="cyber-btn-secondary !px-3 !py-1.5 !text-[10px] disabled:opacity-30">NEXT</button>
+        <button @click="page--" :disabled="page === 0" class="btn-secondary !px-3 !py-1.5 !text-xs">Prev</button>
+        <button @click="page++" :disabled="(page + 1) * limit >= total" class="btn-secondary !px-3 !py-1.5 !text-xs">Next</button>
       </div>
     </div>
   </div>

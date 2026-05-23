@@ -44,7 +44,7 @@ function generateYaml(): string {
 
 async function save() {
   saving.value = true; message.value = null
-  try { await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ content: generateYaml() }) }); message.value = { type: 'success', text: 'CONFIG WRITTEN' } }
+  try { await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ content: generateYaml() }) }); message.value = { type: 'success', text: 'Configuration saved' } }
   catch (e: any) { message.value = { type: 'error', text: e.message } }
   finally { saving.value = false }
 }
@@ -52,7 +52,7 @@ async function save() {
 async function saveAndRestart() {
   await save()
   if (message.value?.type === 'success') {
-    try { await apiFetch('/api/control/restart', { method: 'POST' }); message.value = { type: 'success', text: 'CONFIG SAVED & TUNNEL RESTARTED' } }
+    try { await apiFetch('/api/control/restart', { method: 'POST' }); message.value = { type: 'success', text: 'Configuration saved & tunnel restarted' } }
     catch (e: any) { message.value = { type: 'error', text: `Restart failed: ${e.message}` } }
   }
 }
@@ -62,52 +62,57 @@ loadConfig()
 
 <template>
   <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <h1 class="cyber-heading text-xl lg:text-2xl">Ingress Config</h1>
-      <button @click="addRule" class="cyber-btn flex items-center gap-2 w-full sm:w-auto justify-center">
-        <Plus class="w-4 h-4" :stroke-width="1.5" /> Add Rule
-      </button>
-    </div>
+    <header class="border-b border-border pb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <p class="section-marker mb-2">CONFIGURATION</p>
+          <h1 class="editorial-h1 !text-3xl">Ingress Rules</h1>
+        </div>
+        <button @click="addRule" class="btn-secondary">
+          <Plus class="w-4 h-4" :stroke-width="1.5" /> Add Rule
+        </button>
+      </div>
+    </header>
 
-    <div v-if="message" class="border p-3 text-sm font-mono" :class="message.type === 'success' ? 'border-neon text-neon bg-neon/5' : 'border-danger text-danger bg-danger/5'">
-      [{{ message.type === 'success' ? 'OK' : 'ERR' }}] {{ message.text }}
+    <div v-if="message" class="p-3 rounded-md text-sm border" :class="message.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-700'">
+      {{ message.text }}
     </div>
 
     <div class="space-y-3">
-      <div v-for="(rule, i) in rules" :key="i" class="cyber-card flex gap-4 items-start">
+      <div v-for="(rule, i) in rules" :key="i" class="card flex gap-4 items-start">
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label class="text-[10px] text-muted uppercase tracking-widest block mb-1">Hostname</label>
-            <input v-model="rule.hostname" placeholder="app.example.com" class="cyber-input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
+            <label class="text-xs text-text-muted font-medium block mb-1">Hostname</label>
+            <input v-model="rule.hostname" placeholder="app.example.com" class="input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
           </div>
           <div>
-            <label class="text-[10px] text-muted uppercase tracking-widest block mb-1">Service</label>
-            <input v-model="rule.service" placeholder="http://container:port" class="cyber-input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
+            <label class="text-xs text-text-muted font-medium block mb-1">Service</label>
+            <input v-model="rule.service" placeholder="http://container:port" class="input" :disabled="isTunlifyRule(rule)" :class="isTunlifyRule(rule) && 'opacity-50 cursor-not-allowed'" />
           </div>
-          <label class="flex items-center gap-2 text-xs text-muted col-span-full">
-            <input type="checkbox" v-model="rule.noTLSVerify" class="accent-neon" :disabled="isTunlifyRule(rule)" />
-            <span class="uppercase tracking-wider">no-tls-verify</span>
-            <span v-if="isTunlifyRule(rule)" class="cyber-badge border-magenta text-magenta ml-2">LOCKED</span>
+          <label class="flex items-center gap-2 text-xs text-text-muted col-span-full">
+            <input type="checkbox" v-model="rule.noTLSVerify" class="accent-accent" :disabled="isTunlifyRule(rule)" />
+            <span>Skip TLS verification</span>
+            <span v-if="isTunlifyRule(rule)" class="badge-muted ml-2">Locked</span>
           </label>
         </div>
-        <button v-if="!isTunlifyRule(rule)" @click="removeRule(i)" class="cyber-btn-danger !px-2 !py-2 mt-5">
+        <button v-if="!isTunlifyRule(rule)" @click="removeRule(i)" class="btn-danger !px-2 !py-2 mt-5">
           <Trash2 class="w-4 h-4" :stroke-width="1.5" />
         </button>
       </div>
 
-      <div v-if="!rules.length" class="cyber-card text-center text-muted py-8 tracking-wider text-sm">
-        // NO RULES CONFIGURED
+      <div v-if="!rules.length" class="card text-center text-text-muted py-8 text-sm">
+        No ingress rules configured
       </div>
     </div>
 
-    <p class="text-xs text-muted tracking-wider border-t border-border pt-4">
-      // catch-all: <span class="text-cyan">http_status:404</span> (auto-appended)
+    <p class="text-xs text-text-dim border-t border-border pt-4">
+      Catch-all rule <code class="font-mono text-accent">http_status:404</code> is auto-appended.
     </p>
 
     <div class="flex flex-col sm:flex-row gap-3">
-      <button @click="save" :disabled="saving" class="cyber-btn-secondary w-full sm:w-auto">Save</button>
-      <button @click="saveAndRestart" :disabled="saving" class="cyber-btn w-full sm:w-auto">
-        {{ saving ? 'WRITING...' : 'SAVE & RESTART' }}
+      <button @click="save" :disabled="saving" class="btn-secondary">Save</button>
+      <button @click="saveAndRestart" :disabled="saving" class="btn-primary">
+        {{ saving ? 'Saving…' : 'Save & Restart' }}
       </button>
     </div>
   </div>

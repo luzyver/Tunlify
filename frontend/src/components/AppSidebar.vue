@@ -17,7 +17,7 @@ const nav = [
   { to: '/logs', label: 'Logs', icon: ScrollText },
   { to: '/config', label: 'Ingress', icon: Settings },
   { to: '/backups', label: 'Backups', icon: Archive },
-  { to: '/tcp-access', label: 'TCP', icon: Terminal },
+  { to: '/tcp-access', label: 'TCP Access', icon: Terminal },
   { to: '/notifications', label: 'Alerts', icon: Bell },
   { to: '/audit', label: 'Audit', icon: Shield },
   { to: '/settings', label: 'Settings', icon: Cog },
@@ -31,33 +31,33 @@ async function handleLogout() {
 </script>
 
 <template>
-  <aside class="w-56 h-full bg-surface border-r border-border flex flex-col">
-    <div class="p-5 border-b border-border">
+  <aside class="w-[256px] h-full bg-bg border-r border-border flex flex-col">
+    <div class="px-6 py-6 border-b border-border">
       <div class="flex items-center gap-2">
-        <img src="/icon.png" alt="Tunlify" class="w-7 h-7" />
-        <h1 class="font-display text-lg text-neon text-glow tracking-widest">TUNLIFY</h1>
+        <img src="/icon.png" alt="Tunlify" class="w-6 h-6" />
+        <h1 class="text-base font-semibold text-text">Tunlify</h1>
       </div>
-      <p class="text-xs text-muted mt-1 tracking-wider">// TUNNEL CTRL</p>
+      <p class="text-xs text-text-dim mt-1">Tunnel Management</p>
     </div>
 
-    <nav class="flex-1 p-3 space-y-1">
+    <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
       <router-link
         v-for="item in nav"
         :key="item.to"
         :to="item.to"
         @click="emit('navigate')"
-        class="flex items-center gap-3 px-3 py-2.5 text-sm text-muted uppercase tracking-wider hover:text-neon hover:bg-neon/5 transition-all duration-150"
-        active-class="!text-neon bg-neon/5 border-l-2 border-neon shadow-neon"
+        class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-text-muted hover:text-text hover:bg-surface transition-colors"
+        active-class="!text-text !bg-surface font-medium"
       >
         <component :is="item.icon" class="w-4 h-4" :stroke-width="1.5" />
         {{ item.label }}
       </router-link>
     </nav>
 
-    <div class="p-4 border-t border-border">
+    <div class="px-6 py-4 border-t border-border">
       <div class="flex items-center justify-between">
-        <span class="text-xs text-muted tracking-wider">{{ authStore.username }}<span class="animate-blink text-neon">_</span></span>
-        <button @click="handleLogout" class="text-muted hover:text-danger transition-colors">
+        <span class="text-sm text-text-muted">{{ authStore.username }}</span>
+        <button @click="handleLogout" class="text-text-dim hover:text-text transition-colors" title="Logout">
           <LogOut class="w-4 h-4" :stroke-width="1.5" />
         </button>
       </div>
