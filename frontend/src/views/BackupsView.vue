@@ -1,27 +1,43 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Eye, RotateCcw, X } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
+
 const backups = ref<any[]>([])
-const preview = ref('')
+const previewId = ref<number | null>(null)
+const previewContent = ref('')
 const message = ref('')
+const restoring = ref<number | null>(null)
 
 async function load() {
   try { backups.value = await apiFetch('/api/config/backups') } catch {}
 }
 
 async function showPreview(id: number) {
+  previewId.value = id
   const b = await apiFetch<{ content: string }>(`/api/config/backups/${id}`)
-  preview.value = b.content
+  previewContent.value = b.content
+}
+
+function closePreview() {
+  previewId.value = null
+  previewContent.value = ''
 }
 
 async function restore(id: number) {
-  const b = await apiFetch<{ content: string }>(`/api/config/backups/${id}`)
-  await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ content: b.content }) })
-  message.value = 'Configuration restored'
-  preview.value = ''
-  setTimeout(() => message.value = '', 3000)
+  if (!confirm('Restore this backup? Current configuration will be overwritten.')) return
+  restoring.value = id
+  try {
+    const b = await apiFetch<{ content: string }>(`/api/config/backups/${id}`)
+    await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ content: b.content }) })
+    message.value = 'Configuration restored'
+    closePreview()
+    setTimeout(() => (message.value = ''), 3000)
+  } finally {
+    restoring.value = null
+  }
 }
 
 load()
@@ -29,43 +45,64 @@ load()
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold tracking-tight">Config Backups</h1>
+    <header class="flex items-end justify-between gap-4">
+      <div>
+        <p class="eyebrow mb-2">Console · Config</p>
+        <h1 class="text-2xl font-semibold tracking-tight text-text">Backups</h1>
+      </div>
+      <span class="text-2xs text-text-dim tabular-nums">{{ backups.length }} snapshots</span>
+    </header>
 
-    <div v-if="message" class="p-3 rounded text-sm bg-success/10 text-emerald-800 border border-success/20">{{ message }}</div>
+    <div v-if="message" class="alert-success">{{ message }}</div>
 
-    <div class="card !p-0 overflow-hidden">
+    <section class="card overflow-hidden">
+      <div class="card-header">
+        <span class="card-title">Snapshots</span>
+        <span class="text-2xs text-text-dim">Auto-saved on every config change</span>
+      </div>
       <table class="table-tight">
         <thead>
           <tr>
             <th>Created</th>
-            <th class="text-right">Actions</th>
+            <th class="text-right pr-4">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="b in backups" :key="b.id">
-            <td class="font-mono tabular-nums text-sm">{{ b.created_at }}</td>
-            <td class="text-right">
-              <div class="flex gap-2 justify-end">
-                <button @click="showPreview(b.id)" class="btn-secondary !px-3 !py-1 !text-xs">View</button>
-                <button @click="restore(b.id)" class="btn-primary !px-3 !py-1 !text-xs">Restore</button>
+          <tr v-for="b in backups" :key="b.id" :class="previewId === b.id && 'is-selected'">
+            <td class="font-mono text-text num text-left">{{ b.created_at }}</td>
+            <td class="text-right pr-4">
+              <div class="inline-flex items-center gap-2">
+                <button @click="showPreview(b.id)" class="btn-secondary !py-1 !px-2.5 !text-xs">
+                  <Eye class="w-3.5 h-3.5" :stroke-width="1.75" />
+                  View
+                </button>
+                <button
+                  @click="restore(b.id)"
+                  :disabled="restoring === b.id"
+                  class="btn-primary !py-1 !px-2.5 !text-xs"
+                >
+                  <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
+                  {{ restoring === b.id ? 'Restoring…' : 'Restore' }}
+                </button>
               </div>
             </td>
           </tr>
           <tr v-if="!backups.length">
-            <td colspan="2" class="text-center text-text-muted py-8">No backups</td>
+            <td colspan="2" class="text-center text-text-muted py-8 text-sm">No backups yet</td>
           </tr>
         </tbody>
       </table>
-    </div>
+    </section>
 
-    <div v-if="preview" class="card">
-      <div class="card-header flex items-center justify-between">
-        <span>Preview</span>
-        <button @click="preview = ''" class="btn-secondary !px-3 !py-1 !text-xs">Close</button>
+    <section v-if="previewId !== null" class="card overflow-hidden">
+      <div class="card-header">
+        <span class="card-title">Preview</span>
+        <button @click="closePreview" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
       </div>
-      <div class="card-body">
-        <pre class="font-mono text-xs text-text bg-surface p-4 rounded overflow-auto max-h-64">{{ preview }}</pre>
-      </div>
-    </div>
+      <pre
+        class="font-mono text-2xs leading-5 text-text-muted bg-bg-alt
+               max-h-96 overflow-auto p-4 whitespace-pre scrollbar-thin"
+      >{{ previewContent }}</pre>
+    </section>
   </div>
 </template>

@@ -1,50 +1,87 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
+const authStore = useAuthStore()
 const form = reactive({ current_password: '', new_password: '', confirm: '' })
-const message = ref<{ type: string; text: string } | null>(null)
+const message = ref<{ type: 'success' | 'error'; text: string } | null>(null)
 const loading = ref(false)
 
 async function changePassword() {
-  if (form.new_password !== form.confirm) { message.value = { type: 'error', text: 'Passwords do not match' }; return }
-  loading.value = true; message.value = null
+  if (form.new_password !== form.confirm) {
+    message.value = { type: 'error', text: 'New passwords do not match' }
+    return
+  }
+  loading.value = true
+  message.value = null
   try {
-    await apiFetch('/api/settings/password', { method: 'POST', body: JSON.stringify(form) })
+    await apiFetch('/api/settings/password', {
+      method: 'POST',
+      body: JSON.stringify(form),
+    })
     message.value = { type: 'success', text: 'Password updated' }
-    form.current_password = ''; form.new_password = ''; form.confirm = ''
-  } catch (e: any) { message.value = { type: 'error', text: e.message } }
-  finally { loading.value = false }
+    form.current_password = ''
+    form.new_password = ''
+    form.confirm = ''
+  } catch (e: any) {
+    message.value = { type: 'error', text: e.message }
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold tracking-tight">Settings</h1>
+    <header>
+      <p class="eyebrow mb-2">Console · Settings</p>
+      <h1 class="text-2xl font-semibold tracking-tight text-text">Account</h1>
+    </header>
 
-    <div class="card max-w-md">
-      <div class="card-header">Change Password</div>
-      <div class="card-body space-y-4">
-        <div v-if="message" class="p-3 rounded text-sm" :class="message.type === 'success' ? 'bg-success/10 text-emerald-800' : 'bg-danger/10 text-danger'">
+    <section class="card overflow-hidden max-w-[640px]">
+      <div class="card-header">
+        <span class="card-title">Profile</span>
+      </div>
+      <div class="card-body grid sm:grid-cols-2 gap-4">
+        <div>
+          <span class="field-label">Username</span>
+          <p class="font-mono text-text">{{ authStore.username || 'admin' }}</p>
+        </div>
+        <div>
+          <span class="field-label">Role</span>
+          <p class="text-text">Administrator</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card overflow-hidden max-w-[640px]">
+      <div class="card-header">
+        <span class="card-title">Change password</span>
+      </div>
+      <form @submit.prevent="changePassword" class="card-body space-y-4">
+        <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-danger'">
           {{ message.text }}
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">Current Password</label>
-          <input v-model="form.current_password" type="password" class="input" />
+
+        <div>
+          <label class="field-label">Current password</label>
+          <input v-model="form.current_password" type="password" autocomplete="current-password" class="input" required />
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">New Password</label>
-          <input v-model="form.new_password" type="password" class="input" />
+        <div>
+          <label class="field-label">New password</label>
+          <input v-model="form.new_password" type="password" autocomplete="new-password" class="input" required minlength="8" />
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">Confirm</label>
-          <input v-model="form.confirm" type="password" class="input" />
+        <div>
+          <label class="field-label">Confirm new password</label>
+          <input v-model="form.confirm" type="password" autocomplete="new-password" class="input" required minlength="8" />
         </div>
-        <button @click="changePassword" :disabled="loading" class="btn-primary">
-          {{ loading ? 'Updating…' : 'Update' }}
+
+        <button type="submit" :disabled="loading" class="btn-primary">
+          {{ loading ? 'Updating…' : 'Update password' }}
         </button>
-      </div>
-    </div>
+      </form>
+    </section>
   </div>
 </template>

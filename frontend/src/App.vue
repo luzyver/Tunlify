@@ -1,41 +1,66 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Menu, X } from 'lucide-vue-next'
+import { Menu, Search, X } from 'lucide-vue-next'
 import AppSidebar from './components/AppSidebar.vue'
+import CommandBar from './components/CommandBar.vue'
 
 const route = useRoute()
-const showSidebar = computed(() => route.path !== '/login')
+const isAppMode = computed(() => route.path !== '/login')
 const mobileOpen = ref(false)
+const cmdBar = ref<InstanceType<typeof CommandBar> | null>(null)
+
+function openCmd() {
+  cmdBar.value?.open()
+}
 </script>
 
 <template>
-  <div class="flex h-screen max-w-app mx-auto">
-    <!-- Mobile header -->
-    <div v-if="showSidebar" class="fixed top-0 left-0 right-0 z-40 bg-bg border-b border-border px-4 py-3 flex items-center justify-between md:hidden">
+  <div v-if="!isAppMode" class="min-h-screen bg-bg text-text">
+    <router-view />
+  </div>
+
+  <div v-else class="app-shell">
+
+    <div
+      class="md:hidden fixed inset-x-0 top-0 z-40 h-14
+             bg-bg/95 backdrop-blur-sm border-b border-border
+             flex items-center justify-between px-4"
+    >
       <div class="flex items-center gap-2">
-        <img src="/icon.png" alt="Tunlify" class="w-6 h-6" />
-        <span class="text-sm font-bold text-text">Tunlify</span>
+        <img src="/icon.png" alt="" class="w-6 h-6" />
+        <span class="text-sm font-semibold text-text">Tunlify</span>
       </div>
-      <button @click="mobileOpen = !mobileOpen" class="btn-icon">
-        <Menu v-if="!mobileOpen" class="w-4 h-4" />
-        <X v-else class="w-4 h-4" />
-      </button>
+      <div class="flex items-center gap-2">
+        <button class="btn-icon-ghost" @click="openCmd" title="Command palette">
+          <Search class="w-4 h-4" :stroke-width="1.75" />
+        </button>
+        <button class="btn-icon-ghost" @click="mobileOpen = !mobileOpen" :title="mobileOpen ? 'Close menu' : 'Open menu'">
+          <Menu v-if="!mobileOpen" class="w-4 h-4" :stroke-width="1.75" />
+          <X v-else class="w-4 h-4" :stroke-width="1.75" />
+        </button>
+      </div>
     </div>
 
-    <!-- Mobile overlay -->
-    <div v-if="showSidebar && mobileOpen" class="fixed inset-0 z-30 bg-black/20 md:hidden" @click="mobileOpen = false"></div>
+    <div
+      v-if="mobileOpen"
+      class="md:hidden fixed inset-0 z-30 bg-text/20"
+      @click="mobileOpen = false"
+    ></div>
 
-    <!-- Sidebar -->
-    <div v-if="showSidebar" :class="mobileOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed z-30 inset-y-0 left-0 transition-transform md:translate-x-0 md:static">
-      <AppSidebar @navigate="mobileOpen = false" />
+    <div
+      class="fixed md:sticky inset-y-0 left-0 z-40 transition-transform duration-150"
+      :class="mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+    >
+      <AppSidebar @navigate="mobileOpen = false" @open-cmd="openCmd" />
     </div>
 
-    <!-- Main -->
-    <main class="flex-1 overflow-auto pt-14 md:pt-0">
-      <div class="p-6">
+    <main class="app-content">
+      <div class="app-content-inner pt-20 md:pt-6">
         <router-view />
       </div>
     </main>
+
+    <CommandBar ref="cmdBar" />
   </div>
 </template>

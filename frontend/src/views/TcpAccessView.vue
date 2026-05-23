@@ -1,58 +1,93 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { Check, Copy, Terminal } from 'lucide-vue-next'
 import { useClipboard } from '@vueuse/core'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
-const { copy, copied } = useClipboard()
+const { copy, copied } = useClipboard({ copiedDuring: 1500 })
 
 const form = reactive({ hostname: '', local_url: 'localhost:', mode: 'foreground' })
-const generatedCommand = ref('')
+const generated = ref('')
+const error = ref('')
+const loading = ref(false)
 
 async function generate() {
-  const data = await apiFetch<{ command: string }>('/api/tcp-access/generate', {
-    method: 'POST',
-    body: JSON.stringify(form),
-  })
-  generatedCommand.value = data.command
+  loading.value = true
+  error.value = ''
+  try {
+    const data = await apiFetch<{ command: string }>('/api/tcp-access/generate', {
+      method: 'POST',
+      body: JSON.stringify(form),
+    })
+    generated.value = data.command
+  } catch (e: any) {
+    error.value = e.message
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <template>
   <div class="space-y-6">
-    <h1 class="text-2xl font-bold tracking-tight">TCP Access</h1>
+    <header>
+      <p class="eyebrow mb-2">Console · TCP</p>
+      <h1 class="text-2xl font-semibold tracking-tight text-text">TCP access command</h1>
+    </header>
 
-    <div class="card max-w-xl">
-      <div class="card-header">Generate Command</div>
+    <div v-if="error" class="alert-danger">{{ error }}</div>
+
+    <section class="card overflow-hidden max-w-[640px]">
+      <div class="card-header">
+        <span class="card-title flex items-center gap-2">
+          <Terminal class="w-4 h-4 text-text-muted" :stroke-width="1.75" />
+          Configure
+        </span>
+      </div>
       <div class="card-body space-y-4">
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">Hostname</label>
-          <input v-model="form.hostname" placeholder="tcp.example.com" class="input" />
+        <div>
+          <label class="field-label">Hostname</label>
+          <input v-model="form.hostname" placeholder="tcp.example.com" class="input font-mono" />
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">Local URL</label>
-          <input v-model="form.local_url" placeholder="localhost:9999" class="input" />
+        <div>
+          <label class="field-label">Local URL</label>
+          <input v-model="form.local_url" placeholder="localhost:9999" class="input font-mono" />
         </div>
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-text-muted">Mode</label>
-          <div class="flex gap-4">
-            <label v-for="m in ['foreground', 'nohup', 'systemd']" :key="m" class="flex items-center gap-2 text-sm cursor-pointer" :class="form.mode === m ? 'text-accent font-medium' : 'text-text-muted'">
-              <input type="radio" v-model="form.mode" :value="m" class="accent-accent" /> {{ m }}
-            </label>
+        <div>
+          <label class="field-label">Mode</label>
+          <div class="inline-flex border border-border rounded-md overflow-hidden bg-surface">
+            <button
+              v-for="m in ['foreground', 'nohup', 'systemd']"
+              :key="m"
+              type="button"
+              class="px-3 h-8 text-xs font-medium transition-colors duration-100"
+              :class="form.mode === m ? 'bg-accent-soft text-accent' : 'text-text-muted hover:bg-bg-alt'"
+              @click="form.mode = m"
+            >
+              {{ m }}
+            </button>
           </div>
         </div>
-        <button @click="generate" class="btn-primary">Generate</button>
+        <button @click="generate" :disabled="loading" class="btn-primary">
+          {{ loading ? 'Generating…' : 'Generate command' }}
+        </button>
       </div>
-    </div>
+    </section>
 
-    <div v-if="generatedCommand" class="card max-w-xl relative">
-      <div class="card-header flex items-center justify-between">
-        <span>Output</span>
-        <button @click="copy(generatedCommand)" class="btn-secondary !px-2 !py-1 !text-xs">{{ copied ? 'Copied!' : 'Copy' }}</button>
+    <section v-if="generated" class="card overflow-hidden max-w-[640px]">
+      <div class="card-header">
+        <span class="card-title">Output</span>
+        <button @click="copy(generated)" class="btn-secondary !py-1 !px-2.5 !text-xs">
+          <Check v-if="copied" class="w-3.5 h-3.5 text-success" :stroke-width="1.75" />
+          <Copy v-else class="w-3.5 h-3.5" :stroke-width="1.75" />
+          {{ copied ? 'Copied' : 'Copy' }}
+        </button>
       </div>
-      <div class="card-body">
-        <pre class="font-mono text-sm text-text bg-surface p-4 rounded overflow-x-auto whitespace-pre-wrap">{{ generatedCommand }}</pre>
-      </div>
-    </div>
+      <pre
+        class="font-mono text-xs leading-5 text-text bg-bg-alt
+               p-4 whitespace-pre-wrap overflow-x-auto"
+      >{{ generated }}</pre>
+    </section>
   </div>
 </template>
