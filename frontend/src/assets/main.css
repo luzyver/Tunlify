@@ -159,17 +159,12 @@
   }
   .account-tile-value {
     @apply mt-3 pt-3 border-t border-border
-           text-3xl font-display font-normal text-text tabular-nums;
+           text-3xl font-display font-normal text-text tabular-nums
+           truncate block leading-none;
     letter-spacing: -0.01em;
   }
-  .account-tile-value-sm {
-    @apply mt-3 pt-3 border-t border-border
-           text-xl font-display font-normal text-text tabular-nums;
-    letter-spacing: -0.01em;
-  }
-  .account-tile-meta {
-    @apply mt-3 pt-3 border-t border-border
-           text-sm font-medium text-text font-mono tabular-nums;
+  .account-tile-sub {
+    @apply mt-1.5 text-xs text-text-dim font-mono tabular-nums truncate block;
   }
 
   .input {
@@ -274,50 +269,6 @@
   }
   .dot {
     @apply inline-block w-1.5 h-1.5 rounded-full;
-  }
-
-  .cmdk-overlay {
-    @apply fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4;
-    background: rgba(42, 41, 36, 0.18);
-  }
-  .cmdk-panel {
-    @apply w-full max-w-[640px] bg-surface border border-border-strong rounded-xl overflow-hidden;
-    box-shadow: 0 12px 32px rgba(42, 41, 36, 0.10);
-  }
-  .cmdk-input-row {
-    @apply flex items-center gap-3 px-4 h-12 border-b border-border;
-  }
-  .cmdk-input {
-    @apply flex-1 bg-transparent border-0 outline-none
-           font-mono text-sm text-text
-           placeholder:text-text-dim;
-  }
-  .cmdk-list {
-    @apply max-h-[420px] overflow-y-auto py-2;
-  }
-  .cmdk-section {
-    @apply eyebrow-dim px-4 pt-2 pb-1;
-  }
-  .cmdk-row {
-    @apply flex items-center gap-3 px-4 h-9
-           text-sm text-text cursor-pointer
-           transition-colors duration-100;
-  }
-  .cmdk-row:hover,
-  .cmdk-row.is-active {
-    @apply bg-bg-alt;
-  }
-  .cmdk-row-icon {
-    @apply w-4 h-4 text-text-muted shrink-0;
-  }
-  .cmdk-row-label {
-    @apply flex-1 truncate;
-  }
-  .cmdk-row-hint {
-    @apply font-mono text-2xs text-text-dim;
-  }
-  .cmdk-empty {
-    @apply px-4 py-8 text-center text-sm text-text-muted;
   }
 
   .app-shell {

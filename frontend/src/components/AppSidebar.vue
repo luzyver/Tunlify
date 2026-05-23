@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   LogOut,
   ScrollText,
-  Search,
   Settings,
   Shield,
   Terminal,
@@ -20,7 +19,6 @@ import { useApi } from '../composables/useApi'
 
 const emit = defineEmits<{
   navigate: []
-  'open-cmd': []
 }>()
 
 const authStore = useAuthStore()
@@ -54,27 +52,12 @@ async function handleLogout() {
            bg-bg border-r border-border
            flex flex-col"
   >
-
     <div class="h-14 flex items-center gap-2.5 px-4 border-b border-border shrink-0">
       <img src="/icon.png" alt="" class="w-6 h-6 rounded-sm" />
       <span class="text-sm font-semibold tracking-tight text-text">Tunlify</span>
     </div>
 
-    <button
-      type="button"
-      class="mx-3 mt-3 mb-2 flex items-center gap-2.5 h-9 px-3
-             bg-surface border border-border rounded-md
-             text-text-dim text-sm
-             transition-colors duration-100
-             hover:border-border-strong hover:text-text-muted"
-      @click="$emit('open-cmd')"
-    >
-      <Search class="w-4 h-4 shrink-0" :stroke-width="1.75" />
-      <span class="flex-1 text-left">Search…</span>
-      <span class="kbd">⌘K</span>
-    </button>
-
-    <nav class="flex-1 px-2 pb-3 space-y-px overflow-y-auto scrollbar-thin">
+    <nav class="flex-1 px-2 pt-3 pb-3 space-y-px overflow-y-auto scrollbar-thin">
       <router-link
         v-for="item in nav"
         :key="item.to"

@@ -35,6 +35,13 @@ const versionLabel = computed(() => {
   return raw.split(' ')[2] || raw || '—'
 })
 
+const memory = computed(() => {
+  const raw = (status.value?.memory_usage || '').trim()
+  if (!raw) return { used: '—', total: '' }
+  const [used, total] = raw.split('/').map((s: string) => s.trim())
+  return { used: used || '—', total: total || '' }
+})
+
 fetchStatus()
 fetchProjects()
 const interval = setInterval(fetchStatus, 5000)
@@ -65,7 +72,7 @@ onUnmounted(() => clearInterval(interval))
     <section v-if="status" class="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <div class="account-tile">
         <span class="account-tile-label">Uptime</span>
-        <span class="account-tile-value">{{ status.uptime || '—' }}</span>
+        <span class="account-tile-value" :title="status.uptime || ''">{{ status.uptime || '—' }}</span>
       </div>
       <div class="account-tile">
         <span class="account-tile-label">Ingress rules</span>
@@ -73,15 +80,16 @@ onUnmounted(() => clearInterval(interval))
       </div>
       <div class="account-tile">
         <span class="account-tile-label">Tunnel</span>
-        <span class="account-tile-value-sm truncate block">{{ status.tunnel_name || 'n/a' }}</span>
+        <span class="account-tile-value" :title="status.tunnel_name || ''">{{ status.tunnel_name || 'n/a' }}</span>
       </div>
       <div class="account-tile">
         <span class="account-tile-label">Memory</span>
-        <span class="account-tile-meta block">{{ status.memory_usage || '—' }}</span>
+        <span class="account-tile-value" :title="status.memory_usage || ''">{{ memory.used }}</span>
+        <span v-if="memory.total" class="account-tile-sub">of {{ memory.total }}</span>
       </div>
       <div class="account-tile">
         <span class="account-tile-label">Version</span>
-        <span class="account-tile-meta block truncate">{{ versionLabel }}</span>
+        <span class="account-tile-value" :title="versionLabel">{{ versionLabel }}</span>
       </div>
     </section>
 
