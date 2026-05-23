@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
+import { useVirtualizer } from '@tanstack/vue-virtual'
 import { useAuthStore } from '../stores/auth'
 
 const authStore = useAuthStore()
@@ -10,8 +11,8 @@ const logs = ref<LogEntry[]>([])
 const filter = ref<'all' | 'error' | 'warn' | 'info'>('all')
 const search = ref('')
 const autoScroll = ref(true)
-const logEl = ref<HTMLElement>()
 const wsStatus = ref<'connecting' | 'connected' | 'disconnected'>('connecting')
+const scrollEl = ref<HTMLElement | null>(null)
 
 const wsUrl = `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/api/logs/ws?token=${authStore.token}`
 let ws: WebSocket | null = null
@@ -27,8 +28,7 @@ function connect() {
     try {
       const entry = JSON.parse(e.data) as LogEntry
       logs.value.push(entry)
-      if (logs.value.length > 2000) logs.value.shift()
-      if (autoScroll.value) nextTick(() => logEl.value?.scrollTo(0, logEl.value.scrollHeight))
+      if (logs.value.length > 5000) logs.value.splice(0, logs.value.length - 5000)
     } catch {}
   }
 }
@@ -44,6 +44,25 @@ const filtered = computed(() => {
   }
   return result
 })
+
+const rowVirtualizer = useVirtualizer({
+  get count() { return filtered.value.length },
+  getScrollElement: () => scrollEl.value,
+  estimateSize: () => 24,
+  overscan: 12,
+})
+
+watch(
+  () => filtered.value.length,
+  () => {
+    if (!autoScroll.value) return
+    nextTick(() => {
+      const el = scrollEl.value
+      if (!el) return
+      el.scrollTop = el.scrollHeight
+    })
+  }
+)
 
 function levelClass(msg: string) {
   if (msg.includes('ERR') || msg.includes('error') || msg.includes('Error')) return 'text-danger'
@@ -101,28 +120,36 @@ function clear() { logs.value = [] }
     </div>
 
     <div class="card flex-1 overflow-hidden flex flex-col min-h-0">
-      <div ref="logEl" class="flex-1 overflow-auto scrollbar-thin">
-        <table class="table-tight">
-          <thead>
-            <tr>
-              <th class="w-[120px]">Time</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(log, i) in filtered" :key="i">
-              <td class="num text-text-dim text-xs">{{ formatTime(log.time) }}</td>
-              <td class="font-mono text-xs leading-5" :class="levelClass(log.message)">
-                {{ log.message }}
-              </td>
-            </tr>
-            <tr v-if="!filtered.length">
-              <td colspan="2" class="text-center text-text-muted py-12 text-sm">
-                {{ logs.length ? 'No logs match the current filter' : 'Waiting for logs…' }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="grid border-b border-border bg-bg-alt eyebrow shrink-0" style="grid-template-columns: 120px 1fr;">
+        <div class="px-4 h-9 flex items-center">Time</div>
+        <div class="px-4 h-9 flex items-center">Message</div>
+      </div>
+
+      <div ref="scrollEl" class="flex-1 overflow-auto scrollbar-thin">
+        <div
+          v-if="filtered.length"
+          class="relative w-full"
+          :style="{ height: rowVirtualizer.getTotalSize() + 'px' }"
+        >
+          <div
+            v-for="vrow in rowVirtualizer.getVirtualItems()"
+            :key="vrow.key"
+            class="absolute inset-x-0 grid items-center border-b border-border hover:bg-surface-alt"
+            :style="{
+              transform: `translateY(${vrow.start}px)`,
+              height: vrow.size + 'px',
+              gridTemplateColumns: '120px 1fr',
+            }"
+          >
+            <div class="px-4 num text-xs text-text-dim">{{ formatTime(filtered[vrow.index].time) }}</div>
+            <div class="px-4 font-mono text-xs leading-5 truncate" :class="levelClass(filtered[vrow.index].message)">
+              {{ filtered[vrow.index].message }}
+            </div>
+          </div>
+        </div>
+        <div v-else class="text-center text-text-muted py-12 text-sm">
+          {{ logs.length ? 'No logs match the current filter' : 'Waiting for logs…' }}
+        </div>
       </div>
     </div>
   </div>

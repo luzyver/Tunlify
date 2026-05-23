@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ExternalLink, RotateCcw } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
+import DataTable, { type Column } from '../components/DataTable.vue'
 
 const { apiFetch } = useApi()
+const router = useRouter()
 const status = ref<any>(null)
 const projects = ref<any[]>([])
 const actionLoading = ref('')
 const error = ref('')
+
+interface HostRow { hostname: string }
+interface ProjectRow { id: number; name: string; path: string; created_at: string }
 
 async function fetchStatus() {
   try { status.value = await apiFetch('/api/status') } catch {}
@@ -42,6 +48,22 @@ const memory = computed(() => {
   return { used: used || '—', total: total || '' }
 })
 
+const hostnameRows = computed<HostRow[]>(() =>
+  (status.value?.hostnames || []).map((h: string) => ({ hostname: h }))
+)
+
+const hostnameCols: Column<HostRow>[] = [
+  { key: 'status', label: '', width: '32px' },
+  { key: 'hostname', label: 'Hostname', sortable: true },
+  { key: 'open', label: '', align: 'right', width: '60px' },
+]
+
+const projectCols: Column<ProjectRow>[] = [
+  { key: 'name', label: 'Project', sortable: true },
+  { key: 'path', label: 'Path', sortable: true },
+  { key: 'created_at', label: 'Created', sortable: true, align: 'right', width: '140px', cellClass: 'num text-xs text-text-dim', headerClass: 'num' },
+]
+
 fetchStatus()
 fetchProjects()
 const interval = setInterval(fetchStatus, 5000)
@@ -50,7 +72,6 @@ onUnmounted(() => clearInterval(interval))
 
 <template>
   <div class="space-y-8">
-
     <header class="flex items-end justify-between gap-4">
       <div>
         <p class="eyebrow mb-2">Console · Status</p>
@@ -93,69 +114,61 @@ onUnmounted(() => clearInterval(interval))
       </div>
     </section>
 
-    <section v-if="status?.hostnames?.length" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Active hostnames</span>
-        <span class="text-2xs text-text-dim tabular-nums">{{ status.hostnames.length }} total</span>
+    <section v-if="hostnameRows.length">
+      <div class="flex items-center justify-between mb-3">
+        <p class="eyebrow">Active hostnames</p>
+        <span class="text-2xs text-text-dim tabular-nums">{{ hostnameRows.length }} total</span>
       </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th class="w-8"></th>
-            <th>Hostname</th>
-            <th class="num">Open</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="h in status.hostnames" :key="h">
-            <td class="w-8">
-              <span class="dot bg-success" aria-hidden="true"></span>
-              <span class="sr-only">Live</span>
-            </td>
-            <td class="font-mono text-text">{{ h }}</td>
-            <td class="num">
-              <a
-                :href="`https://${h}`"
-                target="_blank"
-                rel="noopener"
-                class="inline-flex items-center gap-1 text-text-muted hover:text-accent transition-colors"
-              >
-                <ExternalLink class="w-3.5 h-3.5" :stroke-width="1.75" />
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <DataTable
+        :data="hostnameRows"
+        :columns="hostnameCols"
+        :show-pagination="false"
+        :row-key="(row) => row.hostname"
+      >
+        <template #cell-status>
+          <span class="dot bg-success" aria-hidden="true"></span>
+          <span class="sr-only">Live</span>
+        </template>
+        <template #cell-hostname="{ row }">
+          <span class="font-mono text-text">{{ row.hostname }}</span>
+        </template>
+        <template #cell-open="{ row }">
+          <a
+            :href="`https://${row.hostname}`"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-1 text-text-muted hover:text-accent transition-colors"
+            @click.stop
+          >
+            <ExternalLink class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </a>
+        </template>
+      </DataTable>
     </section>
 
-    <section v-if="projects.length" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Projects</span>
+    <section v-if="projects.length">
+      <div class="flex items-center justify-between mb-3">
+        <p class="eyebrow">Projects</p>
         <router-link to="/projects" class="text-xs text-text-muted hover:text-accent transition-colors">
           View all →
         </router-link>
       </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th>Path</th>
-            <th class="num">Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="p in projects"
-            :key="p.id"
-            class="cursor-pointer"
-            @click="$router.push('/projects')"
-          >
-            <td class="font-medium text-text">{{ p.name }}</td>
-            <td class="font-mono text-xs text-text-muted truncate max-w-[260px]">{{ p.path }}</td>
-            <td class="num text-text-dim text-xs">{{ p.created_at?.split('T')[0] || '—' }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <DataTable
+        :data="projects"
+        :columns="projectCols"
+        :show-pagination="false"
+        :row-class="() => 'cursor-pointer'"
+      >
+        <template #cell-name="{ row }">
+          <span class="font-medium text-text" @click="router.push('/projects')">{{ row.name }}</span>
+        </template>
+        <template #cell-path="{ row }">
+          <span class="font-mono text-xs text-text-muted truncate max-w-[260px] block">{{ row.path }}</span>
+        </template>
+        <template #cell-created_at="{ row }">
+          {{ row.created_at?.split('T')[0] || '—' }}
+        </template>
+      </DataTable>
     </section>
 
     <p v-if="!status" class="text-sm text-text-muted">Loading status…</p>

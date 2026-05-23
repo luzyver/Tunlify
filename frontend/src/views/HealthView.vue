@@ -2,22 +2,55 @@
 import { computed, ref } from 'vue'
 import { RefreshCw } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
+import DataTable, { type Column } from '../components/DataTable.vue'
 
 const { apiFetch } = useApi()
-const results = ref<any[]>([])
+
+interface HealthRow {
+  hostname: string
+  service: string
+  latency: string
+  latency_ms?: number
+  status: string
+}
+
+const results = ref<HealthRow[]>([])
 const loading = ref(false)
 
 async function check() {
   loading.value = true
-  try { results.value = await apiFetch('/api/health') } catch {}
+  try {
+    const raw = (await apiFetch<HealthRow[]>('/api/health')) || []
+    results.value = raw.map((r) => ({
+      ...r,
+      latency_ms: parseLatency(r.latency),
+    }))
+  } catch {}
   finally { loading.value = false }
 }
 check()
 
+function parseLatency(v?: string): number {
+  if (!v) return Number.POSITIVE_INFINITY
+  const n = parseFloat(v)
+  if (Number.isNaN(n)) return Number.POSITIVE_INFINITY
+  if (v.includes('ms')) return n
+  if (v.includes('s')) return n * 1000
+  return n
+}
+
 const summary = computed(() => {
-  const up = results.value.filter((r: any) => r.status === 'up').length
+  const up = results.value.filter((r) => r.status === 'up').length
   return { up, total: results.value.length }
 })
+
+const columns: Column<HealthRow>[] = [
+  { key: 'status_dot', label: '', width: '32px' },
+  { key: 'hostname', label: 'Hostname', sortable: true },
+  { key: 'service', label: 'Service', sortable: true, hideBelow: 'md' },
+  { key: 'latency_ms', label: 'Latency', sortable: true, align: 'right', cellClass: 'num', headerClass: 'num' },
+  { key: 'status', label: 'Status', sortable: true, width: '120px' },
+]
 </script>
 
 <template>
@@ -48,39 +81,32 @@ const summary = computed(() => {
       </div>
     </section>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Endpoints</span>
-      </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th class="w-8"></th>
-            <th>Hostname</th>
-            <th>Service</th>
-            <th class="num">Latency</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in results" :key="r.hostname">
-            <td>
-              <span class="dot" :class="r.status === 'up' ? 'bg-success' : 'bg-danger'" aria-hidden="true"></span>
-            </td>
-            <td class="font-mono text-text">{{ r.hostname }}</td>
-            <td class="font-mono text-xs text-text-muted truncate max-w-[260px]">{{ r.service }}</td>
-            <td class="num text-text">{{ r.latency || '—' }}</td>
-            <td>
-              <span :class="r.status === 'up' ? 'badge-success' : 'badge-danger'">
-                {{ r.status }}
-              </span>
-            </td>
-          </tr>
-          <tr v-if="!results.length && !loading">
-            <td colspan="5" class="text-center text-text-muted py-8 text-sm">No endpoints to check</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <DataTable
+      :data="results"
+      :columns="columns"
+      :searchable="true"
+      search-placeholder="Search hostname or service…"
+      :page-size="25"
+      :row-key="(row) => row.hostname"
+    >
+      <template #cell-status_dot="{ row }">
+        <span class="dot" :class="row.status === 'up' ? 'bg-success' : 'bg-danger'" aria-hidden="true"></span>
+      </template>
+      <template #cell-hostname="{ row }">
+        <span class="font-mono text-text">{{ row.hostname }}</span>
+      </template>
+      <template #cell-service="{ row }">
+        <span class="font-mono text-xs text-text-muted truncate max-w-[260px] block">{{ row.service }}</span>
+      </template>
+      <template #cell-latency_ms="{ row }">
+        <span class="num">{{ row.latency || '—' }}</span>
+      </template>
+      <template #cell-status="{ row }">
+        <span :class="row.status === 'up' ? 'badge-success' : 'badge-danger'">{{ row.status }}</span>
+      </template>
+      <template #empty>
+        {{ loading ? 'Checking endpoints…' : 'No endpoints to check' }}
+      </template>
+    </DataTable>
   </div>
 </template>

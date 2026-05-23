@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
+import DataTable, { type Column } from '../components/DataTable.vue'
 
 const { apiFetch } = useApi()
 
@@ -50,6 +51,7 @@ const outputEl = ref<HTMLElement | null>(null)
 
 const history = ref<HistoryEntry[]>([])
 const historyTarget = ref<number | null>(null)
+const historyName = ref('')
 
 async function load() {
   loading.value = true
@@ -142,16 +144,25 @@ function confirmDeploy() {
   if (deployTarget.value && deployRef.value) action(deployTarget.value, 'deploy', { ref: deployRef.value })
 }
 
-async function toggleHistory(id: number) {
-  if (historyTarget.value === id) { historyTarget.value = null; return }
-  historyTarget.value = id
-  try { history.value = await apiFetch(`/api/projects/${id}/history`) }
+async function toggleHistory(p: Project) {
+  if (historyTarget.value === p.id) { historyTarget.value = null; return }
+  historyTarget.value = p.id
+  historyName.value = p.name
+  try { history.value = await apiFetch(`/api/projects/${p.id}/history`) }
   catch { history.value = [] }
 }
 
 const anyRunning = () => Object.values(actionLoading.value).some(Boolean)
 
 load()
+
+const columns: Column<Project>[] = [
+  { key: 'name', label: 'Name', sortable: true },
+  { key: 'path', label: 'Path', sortable: true },
+  { key: 'repo_url', label: 'Repository', sortable: true, hideBelow: 'lg' },
+  { key: 'created_at', label: 'Created', sortable: true, align: 'right', width: '140px', cellClass: 'num text-xs text-text-dim', headerClass: 'num' },
+  { key: 'actions', label: '', align: 'right', width: '260px' },
+]
 </script>
 
 <template>
@@ -241,92 +252,85 @@ load()
       >{{ output || '(waiting)' }}</pre>
     </section>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">All projects</span>
-        <span class="text-2xs text-text-dim tabular-nums">{{ projects.length }}</span>
-      </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Path</th>
-            <th class="hidden lg:table-cell">Repository</th>
-            <th class="num">Created</th>
-            <th class="text-right pr-4">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="p in projects" :key="p.id">
-            <tr :class="historyTarget === p.id && 'is-selected'">
-              <td class="font-medium text-text">{{ p.name }}</td>
-              <td class="font-mono text-xs text-text-muted truncate max-w-[260px]">{{ p.path }}</td>
-              <td class="hidden lg:table-cell font-mono text-xs text-text-dim truncate max-w-[260px]">
-                {{ p.repo_url || '—' }}
-              </td>
-              <td class="num text-xs text-text-dim">{{ p.created_at?.split('T')[0] || '—' }}</td>
-              <td class="text-right pr-4">
-                <div class="inline-flex items-center gap-1">
-                  <button @click="action(p.id, 'up')" :disabled="actionLoading[p.id]" class="btn-icon-ghost" title="Up">
-                    <Play class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="action(p.id, 'down')" :disabled="actionLoading[p.id]" class="btn-icon-ghost" title="Down">
-                    <Square class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="action(p.id, 'restart')" :disabled="actionLoading[p.id]" class="btn-icon-ghost" title="Restart">
-                    <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="startDeploy(p)" :disabled="actionLoading[p.id]" class="btn-icon-ghost text-accent hover:bg-accent-soft" title="Deploy">
-                    <Rocket class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="toggleHistory(p.id)" class="btn-icon-ghost" title="History">
-                    <History class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="openEdit(p)" class="btn-icon-ghost" title="Edit">
-                    <Pencil class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                  <button @click="remove(p.id)" class="btn-icon-ghost text-danger hover:bg-danger/5" title="Delete">
-                    <Trash2 class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  </button>
-                </div>
-              </td>
-            </tr>
+    <DataTable
+      :data="projects"
+      :columns="columns"
+      :searchable="true"
+      search-placeholder="Search projects…"
+      :page-size="25"
+      :row-class="(row) => historyTarget === row.id ? 'is-selected' : undefined"
+    >
+      <template #cell-name="{ row }">
+        <span class="font-medium text-text">{{ row.name }}</span>
+      </template>
+      <template #cell-path="{ row }">
+        <span class="font-mono text-xs text-text-muted truncate max-w-[260px] block">{{ row.path }}</span>
+      </template>
+      <template #cell-repo_url="{ row }">
+        <span class="font-mono text-xs text-text-dim truncate max-w-[260px] block">{{ row.repo_url || '—' }}</span>
+      </template>
+      <template #cell-created_at="{ row }">
+        {{ row.created_at?.split('T')[0] || '—' }}
+      </template>
+      <template #cell-actions="{ row }">
+        <div class="inline-flex items-center gap-1">
+          <button @click="action(row.id, 'up')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Up">
+            <Play class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="action(row.id, 'down')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Down">
+            <Square class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="action(row.id, 'restart')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Restart">
+            <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="startDeploy(row)" :disabled="actionLoading[row.id]" class="btn-icon-ghost text-accent hover:bg-accent-soft" title="Deploy">
+            <Rocket class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="toggleHistory(row)" class="btn-icon-ghost" title="History">
+            <History class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="openEdit(row)" class="btn-icon-ghost" title="Edit">
+            <Pencil class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+          <button @click="remove(row.id)" class="btn-icon-ghost text-danger hover:bg-danger/5" title="Delete">
+            <Trash2 class="w-3.5 h-3.5" :stroke-width="1.75" />
+          </button>
+        </div>
+      </template>
+      <template #empty>
+        {{ loading ? 'Loading projects…' : 'No projects yet — click "New project" above.' }}
+      </template>
+    </DataTable>
 
-            <tr v-if="historyTarget === p.id">
-              <td colspan="5" class="!p-0 bg-bg-alt">
-                <div class="px-6 py-4 space-y-2">
-                  <p class="eyebrow-dim">History</p>
-                  <div v-if="history.length" class="space-y-1">
-                    <div v-for="h in history" :key="h.id" class="text-xs">
-                      <button
-                        type="button"
-                        class="w-full flex items-center justify-between gap-3 py-1
-                               text-text-muted hover:text-text transition-colors"
-                        :disabled="h.action !== 'project_deploy'"
-                        @click="h._open = !h._open"
-                      >
-                        <span class="font-mono">{{ h.action }}</span>
-                        <span class="num text-text-dim">{{ h.created_at }}</span>
-                      </button>
-                      <pre
-                        v-if="h._open"
-                        class="font-mono text-2xs whitespace-pre-wrap text-text-muted
-                               border-l-2 border-border pl-3 ml-1 my-1"
-                      >{{ h.detail }}</pre>
-                    </div>
-                  </div>
-                  <p v-else class="text-xs text-text-dim">No history yet.</p>
-                </div>
-              </td>
-            </tr>
-</template>
-          <tr v-if="!projects.length && !loading">
-            <td colspan="5" class="text-center text-text-muted py-12 text-sm">
-              No projects yet — create one above.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <section v-if="historyTarget !== null" class="card overflow-hidden">
+      <div class="card-header">
+        <span class="card-title">
+          History · <span class="font-mono text-text-muted">{{ historyName }}</span>
+        </span>
+        <button @click="historyTarget = null" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
+      </div>
+      <div class="card-body space-y-1">
+        <div v-if="history.length" class="space-y-1">
+          <div v-for="h in history" :key="h.id" class="text-xs">
+            <button
+              type="button"
+              class="w-full flex items-center justify-between gap-3 py-1
+                     text-text-muted hover:text-text transition-colors"
+              :disabled="h.action !== 'project_deploy'"
+              @click="h._open = !h._open"
+            >
+              <span class="font-mono">{{ h.action }}</span>
+              <span class="num text-text-dim">{{ h.created_at }}</span>
+            </button>
+            <pre
+              v-if="h._open"
+              class="font-mono text-2xs whitespace-pre-wrap text-text-muted
+                     border-l-2 border-border pl-3 ml-1 my-1"
+            >{{ h.detail }}</pre>
+          </div>
+        </div>
+        <p v-else class="text-xs text-text-dim">No history yet.</p>
+      </div>
     </section>
   </div>
 </template>

@@ -1,41 +1,42 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ref, watch } from 'vue'
 import { useApi } from '../composables/useApi'
+import DataTable, { type Column } from '../components/DataTable.vue'
 
 const { apiFetch } = useApi()
 
-const entries = ref<any[]>([])
-const total = ref(0)
-const page = ref(0)
-const limit = 20
+interface AuditEntry {
+  id: number
+  action: string
+  detail?: string
+  ip_address?: string
+  created_at: string
+}
+
+const entries = ref<AuditEntry[]>([])
 const filterAction = ref('')
+const limit = 500
+const total = ref(0)
 
 const actions = ['', 'login', 'logout', 'restart', 'config_edit', 'project_deploy']
 
 async function fetchAudit() {
-  const params = new URLSearchParams({
-    limit: String(limit),
-    offset: String(page.value * limit),
-  })
+  const params = new URLSearchParams({ limit: String(limit), offset: '0' })
   if (filterAction.value) params.set('action', filterAction.value)
-  const data = await apiFetch<{ entries: any[]; total: number }>(`/api/audit?${params}`)
+  const data = await apiFetch<{ entries: AuditEntry[]; total: number }>(`/api/audit?${params}`)
   entries.value = data.entries || []
   total.value = data.total
 }
 
-watch([page, filterAction], fetchAudit)
+watch(filterAction, fetchAudit)
 fetchAudit()
 
-const rangeLabel = computed(() => {
-  if (!total.value) return '0'
-  const from = page.value * limit + 1
-  const to = Math.min((page.value + 1) * limit, total.value)
-  return `${from}–${to} of ${total.value}`
-})
-
-const hasNext = computed(() => (page.value + 1) * limit < total.value)
-const hasPrev = computed(() => page.value > 0)
+const columns: Column<AuditEntry>[] = [
+  { key: 'created_at', label: 'Time', sortable: true, width: '200px', cellClass: 'num text-xs text-text-muted' },
+  { key: 'action', label: 'Action', sortable: true, width: '160px' },
+  { key: 'detail', label: 'Detail', hideBelow: 'md' },
+  { key: 'ip_address', label: 'IP', sortable: true, hideBelow: 'md', width: '140px', align: 'right', cellClass: 'num text-xs text-text-dim', headerClass: 'num' },
+]
 </script>
 
 <template>
@@ -45,57 +46,38 @@ const hasPrev = computed(() => page.value > 0)
         <p class="eyebrow mb-2">Console · Audit</p>
         <h1 class="text-2xl font-semibold tracking-tight text-text">Audit log</h1>
       </div>
-      <div class="flex items-center gap-2">
+      <span v-if="total > entries.length" class="text-2xs text-text-dim tabular-nums">
+        showing newest {{ entries.length }} of {{ total }}
+      </span>
+    </header>
+
+    <DataTable
+      :data="entries"
+      :columns="columns"
+      :searchable="true"
+      search-placeholder="Search detail or IP…"
+      :page-size="25"
+    >
+      <template #toolbar>
         <select v-model="filterAction" class="input !w-auto !py-1.5 !text-xs">
           <option v-for="a in actions" :key="a" :value="a">{{ a || 'All actions' }}</option>
         </select>
-      </div>
-    </header>
+      </template>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Entries</span>
-        <span class="text-2xs text-text-dim tabular-nums">{{ rangeLabel }}</span>
-      </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th class="w-[180px]">Time</th>
-            <th class="w-[160px]">Action</th>
-            <th class="hidden md:table-cell">Detail</th>
-            <th class="hidden md:table-cell w-[140px] num">IP</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="e in entries" :key="e.id">
-            <td class="num text-xs text-text-muted">{{ e.created_at }}</td>
-            <td>
-              <span class="badge-accent font-mono">{{ e.action }}</span>
-            </td>
-            <td class="hidden md:table-cell text-text-muted text-xs truncate max-w-[420px]">
-              {{ e.detail?.split('\n')[0] || '—' }}
-            </td>
-            <td class="hidden md:table-cell num text-xs text-text-dim">{{ e.ip_address || '—' }}</td>
-          </tr>
-          <tr v-if="!entries.length">
-            <td colspan="4" class="text-center text-text-muted py-8 text-sm">No audit entries</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <div class="flex items-center justify-between gap-3">
-      <span class="text-2xs text-text-dim tabular-nums">{{ rangeLabel }}</span>
-      <div class="flex items-center gap-2">
-        <button @click="page--" :disabled="!hasPrev" class="btn-secondary !py-1 !px-2.5 !text-xs">
-          <ChevronLeft class="w-3.5 h-3.5" :stroke-width="1.75" />
-          Previous
-        </button>
-        <button @click="page++" :disabled="!hasNext" class="btn-secondary !py-1 !px-2.5 !text-xs">
-          Next
-          <ChevronRight class="w-3.5 h-3.5" :stroke-width="1.75" />
-        </button>
-      </div>
-    </div>
+      <template #cell-action="{ row }">
+        <span class="badge-accent font-mono">{{ row.action }}</span>
+      </template>
+      <template #cell-detail="{ row }">
+        <span class="text-text-muted text-xs truncate max-w-[420px] block">
+          {{ row.detail?.split('\n')[0] || '—' }}
+        </span>
+      </template>
+      <template #cell-ip_address="{ row }">
+        {{ row.ip_address || '—' }}
+      </template>
+      <template #empty>
+        {{ filterAction ? 'No entries for this action' : 'No audit entries' }}
+      </template>
+    </DataTable>
   </div>
 </template>

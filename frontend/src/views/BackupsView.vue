@@ -2,10 +2,13 @@
 import { ref } from 'vue'
 import { Eye, RotateCcw, X } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
+import DataTable, { type Column } from '../components/DataTable.vue'
 
 const { apiFetch } = useApi()
 
-const backups = ref<any[]>([])
+interface Backup { id: number; created_at: string }
+
+const backups = ref<Backup[]>([])
 const previewId = ref<number | null>(null)
 const previewContent = ref('')
 const message = ref('')
@@ -41,6 +44,11 @@ async function restore(id: number) {
 }
 
 load()
+
+const columns: Column<Backup>[] = [
+  { key: 'created_at', label: 'Created', sortable: true, cellClass: 'font-mono num' },
+  { key: 'actions', label: '', align: 'right', width: '220px' },
+]
 </script>
 
 <template>
@@ -55,44 +63,30 @@ load()
 
     <div v-if="message" class="alert-success">{{ message }}</div>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Snapshots</span>
-        <span class="text-2xs text-text-dim">Auto-saved on every config change</span>
-      </div>
-      <table class="table-tight">
-        <thead>
-          <tr>
-            <th>Created</th>
-            <th class="text-right pr-4">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="b in backups" :key="b.id" :class="previewId === b.id && 'is-selected'">
-            <td class="font-mono text-text num text-left">{{ b.created_at }}</td>
-            <td class="text-right pr-4">
-              <div class="inline-flex items-center gap-2">
-                <button @click="showPreview(b.id)" class="btn-secondary !py-1 !px-2.5 !text-xs">
-                  <Eye class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  View
-                </button>
-                <button
-                  @click="restore(b.id)"
-                  :disabled="restoring === b.id"
-                  class="btn-primary !py-1 !px-2.5 !text-xs"
-                >
-                  <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
-                  {{ restoring === b.id ? 'Restoring…' : 'Restore' }}
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="!backups.length">
-            <td colspan="2" class="text-center text-text-muted py-8 text-sm">No backups yet</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+    <DataTable
+      :data="backups"
+      :columns="columns"
+      :page-size="20"
+      :row-class="(row) => previewId === row.id ? 'is-selected' : undefined"
+    >
+      <template #cell-actions="{ row }">
+        <div class="inline-flex items-center gap-2">
+          <button @click="showPreview(row.id)" class="btn-secondary !py-1 !px-2.5 !text-xs">
+            <Eye class="w-3.5 h-3.5" :stroke-width="1.75" />
+            View
+          </button>
+          <button
+            @click="restore(row.id)"
+            :disabled="restoring === row.id"
+            class="btn-primary !py-1 !px-2.5 !text-xs"
+          >
+            <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
+            {{ restoring === row.id ? 'Restoring…' : 'Restore' }}
+          </button>
+        </div>
+      </template>
+      <template #empty>No backups yet</template>
+    </DataTable>
 
     <section v-if="previewId !== null" class="card overflow-hidden">
       <div class="card-header">
