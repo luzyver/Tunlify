@@ -40,7 +40,7 @@ async function changePassword() {
       <h1 class="text-2xl font-semibold tracking-tight text-text">Account</h1>
     </header>
 
-    <section class="card overflow-hidden max-w-[640px]">
+    <section class="card overflow-hidden">
       <div class="card-header">
         <span class="card-title">Profile</span>
       </div>
@@ -56,7 +56,7 @@ async function changePassword() {
       </div>
     </section>
 
-    <section class="card overflow-hidden max-w-[640px]">
+    <section class="card overflow-hidden">
       <div class="card-header">
         <span class="card-title">Change password</span>
       </div>

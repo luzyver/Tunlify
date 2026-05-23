@@ -52,7 +52,7 @@ load()
       {{ message.text }}
     </div>
 
-    <section class="card overflow-hidden max-w-[640px]">
+    <section class="card overflow-hidden">
       <div class="card-header">
         <span class="card-title">Configuration</span>
         <span class="badge" :class="form.enabled ? 'badge-success' : 'badge-neutral'">

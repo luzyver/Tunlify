@@ -38,7 +38,7 @@ async function generate() {
 
     <div v-if="error" class="alert-danger">{{ error }}</div>
 
-    <section class="card overflow-hidden max-w-[640px]">
+    <section class="card overflow-hidden">
       <div class="card-header">
         <span class="card-title flex items-center gap-2">
           <Terminal class="w-4 h-4 text-text-muted" :stroke-width="1.75" />
@@ -75,7 +75,7 @@ async function generate() {
       </div>
     </section>
 
-    <section v-if="generated" class="card overflow-hidden max-w-[640px]">
+    <section v-if="generated" class="card overflow-hidden">
       <div class="card-header">
         <span class="card-title">Output</span>
         <button @click="copy(generated)" class="btn-secondary !py-1 !px-2.5 !text-xs">

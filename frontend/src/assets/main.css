@@ -327,7 +327,7 @@
     @apply flex-1 min-w-0 overflow-x-hidden;
   }
   .app-content-inner {
-    @apply max-w-app mx-auto px-6 py-6;
+    @apply w-full px-6 py-6;
   }
 
   .reading {
