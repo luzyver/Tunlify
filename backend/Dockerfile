@@ -1,7 +1,8 @@
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
 COPY go.mod go.sum ./
-RUN go mod download
+ENV GOPROXY=https://goproxy.io,https://proxy.golang.org,direct
+RUN go mod download || go mod download || go mod download
 COPY . .
 RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /server ./cmd/server
 
