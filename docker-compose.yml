@@ -15,7 +15,7 @@ services:
     container_name: tunlify-backend
     restart: unless-stopped
     expose:
-      - "3001"
+      - "3333"
     env_file: .env
     volumes:
       - ./data:/app/data
