@@ -70,7 +70,7 @@ docker compose up -d
 | `CLOUDFLARED_CONFIG_PATH` | Config path inside container | `/etc/cloudflared/config.yml` |
 | `CLOUDFLARED_CONTAINER` | Cloudflared container name | `tunlify-cloudflared` |
 | `DB_PATH` | SQLite database path | `/app/data/app.db` |
-| `LISTEN_ADDR` | Backend listen address | `0.0.0.0:3001` |
+| `LISTEN_ADDR` | Backend listen address | `0.0.0.0:3333` |
 
 ## Architecture
 

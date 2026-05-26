@@ -3,7 +3,7 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	ListenAddr          string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:3001"`
+	ListenAddr          string `envconfig:"LISTEN_ADDR" default:"0.0.0.0:3333"`
 	JWTSecret           string `envconfig:"JWT_SECRET" required:"true"`
 	AdminUsername       string `envconfig:"ADMIN_USERNAME" default:"admin"`
 	AdminPassword       string `envconfig:"ADMIN_PASSWORD" required:"true"`

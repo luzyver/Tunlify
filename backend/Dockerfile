@@ -12,5 +12,5 @@ RUN apk --no-cache add ca-certificates docker-cli docker-cli-compose git && \
 WORKDIR /app
 COPY --from=builder /server .
 RUN mkdir -p /app/data
-EXPOSE 3001
+EXPOSE 3333
 ENTRYPOINT ["./server"]

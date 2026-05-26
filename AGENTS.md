@@ -62,7 +62,7 @@ docker compose up -d
 ## Environment Variables
 
 Required: `JWT_SECRET`, `ADMIN_PASSWORD`
-Optional with defaults: `ADMIN_USERNAME` (admin), `CLOUDFLARED_CONFIG_PATH` (/etc/cloudflared/config.yml), `CLOUDFLARED_CONTAINER` (tunlify-cloudflared), `DB_PATH` (/app/data/app.db), `LISTEN_ADDR` (0.0.0.0:3001)
+Optional with defaults: `ADMIN_USERNAME` (admin), `CLOUDFLARED_CONFIG_PATH` (/etc/cloudflared/config.yml), `CLOUDFLARED_CONTAINER` (tunlify-cloudflared), `DB_PATH` (/app/data/app.db), `LISTEN_ADDR` (0.0.0.0:3333)
 
 ## API Pattern
 
@@ -75,7 +75,7 @@ Optional with defaults: `ADMIN_USERNAME` (admin), `CLOUDFLARED_CONFIG_PATH` (/et
 ## Important Notes
 
 - Backend communicates with Docker daemon via mounted `/var/run/docker.sock`
-- Frontend in production is served by nginx which reverse-proxies `/api` and `/auth` to backend:3001
+- Frontend in production is served by nginx which reverse-proxies `/api` and `/auth` to backend:3333
 - SQLite database stored at `/app/data/app.db` (persisted via Docker volume)
 - Cloudflared config mounted read-only to tunnel container, read-write to backend for editing
 - No ORM — raw SQL with modernc.org/sqlite (pure Go, no CGO)
