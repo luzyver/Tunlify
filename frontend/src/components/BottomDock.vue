@@ -102,12 +102,8 @@ function decodeLog(raw: string): string {
   }
 }
 
-function formatLogLine(line: string): string {
-  const escaped = line
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-  const colors: { re: RegExp; color: string }[] = [
+function colorizeLine(line: string): { text: string; color: string | null }[] {
+  const rules: { re: RegExp; color: string }[] = [
     { re: /\b(ERR[OR]?|FATAL|CRITICAL|CRIT|PANIC)\b/g, color: '#EF4444' },
     { re: /\b(WARN[ING]?)\b/g, color: '#F59E0B' },
     { re: /\b(INFO?)\b/g, color: '#3B82F6' },
@@ -115,14 +111,30 @@ function formatLogLine(line: string): string {
     { re: /\b(OK|SUCCESS|DONE)\b/g, color: '#10B981' },
     { re: /(https?:\/\/\S+)/g, color: '#60A5FA' },
     { re: /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/g, color: '#34D399' },
-    { re: /("([^"\\]|\\.)*")/g, color: '#E2E8F0' },
-    { re: /\b(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})\b/g, color: '#64748B' },
+    { re: /\b(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})Z?\b/g, color: '#64748B' },
   ]
-  let html = escaped
-  for (const { re, color } of colors) {
-    html = html.replace(re, (m) => `<span style="color:${color}">${m}</span>`)
+  const segments: { text: string; color: string | null }[] = [{ text: line, color: null }]
+  for (const { re, color } of rules) {
+    const newSegments: { text: string; color: string | null }[] = []
+    for (const seg of segments) {
+      if (seg.color !== null) {
+        newSegments.push(seg)
+        continue
+      }
+      let last = 0
+      let m: RegExpExecArray | null
+      const r = new RegExp(re.source, 'g')
+      while ((m = r.exec(seg.text)) !== null) {
+        if (m.index > last) newSegments.push({ text: seg.text.slice(last, m.index), color: null })
+        newSegments.push({ text: m[1] || m[0], color })
+        last = r.lastIndex
+      }
+      if (last < seg.text.length) newSegments.push({ text: seg.text.slice(last), color: null })
+    }
+    segments.length = 0
+    segments.push(...newSegments)
   }
-  return html
+  return segments
 }
 
 function startDrag(e: MouseEvent) {
@@ -176,8 +188,17 @@ function startDrag(e: MouseEvent) {
           ref="liveLogEl"
           class="font-mono pa-2 rounded-lg"
           style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 120px; overflow-y: auto; white-space: pre-wrap; background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);"
-          v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '(connecting...)'"
-        ></div>
+        >
+          <template v-if="liveLogs.length">
+            <div v-for="(line, li) in liveLogs.slice(-100)" :key="li">
+              <template v-for="(seg, si) in colorizeLine(line)" :key="si">
+                <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
+                <span v-else>{{ seg.text }}</span>
+              </template>
+            </div>
+          </template>
+          <span v-else style="color: rgba(148,163,184,0.4);">(connecting...)</span>
+        </div>
       </div>
 
       <!-- Action logs -->
@@ -215,8 +236,17 @@ function startDrag(e: MouseEvent) {
             :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
             class="font-mono pa-2"
             style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"
-            v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '(waiting for output...)'"
-          ></div>
+          >
+            <template v-if="a.lines.length">
+              <div v-for="(line, ai) in a.lines" :key="ai">
+                <template v-for="(seg, si) in colorizeLine(line)" :key="si">
+                  <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
+                  <span v-else>{{ seg.text }}</span>
+                </template>
+              </div>
+            </template>
+            <span v-else style="color: rgba(148,163,184,0.4);">(waiting for output...)</span>
+          </div>
         </div>
       </div>
     </div>
