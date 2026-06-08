@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
 import { useApi } from '../composables/useApi'
+import { useActionLogStore } from '../stores/actionLog'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
 
 const { apiFetch } = useApi()
+const actionLog = useActionLogStore()
 
 interface Project {
   id: number; name: string; path: string; repo_url: string
@@ -64,18 +66,34 @@ async function remove(id: number) {
 async function action(id: number, act: string, body?: object) {
   if (actionLoading.value[id]) return
   actionLoading.value[id] = true; output.value = ''
+  const project = projects.value.find((p) => p.id === id)
+  const label = act === 'deploy' ? `deploy ${project?.name || id}` : `${act} ${project?.name || id}`
+  const logId = actionLog.start(label, project?.name)
+  actionLog.append(logId, `Starting ${act} on project ${project?.name || id}...`)
   try {
     await apiFetch(`/api/projects/${id}/${act}`, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
     const poll = setInterval(async () => {
       try {
         const res: any = await apiFetch(`/api/projects/${id}/output`)
-        output.value = (res.lines || []).join('\n')
+        const lines: string[] = res.lines || []
+        if (lines.length) actionLog.appendLines(logId, lines)
+        output.value = lines.join('\n')
         nextTick(() => { if (outputEl.value) outputEl.value.scrollTop = outputEl.value.scrollHeight })
-        if (res.done) { clearInterval(poll); actionLoading.value[id] = false; deployTarget.value = null; deployRef.value = '' }
-      } catch { clearInterval(poll); actionLoading.value[id] = false }
+        if (res.done) {
+          clearInterval(poll); actionLoading.value[id] = false; deployTarget.value = null; deployRef.value = ''
+          actionLog.append(logId, 'Completed successfully')
+          actionLog.end(logId, 'success')
+        }
+      } catch {
+        clearInterval(poll); actionLoading.value[id] = false
+        actionLog.append(logId, 'Connection lost while polling')
+        actionLog.end(logId, 'error')
+      }
     }, 500)
   } catch (e: any) {
     output.value = e.message; actionLoading.value[id] = false; deployTarget.value = null; deployRef.value = ''
+    actionLog.append(logId, `Error: ${e.message}`)
+    actionLog.end(logId, 'error')
   }
 }
 

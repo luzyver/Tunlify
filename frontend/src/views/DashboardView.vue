@@ -2,6 +2,7 @@
 import { computed, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
+import { useActionLogStore } from '../stores/actionLog'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
 
@@ -21,15 +22,23 @@ async function fetchStatus() {
 async function fetchProjects() {
   try { projects.value = await apiFetch('/api/projects') } catch {}
 }
+const actionLog = useActionLogStore()
+
 async function control(action: string) {
   if (actionLoading.value) return
   actionLoading.value = action
   error.value = ''
+  const logId = actionLog.start(`${action} tunnel`, 'cloudflared')
+  actionLog.append(logId, `Executing ${action} on cloudflared container...`)
   try {
     await apiFetch(`/api/control/${action}`, { method: 'POST' })
+    actionLog.append(logId, `Successfully executed ${action}`)
     await new Promise((r) => setTimeout(r, 1500))
     await fetchStatus()
+    actionLog.end(logId, 'success')
   } catch (e: any) {
+    actionLog.append(logId, `Error: ${e.message}`)
+    actionLog.end(logId, 'error')
     error.value = e.message
   } finally {
     actionLoading.value = ''

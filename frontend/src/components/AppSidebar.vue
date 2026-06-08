@@ -15,7 +15,6 @@ const nav = [
   { to: '/projects', label: 'Projects', icon: 'mdi-docker' },
   { to: '/health', label: 'Health', icon: 'mdi-heart-pulse' },
   { to: '/metrics', label: 'Metrics', icon: 'mdi-chart-bar' },
-  { to: '/logs', label: 'Logs', icon: 'mdi-scroll-text' },
   { to: '/config', label: 'Ingress', icon: 'mdi-tune' },
   { to: '/backups', label: 'Backups', icon: 'mdi-archive' },
   { to: '/tcp-access', label: 'TCP Access', icon: 'mdi-console' },

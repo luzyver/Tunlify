@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './components/AppSidebar.vue'
+import BottomDock from './components/BottomDock.vue'
 
 const route = useRoute()
 const isAppMode = computed(() => route.path !== '/login')
@@ -16,6 +17,7 @@ const isAppMode = computed(() => route.path !== '/login')
     <v-main style="position: relative; z-index: 1;">
       <router-view />
     </v-main>
+    <BottomDock />
   </v-app>
 
   <router-view v-else />
