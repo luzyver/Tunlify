@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
 import {
   LayoutDashboard,
   Container,
   HeartPulse,
-  BarChart3,
+  ChartBarBig,
   ScrollText,
   SlidersHorizontal,
   Archive,
@@ -20,6 +20,7 @@ import {
 const emit = defineEmits<{ navigate: [] }>()
 
 const authStore = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 const { apiFetch } = useApi()
 
@@ -27,7 +28,7 @@ const nav = [
   { to: '/', label: 'Status', icon: LayoutDashboard },
   { to: '/projects', label: 'Projects', icon: Container },
   { to: '/health', label: 'Health', icon: HeartPulse },
-  { to: '/metrics', label: 'Metrics', icon: BarChart3 },
+  { to: '/metrics', label: 'Metrics', icon: ChartBarBig },
   { to: '/logs', label: 'Logs', icon: ScrollText },
   { to: '/config', label: 'Ingress', icon: SlidersHorizontal },
   { to: '/backups', label: 'Backups', icon: Archive },
@@ -59,33 +60,28 @@ async function handleLogout() {
     </template>
 
     <v-list density="compact" nav class="px-2 pt-3">
-      <router-link
+      <v-list-item
         v-for="item in nav"
         :key="item.to"
         :to="item.to"
-        custom
-        v-slot="{ navigate, isExactActive }"
+        :active="route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to))"
+        color="primary"
+        variant="text"
+        density="compact"
+        class="mb-1 rounded-lg"
+        :style="{
+          background: (route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to))) ? 'rgba(247, 147, 26, 0.1)' : 'transparent',
+          borderLeft: (route.path === item.to || (item.to !== '/' && route.path.startsWith(item.to))) ? '2px solid #F7931A' : '2px solid transparent',
+        }"
+        @click="emit('navigate')"
       >
-        <v-list-item
-          :active="isExactActive"
-          color="primary"
-          variant="text"
-          density="compact"
-          class="mb-1 rounded-lg"
-          :style="{
-            background: isExactActive ? 'rgba(247, 147, 26, 0.1)' : 'transparent',
-            borderLeft: isExactActive ? '2px solid #F7931A' : '2px solid transparent',
-          }"
-          @click="navigate(); emit('navigate')"
-        >
-          <template #prepend>
-            <component :is="item.icon" :size="18" :stroke-width="1.5" />
-          </template>
-          <template #title>
-            <span class="font-mono" style="font-size: 13px;">{{ item.label }}</span>
-          </template>
-        </v-list-item>
-      </router-link>
+        <template #prepend>
+          <component :is="item.icon" :size="18" :stroke-width="1.5" />
+        </template>
+        <template #title>
+          <span class="font-mono" style="font-size: 13px;">{{ item.label }}</span>
+        </template>
+      </v-list-item>
     </v-list>
 
     <template #append>

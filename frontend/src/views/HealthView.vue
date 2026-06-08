@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { RefreshCw, CheckCircle, XCircle } from '@lucide/vue'
+import { RefreshCw, CircleCheck, CircleX } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 
@@ -96,8 +96,8 @@ const columns: Column<HealthRow>[] = [
       :row-key="(row) => row.hostname"
     >
       <template #cell-status_dot="{ row }">
-        <CheckCircle v-if="row.status === 'up'" :size="14" :stroke-width="1.5" style="color: #FFD600;" />
-        <XCircle v-else :size="14" :stroke-width="1.5" style="color: #EF4444;" />
+        <CircleCheck v-if="row.status === 'up'" :size="14" :stroke-width="1.5" style="color: #FFD600;" />
+        <CircleX v-else :size="14" :stroke-width="1.5" style="color: #EF4444;" />
       </template>
       <template #cell-hostname="{ row }">
         <span class="font-mono" style="color: white;">{{ row.hostname }}</span>

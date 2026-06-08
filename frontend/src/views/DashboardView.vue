@@ -3,7 +3,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { ExternalLink, RotateCcw, CheckCircle } from '@lucide/vue'
+import { ExternalLink, RotateCcw, CircleCheck } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 const router = useRouter()
@@ -130,7 +130,7 @@ onUnmounted(() => clearInterval(interval))
         :row-key="(row) => row.hostname"
       >
         <template #cell-status>
-          <CheckCircle :size="14" :stroke-width="1.5" style="color: #FFD600;" />
+          <CircleCheck :size="14" :stroke-width="1.5" style="color: #FFD600;" />
         </template>
         <template #cell-hostname="{ row }">
           <span class="font-mono" style="color: white;">{{ row.hostname }}</span>

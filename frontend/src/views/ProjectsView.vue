@@ -2,7 +2,7 @@
 import { nextTick, ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { Plus, Play, StopCircle, RotateCcw, Rocket, History, Pencil, Trash2, X, Container } from '@lucide/vue'
+import { Plus, Play, CircleStop, RotateCcw, Rocket, History, Pencil, Trash2, X } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 
@@ -221,7 +221,7 @@ const columns: Column<Project>[] = [
       <template #cell-actions="{ row }">
         <div class="d-inline-flex align-center ga-1">
           <button title="Up" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'up')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><Play :size="14" :stroke-width="1.5" /></button>
-          <button title="Down" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'down')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><StopCircle :size="14" :stroke-width="1.5" /></button>
+          <button title="Down" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'down')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><CircleStop :size="14" :stroke-width="1.5" /></button>
           <button title="Restart" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'restart')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><RotateCcw :size="14" :stroke-width="1.5" /></button>
           <button title="Deploy" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #F7931A; cursor: pointer; padding: 4px;" @click="startDeploy(row)"><Rocket :size="14" :stroke-width="1.5" /></button>
           <button title="History" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="toggleHistory(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><History :size="14" :stroke-width="1.5" /></button>

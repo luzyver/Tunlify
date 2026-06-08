@@ -198,7 +198,7 @@ function rowKeyFor(row: T, fallback: number) {
       <div class="d-flex align-center ga-2">
         <button
           class="d-inline-flex align-center ga-1 rounded-pill px-3"
-          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s; opacity: 1;"
+          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; transition: all 0.2s;"
           :disabled="!table.getCanPreviousPage()"
           :style="{ opacity: !table.getCanPreviousPage() ? 0.4 : 1, cursor: !table.getCanPreviousPage() ? 'not-allowed' : 'pointer' }"
           @click="table.previousPage()"
@@ -211,7 +211,7 @@ function rowKeyFor(row: T, fallback: number) {
         </span>
         <button
           class="d-inline-flex align-center ga-1 rounded-pill px-3"
-          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s; opacity: 1;"
+          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; transition: all 0.2s;"
           :disabled="!table.getCanNextPage()"
           :style="{ opacity: !table.getCanNextPage() ? 0.4 : 1, cursor: !table.getCanNextPage() ? 'not-allowed' : 'pointer' }"
           @click="table.nextPage()"
