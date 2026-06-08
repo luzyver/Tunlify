@@ -83,6 +83,29 @@ function toggleSection(id: number) {
   if (a) a.lines = [...a.lines]
 }
 
+function formatLogLine(line: string): string {
+  const escaped = line
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  const colors: { re: RegExp; color: string }[] = [
+    { re: /\b(ERR[OR]?|FATAL|CRITICAL|CRIT|PANIC)\b/g, color: '#EF4444' },
+    { re: /\b(WARN[ING]?)\b/g, color: '#F59E0B' },
+    { re: /\b(INFO?)\b/g, color: '#3B82F6' },
+    { re: /\b(DEBUG|TRACE?)\b/g, color: '#8B5CF6' },
+    { re: /\b(OK|SUCCESS|DONE)\b/g, color: '#10B981' },
+    { re: /(https?:\/\/\S+)/g, color: '#60A5FA' },
+    { re: /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/g, color: '#34D399' },
+    { re: /("([^"\\]|\\.)*")/g, color: '#E2E8F0' },
+    { re: /\b(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2})\b/g, color: '#64748B' },
+  ]
+  let html = escaped
+  for (const { re, color } of colors) {
+    html = html.replace(re, (m) => `<span style="color:${color}">${m}</span>`)
+  }
+  return html
+}
+
 function startDrag(e: MouseEvent) {
   dragging.value = true
   const startY = e.clientY
@@ -134,7 +157,7 @@ function startDrag(e: MouseEvent) {
           ref="liveLogEl"
           class="font-mono pa-2 rounded-lg"
           style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 120px; overflow-y: auto; white-space: pre-wrap; background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);"
-        >{{ liveLogs.length ? liveLogs.slice(-100).join('\n') : '(connecting...)' }}</pre>
+        ><span v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '(connecting...)'" /></pre>
       </div>
 
       <!-- Action logs -->
@@ -172,7 +195,7 @@ function startDrag(e: MouseEvent) {
             :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
             class="font-mono pa-2"
             style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"
-          >{{ a.lines.length ? a.lines.join('\n') : '(waiting for output...)' }}</pre>
+          ><span v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '(waiting for output...)'" /></pre>
         </div>
       </div>
     </div>
