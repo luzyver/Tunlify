@@ -2,9 +2,10 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useActionLogStore } from '../stores/actionLog'
-
 const store = useActionLogStore()
 const authStore = useAuthStore()
+
+const barHeight = 32
 const expanded = ref(false)
 const dockHeight = ref(300)
 const dragging = ref(false)
@@ -103,6 +104,7 @@ function startDrag(e: MouseEvent) {
   <div
     class="bottom-dock"
     :class="{ 'bottom-dock--expanded': expanded, 'bottom-dock--dragging': dragging }"
+    :style="{ height: barHeight + (expanded ? dockHeight : 0) + 'px' }"
   >
     <div
       class="bottom-dock__bar d-flex align-center px-4 font-mono"
@@ -122,13 +124,9 @@ function startDrag(e: MouseEvent) {
       >Clear</button>
     </div>
 
-    <div v-if="expanded" class="bottom-dock__resize-handle" @mousedown="startDrag" />
+    <div v-if="expanded" class="bottom-dock__body" :style="{ height: dockHeight + 'px' }">
+      <div class="bottom-dock__resize-handle" @mousedown="startDrag" />
 
-    <div
-      v-if="expanded"
-      class="bottom-dock__body"
-      :style="{ height: dockHeight + 'px' }"
-    >
       <!-- Live tunnel logs -->
       <div class="pa-2" style="background: #0A0C10;">
         <div class="font-mono mb-1" style="color: rgba(148, 163, 184, 0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;">Live tunnel logs</div>
@@ -182,8 +180,20 @@ function startDrag(e: MouseEvent) {
 </template>
 
 <style scoped>
+.bottom-dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: #0F1115;
+  border-top: 1px solid rgba(30, 41, 59, 0.6);
+}
 .bottom-dock--dragging {
   user-select: none;
+}
+.bottom-dock__bar {
+  border-top: none !important;
 }
 .bottom-dock__resize-handle {
   height: 8px;
@@ -194,6 +204,7 @@ function startDrag(e: MouseEvent) {
   align-items: center;
   justify-content: center;
   position: relative;
+  flex-shrink: 0;
 }
 .bottom-dock__resize-handle::after {
   content: '';
@@ -211,6 +222,7 @@ function startDrag(e: MouseEvent) {
 .bottom-dock__body {
   overflow-y: auto;
   background: #0A0C10;
-  border-top: 1px solid rgba(30, 41, 59, 0.4);
+  display: flex;
+  flex-direction: column;
 }
 </style>
