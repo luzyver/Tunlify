@@ -191,6 +191,13 @@ pre,
   color: var(--bitcoin-orange) !important;
 }
 
+.v-field-label {
+  color: rgba(148, 163, 184, 0.7) !important;
+}
+.v-field--focused .v-field-label {
+  color: var(--bitcoin-orange) !important;
+}
+
 .v-table {
   background: transparent !important;
   color: var(--pure-light) !important;

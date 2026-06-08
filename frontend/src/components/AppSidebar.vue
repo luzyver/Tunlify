@@ -50,7 +50,7 @@ async function handleLogout() {
     <template #prepend>
       <div class="d-flex align-center ga-3 px-4 py-3 border-bottom" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <div class="rounded-lg d-flex align-center justify-center" style="width: 32px; height: 32px; background: rgba(247, 147, 26, 0.15); border: 1px solid rgba(247, 147, 26, 0.3);">
-          <img src="/icon.png" alt="" style="width: 20px; height: 20px;" />
+          <img src="/icon.png?v=2" alt="" style="width: 20px; height: 20px;" />
         </div>
         <div>
           <div class="font-heading font-semibold text-body-1" style="color: white;">Tunlify</div>

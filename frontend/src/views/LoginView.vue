@@ -40,7 +40,7 @@ async function handleLogin() {
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; max-width: 1280px; width: 100%; margin: 0 auto;">
           <div class="d-flex align-center ga-3">
             <v-avatar size="36" color="surface" variant="outlined" style="border: 1px solid rgba(247, 147, 26, 0.3);">
-              <img src="/icon.png" alt="" style="width: 22px; height: 22px;" />
+              <img src="/icon.png?v=2" alt="" style="width: 22px; height: 22px;" />
             </v-avatar>
             <span class="font-heading font-semibold" style="color: white; font-size: 18px;">Tunlify</span>
           </div>
@@ -68,7 +68,7 @@ async function handleLogin() {
               </p>
             </div>
 
-            <v-card variant="outlined" color="surface" class="rounded-2xl">
+            <v-card flat color="surface" class="rounded-2xl" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
               <v-card-text class="pa-8">
                 <form @submit.prevent="handleLogin">
                   <v-alert v-if="error" type="error" class="mb-4" variant="tonal" closable @click:close="error = ''">{{ error }}</v-alert>
@@ -84,6 +84,7 @@ async function handleLogin() {
                     hide-details="auto"
                     variant="filled"
                     color="primary"
+                    bg-color="#0A0C10"
                   />
 
                   <v-text-field
@@ -96,6 +97,7 @@ async function handleLogin() {
                     hide-details="auto"
                     variant="filled"
                     color="primary"
+                    bg-color="#0A0C10"
                   />
 
                   <v-btn
