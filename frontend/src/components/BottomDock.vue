@@ -172,11 +172,12 @@ function startDrag(e: MouseEvent) {
       <!-- Live tunnel logs -->
       <div class="pa-2" style="background: #0A0C10;">
         <div class="font-mono mb-1" style="color: rgba(148, 163, 184, 0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;">Live tunnel logs</div>
-        <pre
+        <div
           ref="liveLogEl"
           class="font-mono pa-2 rounded-lg"
           style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 120px; overflow-y: auto; white-space: pre-wrap; background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);"
-        ><span v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '(connecting...)'" /></pre>
+          v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '<span style=\"color:#64748B\">(connecting...)</span>'"
+        ></div>
       </div>
 
       <!-- Action logs -->
@@ -210,11 +211,12 @@ function startDrag(e: MouseEvent) {
               @click.stop="store.remove(a.id)"
             >&times;</button>
           </div>
-          <pre
+          <div
             :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
             class="font-mono pa-2"
             style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"
-          ><span v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '(waiting for output...)'" /></pre>
+            v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '<span style=\"color:#64748B\">(waiting for output...)</span>'"
+          ></div>
         </div>
       </div>
     </div>
