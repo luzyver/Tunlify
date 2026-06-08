@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useApi } from '../composables/useApi'
-import { Plus, Trash2 } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -97,7 +97,7 @@ loadConfig()
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Ingress</p>
@@ -110,7 +110,7 @@ loadConfig()
         @mouseenter="$event.target.style.transform = 'scale(1.03)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
         @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
       >
-        <Plus :size="16" :stroke-width="1.5" />
+        <v-icon size="16">mdi-plus</v-icon>
         Add rule
       </button>
     </div>
@@ -170,7 +170,7 @@ loadConfig()
               </td>
               <td style="border-bottom: 1px solid rgba(30, 41, 59, 0.3);">
                 <button v-if="!isLocked(rule)" @click="removeRule(i)" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 4px; transition: color 0.2s;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#EF4444'">
-                  <Trash2 :size="14" :stroke-width="1.5" />
+                  <v-icon size="14">mdi-delete</v-icon>
                 </button>
               </td>
             </tr>

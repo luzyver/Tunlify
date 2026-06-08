@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
 import { useApi } from '../composables/useApi'
-import { RefreshCw } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 const metrics = ref<any>(null)
@@ -53,7 +53,7 @@ function formatPct(p: number) {
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Metrics</p>
@@ -67,7 +67,7 @@ function formatPct(p: number) {
         @mouseenter="if(!loading) { $event.target.style.background = 'rgba(247, 147, 26, 0.2)'; $event.target.style.borderColor = '#F7931A' }"
         @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'; $event.target.style.borderColor = 'rgba(247, 147, 26, 0.2)'"
       >
-        <RefreshCw :size="14" :stroke-width="1.5" :class="{ 'spin': loading }" />
+        <v-icon size="14" :class="{ 'spin': loading }">mdi-refresh</v-icon>
         Refresh
       </button>
     </div>

@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { Shield } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -35,7 +35,7 @@ const columns: Column<AuditEntry>[] = [
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Audit</p>

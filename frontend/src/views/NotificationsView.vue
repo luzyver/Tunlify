@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useApi } from '../composables/useApi'
-import { Bell } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 const form = reactive({ enabled: false, webhook_url: '', type: 'discord' })
@@ -32,7 +32,7 @@ load()
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <header class="mb-6">
       <p class="eyebrow mb-2">Console &middot; Alerts</p>
       <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Webhook notifications</h1>
@@ -43,7 +43,7 @@ load()
     <div class="rounded-2xl" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
       <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <div class="d-flex align-center ga-2">
-          <Bell :size="18" :stroke-width="1.5" style="color: #F7931A;" />
+          <v-icon size="18" color="#F7931A">mdi-bell</v-icon>
           <span class="font-heading font-semibold" style="color: white;">Configuration</span>
         </div>
         <span class="rounded-pill px-2 font-mono d-inline-flex align-center ga-1" :style="{ background: form.enabled ? 'rgba(255, 214, 0, 0.1)' : 'rgba(148, 163, 184, 0.1)', border: '1px solid ' + (form.enabled ? 'rgba(255, 214, 0, 0.3)' : 'rgba(148, 163, 184, 0.3)'), color: form.enabled ? '#FFD600' : '#94A3B8', fontSize: '11px', lineHeight: '22px' }">

@@ -2,20 +2,6 @@
 import { useAuthStore } from '../stores/auth'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
-import {
-  LayoutDashboard,
-  Container,
-  HeartPulse,
-  ChartBarBig,
-  ScrollText,
-  SlidersHorizontal,
-  Archive,
-  Terminal,
-  Bell,
-  Shield,
-  Cog,
-  LogOut,
-} from '@lucide/vue'
 
 const emit = defineEmits<{ navigate: [] }>()
 
@@ -25,17 +11,17 @@ const router = useRouter()
 const { apiFetch } = useApi()
 
 const nav = [
-  { to: '/', label: 'Status', icon: LayoutDashboard },
-  { to: '/projects', label: 'Projects', icon: Container },
-  { to: '/health', label: 'Health', icon: HeartPulse },
-  { to: '/metrics', label: 'Metrics', icon: ChartBarBig },
-  { to: '/logs', label: 'Logs', icon: ScrollText },
-  { to: '/config', label: 'Ingress', icon: SlidersHorizontal },
-  { to: '/backups', label: 'Backups', icon: Archive },
-  { to: '/tcp-access', label: 'TCP Access', icon: Terminal },
-  { to: '/notifications', label: 'Alerts', icon: Bell },
-  { to: '/audit', label: 'Audit', icon: Shield },
-  { to: '/settings', label: 'Settings', icon: Cog },
+  { to: '/', label: 'Status', icon: 'mdi-view-dashboard' },
+  { to: '/projects', label: 'Projects', icon: 'mdi-docker' },
+  { to: '/health', label: 'Health', icon: 'mdi-heart-pulse' },
+  { to: '/metrics', label: 'Metrics', icon: 'mdi-chart-bar' },
+  { to: '/logs', label: 'Logs', icon: 'mdi-scroll-text' },
+  { to: '/config', label: 'Ingress', icon: 'mdi-tune' },
+  { to: '/backups', label: 'Backups', icon: 'mdi-archive' },
+  { to: '/tcp-access', label: 'TCP Access', icon: 'mdi-console' },
+  { to: '/notifications', label: 'Alerts', icon: 'mdi-bell' },
+  { to: '/audit', label: 'Audit', icon: 'mdi-shield' },
+  { to: '/settings', label: 'Settings', icon: 'mdi-cog' },
 ]
 
 async function handleLogout() {
@@ -76,7 +62,7 @@ async function handleLogout() {
         @click="emit('navigate')"
       >
         <template #prepend>
-          <component :is="item.icon" :size="18" :stroke-width="1.5" />
+          <v-icon size="18">{{ item.icon }}</v-icon>
         </template>
         <template #title>
           <span class="font-mono" style="font-size: 13px;">{{ item.label }}</span>
@@ -98,7 +84,7 @@ async function handleLogout() {
             <div class="eyebrow-dim" style="font-size: 10px;">Signed in</div>
           </div>
           <v-btn icon variant="text" size="small" @click="handleLogout" style="color: #94A3B8;">
-            <LogOut :size="16" :stroke-width="1.5" />
+            <v-icon size="16">mdi-logout</v-icon>
           </v-btn>
         </div>
       </div>

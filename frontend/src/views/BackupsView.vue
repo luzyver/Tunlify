@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { Eye, RotateCcw, X } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -47,7 +47,7 @@ const columns: Column<Backup>[] = [
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Config</p>
@@ -73,7 +73,7 @@ const columns: Column<Backup>[] = [
             @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'"
             @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'"
           >
-            <Eye :size="12" :stroke-width="1.5" />
+            <v-icon size="12">mdi-eye</v-icon>
             View
           </button>
           <button
@@ -84,7 +84,7 @@ const columns: Column<Backup>[] = [
             @mouseenter="if(restoring !== row.id) { $event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)' }"
             @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
           >
-            <RotateCcw :size="12" :stroke-width="1.5" />
+            <v-icon size="12">mdi-refresh</v-icon>
             {{ restoring === row.id ? 'Restoring...' : 'Restore' }}
           </button>
         </div>
@@ -96,7 +96,7 @@ const columns: Column<Backup>[] = [
       <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <span class="font-heading font-semibold" style="color: white;">Preview</span>
         <button @click="closePreview" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'">
-          <X :size="16" :stroke-width="1.5" />
+          <v-icon size="16">mdi-close</v-icon>
         </button>
       </div>
       <pre class="font-mono pa-4 overflow-auto scrollbar-thin" style="color: #94A3B8; font-size: 12px; line-height: 1.25; max-height: 384px; white-space: pre;">{{ previewContent }}</pre>

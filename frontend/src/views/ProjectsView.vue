@@ -2,7 +2,7 @@
 import { nextTick, ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { Plus, Play, CircleStop, RotateCcw, Rocket, History, Pencil, Trash2, X } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -106,7 +106,7 @@ const columns: Column<Project>[] = [
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Compose</p>
@@ -119,7 +119,7 @@ const columns: Column<Project>[] = [
         @mouseenter="$event.target.style.transform = 'scale(1.03)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
         @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
       >
-        <Plus :size="16" :stroke-width="1.5" />
+        <v-icon size="16">mdi-plus</v-icon>
         New project
       </button>
     </div>
@@ -130,7 +130,7 @@ const columns: Column<Project>[] = [
     <div v-if="showForm" class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
       <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <span class="font-heading font-semibold" style="color: white;">{{ editingId ? 'Edit project' : 'New project' }}</span>
-        <button @click="showForm = false" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><X :size="16" :stroke-width="1.5" /></button>
+        <button @click="showForm = false" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="16">mdi-close</v-icon></button>
       </div>
       <div class="pa-6">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -170,10 +170,10 @@ const columns: Column<Project>[] = [
     <!-- Deploy prompt -->
     <div v-if="deployTarget" class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
       <div class="d-flex align-center px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <Rocket :size="18" :stroke-width="1.5" style="color: #F7931A; margin-right: 8px;" />
+        <v-icon size="18" color="#F7931A" class="mr-1">mdi-rocket</v-icon>
         <span class="font-heading font-semibold" style="color: white;">Deploy &mdash; choose ref</span>
         <v-spacer />
-        <button @click="deployTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><X :size="16" :stroke-width="1.5" /></button>
+        <button @click="deployTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><v-icon size="16">mdi-close</v-icon></button>
       </div>
       <div class="pa-6 d-flex ga-3">
         <input v-model="deployRef" placeholder="main / v1.0.0" style="flex: 1; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" @keyup.enter="confirmDeploy" />
@@ -220,13 +220,13 @@ const columns: Column<Project>[] = [
       </template>
       <template #cell-actions="{ row }">
         <div class="d-inline-flex align-center ga-1">
-          <button title="Up" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'up')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><Play :size="14" :stroke-width="1.5" /></button>
-          <button title="Down" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'down')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><CircleStop :size="14" :stroke-width="1.5" /></button>
-          <button title="Restart" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'restart')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><RotateCcw :size="14" :stroke-width="1.5" /></button>
-          <button title="Deploy" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #F7931A; cursor: pointer; padding: 4px;" @click="startDeploy(row)"><Rocket :size="14" :stroke-width="1.5" /></button>
-          <button title="History" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="toggleHistory(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><History :size="14" :stroke-width="1.5" /></button>
-          <button title="Edit" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="openEdit(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><Pencil :size="14" :stroke-width="1.5" /></button>
-          <button title="Delete" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 4px;" @click="remove(row.id)"><Trash2 :size="14" :stroke-width="1.5" /></button>
+          <button title="Up" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'up')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-play</v-icon></button>
+          <button title="Down" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'down')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-stop-circle</v-icon></button>
+          <button title="Restart" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'restart')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-refresh</v-icon></button>
+          <button title="Deploy" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #F7931A; cursor: pointer; padding: 4px;" @click="startDeploy(row)"><v-icon size="14">mdi-rocket</v-icon></button>
+          <button title="History" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="toggleHistory(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-history</v-icon></button>
+          <button title="Edit" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="openEdit(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-pencil</v-icon></button>
+          <button title="Delete" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 4px;" @click="remove(row.id)"><v-icon size="14">mdi-delete</v-icon></button>
         </div>
       </template>
       <template #empty>
@@ -238,7 +238,7 @@ const columns: Column<Project>[] = [
     <div v-if="historyTarget !== null" class="rounded-2xl mt-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
       <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <span class="font-heading font-semibold" style="color: white;">History &middot; <span class="font-mono" style="color: #F7931A;">{{ historyName }}</span></span>
-        <button @click="historyTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><X :size="16" :stroke-width="1.5" /></button>
+        <button @click="historyTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><v-icon size="16">mdi-close</v-icon></button>
       </div>
       <div class="pa-4 d-flex flex-column ga-1">
         <div v-if="history.length" class="d-flex flex-column ga-1">

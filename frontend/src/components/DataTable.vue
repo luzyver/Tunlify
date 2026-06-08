@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from '@lucide/vue'
+
 
 export interface Column<R> {
   key: string
@@ -96,12 +96,7 @@ function rowKeyFor(row: T, fallback: number) {
   <div>
     <div v-if="searchable || $slots.toolbar" class="d-flex align-center ga-2 flex-wrap mb-3">
       <div v-if="searchable" class="position-relative" style="max-width: 320px; width: 100%;">
-        <Search
-          :size="16"
-          :stroke-width="1.5"
-          class="position-absolute"
-          style="color: #94A3B8; left: 12px; top: 50%; transform: translateY(-50%); z-index: 1;"
-        />
+        <v-icon size="16" color="#94A3B8" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); z-index: 1;">mdi-magnify</v-icon>
         <input
           v-model="globalFilter"
           :placeholder="searchPlaceholder"
@@ -141,9 +136,9 @@ function rowKeyFor(row: T, fallback: number) {
                 <slot :name="`header-${header.column.id}`" :column="header.column">
                   {{ columns.find((c) => c.key === header.column.id)?.label }}
                 </slot>
-                <ArrowUp v-if="header.column.getIsSorted() === 'asc'" :size="12" :stroke-width="2" style="color: #F7931A;" />
-                <ArrowDown v-else-if="header.column.getIsSorted() === 'desc'" :size="12" :stroke-width="2" style="color: #F7931A;" />
-                <ArrowUpDown v-else :size="12" :stroke-width="1.5" style="opacity: 0.3;" />
+                <v-icon v-if="header.column.getIsSorted() === 'asc'" size="12" color="#F7931A">mdi-arrow-up</v-icon>
+                <v-icon v-else-if="header.column.getIsSorted() === 'desc'" size="12" color="#F7931A">mdi-arrow-down</v-icon>
+                <v-icon v-else size="12" style="opacity: 0.3;">mdi-swap-vertical</v-icon>
               </button>
               <span v-else>
                 <slot :name="`header-${header.column.id}`" :column="header.column">
@@ -203,7 +198,7 @@ function rowKeyFor(row: T, fallback: number) {
           :style="{ opacity: !table.getCanPreviousPage() ? 0.4 : 1, cursor: !table.getCanPreviousPage() ? 'not-allowed' : 'pointer' }"
           @click="table.previousPage()"
         >
-          <ChevronLeft :size="14" :stroke-width="1.5" />
+          <v-icon size="14">mdi-chevron-left</v-icon>
           Prev
         </button>
         <span class="font-mono text-caption" style="color: #94A3B8;">
@@ -217,7 +212,7 @@ function rowKeyFor(row: T, fallback: number) {
           @click="table.nextPage()"
         >
           Next
-          <ChevronRight :size="14" :stroke-width="1.5" />
+          <v-icon size="14">mdi-chevron-right</v-icon>
         </button>
       </div>
     </div>

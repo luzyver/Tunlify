@@ -25,7 +25,7 @@ async function changePassword() {
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <header class="mb-6">
       <p class="eyebrow mb-2">Console &middot; Settings</p>
       <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Account</h1>

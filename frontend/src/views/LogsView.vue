@@ -101,7 +101,7 @@ function handleMouseLeave(e: MouseEvent, entry: LogEntry) {
 </script>
 
 <template>
-  <div class="pa-6 d-flex flex-column" style="max-width: 1280px; height: calc(100vh - 48px);">
+  <div class="pa-6 d-flex flex-column" style="height: calc(100vh - 48px);">
     <div class="d-flex align-center justify-space-between ga-4 flex-shrink-0 mb-4 flex-wrap" style="gap: 12px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Logs</p>

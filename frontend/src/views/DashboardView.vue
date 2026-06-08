@@ -3,7 +3,7 @@ import { computed, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { ExternalLink, RotateCcw, CircleCheck } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 const router = useRouter()
@@ -71,7 +71,7 @@ onUnmounted(() => clearInterval(interval))
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-8 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Status</p>
@@ -85,7 +85,7 @@ onUnmounted(() => clearInterval(interval))
         @mouseenter="$event.target.style.transform = 'scale(1.03)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
         @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
       >
-        <RotateCcw :size="16" :stroke-width="1.5" :class="{ 'spin': actionLoading === 'restart' }" />
+        <v-icon size="16" :class="{ 'spin': actionLoading === 'restart' }">mdi-refresh</v-icon>
         {{ actionLoading === 'restart' ? 'Restarting...' : 'Restart tunnel' }}
       </button>
     </div>
@@ -130,7 +130,7 @@ onUnmounted(() => clearInterval(interval))
         :row-key="(row) => row.hostname"
       >
         <template #cell-status>
-          <CircleCheck :size="14" :stroke-width="1.5" style="color: #FFD600;" />
+          <v-icon size="14" color="#FFD600">mdi-check-circle</v-icon>
         </template>
         <template #cell-hostname="{ row }">
           <span class="font-mono" style="color: white;">{{ row.hostname }}</span>
@@ -144,7 +144,7 @@ onUnmounted(() => clearInterval(interval))
             @mouseenter="$event.target.style.color = '#F7931A'"
             @mouseleave="$event.target.style.color = '#94A3B8'"
           >
-            <ExternalLink :size="14" :stroke-width="1.5" />
+            <v-icon size="14">mdi-open-in-new</v-icon>
           </a>
         </template>
       </DataTable>

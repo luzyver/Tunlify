@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
-import { RefreshCw, CircleCheck, CircleX } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -51,7 +51,7 @@ const columns: Column<HealthRow>[] = [
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Health</p>
@@ -65,7 +65,7 @@ const columns: Column<HealthRow>[] = [
         @mouseenter="if(!loading) { $event.target.style.background = 'rgba(247, 147, 26, 0.2)'; $event.target.style.borderColor = '#F7931A' }"
         @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'; $event.target.style.borderColor = 'rgba(247, 147, 26, 0.2)'"
       >
-        <RefreshCw :size="14" :stroke-width="1.5" :class="{ 'spin': loading }" />
+        <v-icon size="14" :class="{ 'spin': loading }">mdi-refresh</v-icon>
         {{ loading ? 'Checking...' : 'Refresh' }}
       </button>
     </div>
@@ -96,8 +96,8 @@ const columns: Column<HealthRow>[] = [
       :row-key="(row) => row.hostname"
     >
       <template #cell-status_dot="{ row }">
-        <CircleCheck v-if="row.status === 'up'" :size="14" :stroke-width="1.5" style="color: #FFD600;" />
-        <CircleX v-else :size="14" :stroke-width="1.5" style="color: #EF4444;" />
+        <v-icon v-if="row.status === 'up'" size="14" color="#FFD600">mdi-check-circle</v-icon>
+        <v-icon v-else size="14" color="#EF4444">mdi-close-circle</v-icon>
       </template>
       <template #cell-hostname="{ row }">
         <span class="font-mono" style="color: white;">{{ row.hostname }}</span>

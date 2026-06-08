@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useApi } from '../composables/useApi'
-import { Terminal, Check, Copy } from '@lucide/vue'
+
 
 const { apiFetch } = useApi()
 
@@ -31,7 +31,7 @@ function copyCommand() {
 </script>
 
 <template>
-  <div class="pa-6" style="max-width: 1280px;">
+  <div class="pa-6">
     <header class="mb-6">
       <p class="eyebrow mb-2">Console &middot; TCP</p>
       <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">TCP access command</h1>
@@ -42,7 +42,7 @@ function copyCommand() {
     <div class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
       <div class="d-flex align-center ga-3 px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <div class="rounded-lg p-2 d-flex" style="background: rgba(234, 88, 12, 0.15); border: 1px solid rgba(234, 88, 12, 0.3);">
-          <Terminal :size="18" :stroke-width="1.5" style="color: #F7931A;" />
+          <v-icon size="18" color="#F7931A">mdi-console</v-icon>
         </div>
         <span class="font-heading font-semibold" style="color: white;">Configure</span>
       </div>
@@ -90,8 +90,8 @@ function copyCommand() {
           @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'"
           @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'"
         >
-          <Check v-if="copied" :size="12" :stroke-width="1.5" style="color: #FFD600;" />
-          <Copy v-else :size="12" :stroke-width="1.5" />
+          <v-icon v-if="copied" size="12" color="#FFD600">mdi-check</v-icon>
+          <v-icon v-else size="12">mdi-content-copy</v-icon>
           {{ copied ? 'Copied' : 'Copy' }}
         </button>
       </div>
