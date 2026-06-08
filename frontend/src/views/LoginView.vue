@@ -16,7 +16,7 @@ async function handleLogin() {
   error.value = ''
   loading.value = true
   try {
-    const data = await apiFetch<{ access_token: string }>('/auth/login', {
+    const data =await apiFetch<{ access_token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(form),
     })
@@ -32,15 +32,15 @@ async function handleLogin() {
 
 <template>
   <v-app>
-    <v-main style="background: #030304;">
+    <v-main>
       <div class="bg-orange-glow" style="position: fixed; inset: 0; z-index: 0;" />
       <div class="bg-grid" style="position: fixed; inset: 0; z-index: 0;" />
       <div style="position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column;">
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; max-width: 1280px; width: 100%; margin: 0 auto;">
           <div class="d-flex align-center ga-3">
-            <div class="rounded-lg d-flex align-center justify-center" style="width: 36px; height: 36px; background: rgba(247, 147, 26, 0.15); border: 1px solid rgba(247, 147, 26, 0.3);">
+            <v-avatar size="36" color="surface" variant="outlined" style="border: 1px solid rgba(247, 147, 26, 0.3);">
               <img src="/icon.png" alt="" style="width: 22px; height: 22px;" />
-            </div>
+            </v-avatar>
             <span class="font-heading font-semibold" style="color: white; font-size: 18px;">Tunlify</span>
           </div>
           <a
@@ -49,8 +49,8 @@ async function handleLogin() {
             rel="noopener"
             class="font-mono text-decoration-none"
             style="color: #94A3B8; font-size: 13px; transition: color 0.2s;"
-            @mouseenter="$event.target.style.color = '#F7931A'"
-            @mouseleave="$event.target.style.color = '#94A3B8'"
+            @mouseenter="($event.target as HTMLElement).style.color = '#F7931A'"
+            @mouseleave="($event.target as HTMLElement).style.color = '#94A3B8'"
           >Source &Nearr;</a>
         </header>
 
@@ -67,67 +67,55 @@ async function handleLogin() {
               </p>
             </div>
 
-            <div class="rounded-2xl p-8" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-              <form @submit.prevent="handleLogin">
-                <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
+            <v-card variant="outlined" color="surface" class="rounded-2xl">
+              <v-card-text class="pa-8">
+                <form @submit.prevent="handleLogin">
+                  <v-alert v-if="error" type="error" class="mb-4" variant="tonal" closable @click:close="error = ''">{{ error }}</v-alert>
 
-                <div class="mb-5">
-                  <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Username</label>
-                  <input
+                  <v-text-field
                     v-model="form.username"
+                    label="Username"
                     type="text"
                     required
                     autofocus
                     autocomplete="username"
-                    placeholder="admin"
-                    style="
-                      width: 100%; height: 48px; background: rgba(0,0,0,0.5); border: none;
-                      border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white;
-                      padding: 8px 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px;
-                      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-                    "
-                    @focus="$event.target.style.borderColor = '#F7931A'; $event.target.style.boxShadow = '0 10px 20px -10px rgba(247, 147, 26, 0.3)'"
-                    @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'; $event.target.style.boxShadow = 'none'"
+                    prepend-inner-icon
+                    class="mb-2"
+                    hide-details="auto"
+                    variant="outlined"
+                    color="primary"
+                    base-color="grey"
                   />
-                </div>
 
-                <div class="mb-6">
-                  <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;">Password</label>
-                  <input
+                  <v-text-field
                     v-model="form.password"
+                    label="Password"
                     type="password"
                     required
                     autocomplete="current-password"
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                    style="
-                      width: 100%; height: 48px; background: rgba(0,0,0,0.5); border: none;
-                      border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white;
-                      padding: 8px 16px; font-family: 'JetBrains Mono', monospace; font-size: 14px;
-                      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-                    "
-                    @focus="$event.target.style.borderColor = '#F7931A'; $event.target.style.boxShadow = '0 10px 20px -10px rgba(247, 147, 26, 0.3)'"
-                    @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'; $event.target.style.boxShadow = 'none'"
+                    prepend-inner-icon
+                    class="mb-6"
+                    hide-details="auto"
+                    variant="outlined"
+                    color="primary"
+                    base-color="grey"
                   />
-                </div>
 
-                <button
-                  type="submit"
-                  :disabled="loading"
-                  class="w-100 rounded-pill font-mono"
-                  style="
-                    height: 48px; background: linear-gradient(to right, #EA580C, #F7931A);
-                    border: none; color: white; font-size: 14px; font-weight: 600;
-                    text-transform: uppercase; letter-spacing: 0.08em;
-                    box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5);
-                    cursor: pointer; transition: all 0.3s;
-                  "
-                  @mouseenter="if (!loading) { $event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'; }"
-                  @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
-                >
-                  {{ loading ? 'Signing in...' : 'Sign in' }}
-                </button>
-              </form>
-            </div>
+                  <v-btn
+                    type="submit"
+                    :loading="loading"
+                    block
+                    size="large"
+                    color="primary"
+                    variant="flat"
+                    class="rounded-pill font-mono text-none"
+                    style="height: 48px; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: linear-gradient(to right, #EA580C, #F7931A); box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5);"
+                  >
+                    Sign in
+                  </v-btn>
+                </form>
+              </v-card-text>
+            </v-card>
 
             <p class="text-center font-mono" style="margin-top: 48px; color: rgba(148, 163, 184, 0.5); font-size: 11px;">
               Self-hosted &middot; MIT licensed
