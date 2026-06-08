@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Plus, Trash2 } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
@@ -97,109 +96,116 @@ loadConfig()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Ingress</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Tunnel configuration</h1>
+        <p class="eyebrow mb-2">Console &middot; Ingress</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Tunnel configuration</h1>
       </div>
-      <button class="btn-secondary" @click="addRule">
-        <Plus class="w-4 h-4" :stroke-width="1.75" />
+      <v-btn color="primary" @click="addRule">
+        <v-icon start>mdi-plus</v-icon>
         Add rule
-      </button>
-    </header>
-
-    <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-danger'">
-      {{ message.text }}
+      </v-btn>
     </div>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Tunnel</span>
-        <span class="text-2xs text-text-dim">Read from cloudflared/config.yml</span>
-      </div>
-      <div class="card-body grid sm:grid-cols-2 gap-4">
-        <div>
-          <label class="field-label">Tunnel ID</label>
-          <input v-model="tunnelId" class="input font-mono" placeholder="00000000-0000-0000-0000-000000000000" />
-        </div>
-        <div>
-          <label class="field-label">Credentials</label>
-          <input value="/etc/cloudflared/credentials.json" disabled class="input font-mono" />
-        </div>
-      </div>
-    </section>
+    <v-alert v-if="message" :type="message.type" class="mb-4" variant="tonal">{{ message.text }}</v-alert>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Ingress rules</span>
-        <span class="text-2xs text-text-dim tabular-nums">{{ rules.length }} rules</span>
-      </div>
-      <table class="table-tight">
+    <v-card class="mb-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Tunnel</span>
+        <span class="text-caption text-medium-emphasis">Read from cloudflared/config.yml</span>
+      </v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="tunnelId" label="Tunnel ID" placeholder="00000000-0000-0000-0000-000000000000" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field model-value="/etc/cloudflared/credentials.json" label="Credentials" disabled variant="outlined" density="compact" hide-details />
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+
+    <v-card class="mb-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Ingress rules</span>
+        <span class="text-caption text-medium-emphasis tabular-nums">{{ rules.length }} rules</span>
+      </v-card-title>
+      <v-table density="compact">
         <thead>
           <tr>
-            <th class="w-[34%]">Hostname</th>
-            <th class="w-[34%]">Service</th>
+            <th style="width: 34%;">Hostname</th>
+            <th style="width: 34%;">Service</th>
             <th>TLS</th>
-            <th class="w-10"></th>
+            <th style="width: 40px;"></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(rule, i) in rules" :key="i">
             <td>
-              <input
+              <v-text-field
                 v-model="rule.hostname"
                 placeholder="app.example.com"
-                class="input !py-1 !text-xs font-mono"
+                density="compact"
+                variant="outlined"
+                hide-details
                 :disabled="isLocked(rule)"
               />
             </td>
             <td>
-              <input
+              <v-text-field
                 v-model="rule.service"
                 placeholder="http://container:port"
-                class="input !py-1 !text-xs font-mono"
+                density="compact"
+                variant="outlined"
+                hide-details
                 :disabled="isLocked(rule)"
               />
             </td>
             <td>
-              <label class="inline-flex items-center gap-2 text-xs text-text-muted">
-                <input type="checkbox" v-model="rule.noTLSVerify" class="accent-accent" :disabled="isLocked(rule)" />
-                Skip verify
-                <span v-if="isLocked(rule)" class="badge-neutral">Locked</span>
-              </label>
+              <div class="d-flex align-center ga-2">
+                <v-checkbox
+                  v-model="rule.noTLSVerify"
+                  label="Skip verify"
+                  hide-details
+                  density="compact"
+                  :disabled="isLocked(rule)"
+                />
+                <v-chip v-if="isLocked(rule)" size="x-small" variant="outlined">Locked</v-chip>
+              </div>
             </td>
             <td>
-              <button
+              <v-btn
                 v-if="!isLocked(rule)"
+                icon="mdi-delete"
+                color="error"
+                variant="text"
+                size="small"
                 @click="removeRule(i)"
-                class="btn-icon-ghost text-danger hover:bg-danger/5"
-                title="Remove rule"
-              >
-                <Trash2 class="w-3.5 h-3.5" :stroke-width="1.75" />
-              </button>
+              />
             </td>
           </tr>
           <tr v-if="!rules.length">
-            <td colspan="4" class="text-center text-text-muted py-8 text-sm">
-              No ingress rules yet — add one above.
+            <td colspan="4" class="text-center text-medium-emphasis py-8">
+              No ingress rules yet &mdash; add one above.
             </td>
           </tr>
         </tbody>
-      </table>
-    </section>
+      </v-table>
+    </v-card>
 
-    <p class="text-xs text-text-dim">
-      Catch-all <code class="font-mono text-text-muted">http_status:404</code> is auto-appended on save.
+    <p class="text-caption text-medium-emphasis mb-4">
+      Catch-all <code class="font-mono">http_status:404</code> is auto-appended on save.
     </p>
 
-    <div class="flex items-center gap-3">
-      <button @click="save" :disabled="saving" class="btn-secondary">
-        {{ saving ? 'Saving…' : 'Save' }}
-      </button>
-      <button @click="saveAndRestart" :disabled="saving" class="btn-primary">
-        {{ saving ? 'Saving…' : 'Save & restart tunnel' }}
-      </button>
+    <div class="d-flex ga-3">
+      <v-btn variant="tonal" :loading="saving" @click="save">
+        {{ saving ? 'Saving...' : 'Save' }}
+      </v-btn>
+      <v-btn color="primary" :loading="saving" @click="saveAndRestart">
+        {{ saving ? 'Saving...' : 'Save & restart tunnel' }}
+      </v-btn>
     </div>
   </div>
 </template>

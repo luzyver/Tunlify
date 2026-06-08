@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Eye, RotateCcw, X } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
@@ -30,7 +29,8 @@ function closePreview() {
 }
 
 async function restore(id: number) {
-  if (!confirm('Restore this backup? Current configuration will be overwritten.')) return
+  const confirmed = await confirm('Restore this backup? Current configuration will be overwritten.')
+  if (!confirmed) return
   restoring.value = id
   try {
     const b = await apiFetch<{ content: string }>(`/api/config/backups/${id}`)
@@ -52,16 +52,16 @@ const columns: Column<Backup>[] = [
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Config</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Backups</h1>
+        <p class="eyebrow mb-2">Console &middot; Config</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Backups</h1>
       </div>
-      <span class="text-2xs text-text-dim tabular-nums">{{ backups.length }} snapshots</span>
-    </header>
+      <span class="text-caption text-medium-emphasis tabular-nums">{{ backups.length }} snapshots</span>
+    </div>
 
-    <div v-if="message" class="alert-success">{{ message }}</div>
+    <v-alert v-if="message" type="success" class="mb-4" variant="tonal">{{ message }}</v-alert>
 
     <DataTable
       :data="backups"
@@ -70,33 +70,35 @@ const columns: Column<Backup>[] = [
       :row-class="(row) => previewId === row.id ? 'is-selected' : undefined"
     >
       <template #cell-actions="{ row }">
-        <div class="inline-flex items-center gap-2">
-          <button @click="showPreview(row.id)" class="btn-secondary !py-1 !px-2.5 !text-xs">
-            <Eye class="w-3.5 h-3.5" :stroke-width="1.75" />
+        <div class="d-inline-flex align-center ga-2">
+          <v-btn variant="tonal" size="small" @click="showPreview(row.id)">
+            <v-icon start size="x-small">mdi-eye</v-icon>
             View
-          </button>
-          <button
-            @click="restore(row.id)"
+          </v-btn>
+          <v-btn
+            color="primary"
+            size="small"
+            :loading="restoring === row.id"
             :disabled="restoring === row.id"
-            class="btn-primary !py-1 !px-2.5 !text-xs"
+            @click="restore(row.id)"
           >
-            <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
-            {{ restoring === row.id ? 'Restoring…' : 'Restore' }}
-          </button>
+            <v-icon start size="x-small">mdi-restore</v-icon>
+            {{ restoring === row.id ? 'Restoring...' : 'Restore' }}
+          </v-btn>
         </div>
       </template>
       <template #empty>No backups yet</template>
     </DataTable>
 
-    <section v-if="previewId !== null" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Preview</span>
-        <button @click="closePreview" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
-      </div>
+    <v-card v-if="previewId !== null" class="mt-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Preview</span>
+        <v-btn icon="mdi-close" variant="text" size="small" @click="closePreview" />
+      </v-card-title>
       <pre
-        class="font-mono text-2xs leading-5 text-text-muted bg-bg-alt
-               max-h-96 overflow-auto p-4 whitespace-pre scrollbar-thin"
+        class="font-mono text-caption text-medium-emphasis bg-grey-lighten-3 pa-4 overflow-auto scrollbar-thin"
+        style="max-height: 384px; white-space: pre; line-height: 1.25;"
       >{{ previewContent }}</pre>
-    </section>
+    </v-card>
   </div>
 </template>

@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { Check, Copy, Terminal } from 'lucide-vue-next'
-import { useClipboard } from '@vueuse/core'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
-const { copy, copied } = useClipboard({ copiedDuring: 1500 })
 
 const form = reactive({ hostname: '', local_url: 'localhost:', mode: 'foreground' })
 const generated = ref('')
 const error = ref('')
 const loading = ref(false)
+const snackbar = ref(false)
 
 async function generate() {
   loading.value = true
@@ -27,67 +25,72 @@ async function generate() {
     loading.value = false
   }
 }
+
+function copyCommand() {
+  navigator.clipboard.writeText(generated.value)
+  snackbar.value = true
+}
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header>
-      <p class="eyebrow mb-2">Console · TCP</p>
-      <h1 class="text-2xl font-semibold tracking-tight text-text">TCP access command</h1>
+  <div class="pa-6" style="max-width: 1280px;">
+    <header class="mb-6">
+      <p class="eyebrow mb-2">Console &middot; TCP</p>
+      <h1 class="text-h4 font-weight-semibold text-on-surface">TCP access command</h1>
     </header>
 
-    <div v-if="error" class="alert-danger">{{ error }}</div>
+    <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title flex items-center gap-2">
-          <Terminal class="w-4 h-4 text-text-muted" :stroke-width="1.75" />
-          Configure
-        </span>
-      </div>
-      <div class="card-body space-y-4">
+    <v-card class="mb-6">
+      <v-card-title class="d-flex align-center ga-2">
+        <v-icon>mdi-console</v-icon>
+        Configure
+      </v-card-title>
+      <v-card-text class="d-flex flex-column ga-4">
+        <v-text-field
+          v-model="form.hostname"
+          label="Hostname"
+          placeholder="tcp.example.com"
+          variant="outlined"
+          density="compact"
+          hide-details
+        />
+        <v-text-field
+          v-model="form.local_url"
+          label="Local URL"
+          placeholder="localhost:9999"
+          variant="outlined"
+          density="compact"
+          hide-details
+        />
         <div>
-          <label class="field-label">Hostname</label>
-          <input v-model="form.hostname" placeholder="tcp.example.com" class="input font-mono" />
+          <p class="text-caption font-weight-medium text-medium-emphasis mb-2">Mode</p>
+          <v-chip-group v-model="form.mode" mandatory color="primary" variant="tonal" density="compact">
+            <v-chip value="foreground" size="small">foreground</v-chip>
+            <v-chip value="nohup" size="small">nohup</v-chip>
+            <v-chip value="systemd" size="small">systemd</v-chip>
+          </v-chip-group>
         </div>
-        <div>
-          <label class="field-label">Local URL</label>
-          <input v-model="form.local_url" placeholder="localhost:9999" class="input font-mono" />
-        </div>
-        <div>
-          <label class="field-label">Mode</label>
-          <div class="inline-flex border border-border rounded-md overflow-hidden bg-surface">
-            <button
-              v-for="m in ['foreground', 'nohup', 'systemd']"
-              :key="m"
-              type="button"
-              class="px-3 h-8 text-xs font-medium transition-colors duration-100"
-              :class="form.mode === m ? 'bg-accent-soft text-accent' : 'text-text-muted hover:bg-bg-alt'"
-              @click="form.mode = m"
-            >
-              {{ m }}
-            </button>
-          </div>
-        </div>
-        <button @click="generate" :disabled="loading" class="btn-primary">
-          {{ loading ? 'Generating…' : 'Generate command' }}
-        </button>
-      </div>
-    </section>
+        <v-btn color="primary" :loading="loading" @click="generate" class="align-self-start">
+          {{ loading ? 'Generating...' : 'Generate command' }}
+        </v-btn>
+      </v-card-text>
+    </v-card>
 
-    <section v-if="generated" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Output</span>
-        <button @click="copy(generated)" class="btn-secondary !py-1 !px-2.5 !text-xs">
-          <Check v-if="copied" class="w-3.5 h-3.5 text-success" :stroke-width="1.75" />
-          <Copy v-else class="w-3.5 h-3.5" :stroke-width="1.75" />
-          {{ copied ? 'Copied' : 'Copy' }}
-        </button>
-      </div>
+    <v-card v-if="generated">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Output</span>
+        <v-btn variant="tonal" size="small" @click="copyCommand">
+          <v-icon start size="x-small">mdi-content-copy</v-icon>
+          Copy
+        </v-btn>
+      </v-card-title>
       <pre
-        class="font-mono text-xs leading-5 text-text bg-bg-alt
-               p-4 whitespace-pre-wrap overflow-x-auto"
+        class="font-mono text-body-2 text-on-surface bg-grey-lighten-3 pa-4 overflow-auto"
+        style="white-space: pre-wrap; line-height: 1.5;"
       >{{ generated }}</pre>
-    </section>
+    </v-card>
+
+    <v-snackbar v-model="snackbar" timeout="1500" color="success">Copied</v-snackbar>
   </div>
 </template>

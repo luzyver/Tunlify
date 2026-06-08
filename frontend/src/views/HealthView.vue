@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { RefreshCw } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
@@ -54,58 +53,70 @@ const columns: Column<HealthRow>[] = [
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Health</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Endpoint reachability</h1>
+        <p class="eyebrow mb-2">Console &middot; Health</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Endpoint reachability</h1>
       </div>
-      <button class="btn-secondary" :disabled="loading" @click="check">
-        <RefreshCw class="w-4 h-4" :stroke-width="1.75" :class="loading && 'animate-spin'" />
-        {{ loading ? 'Checking…' : 'Refresh' }}
-      </button>
-    </header>
+      <v-btn variant="tonal" :loading="loading" @click="check">
+        <v-icon start>mdi-refresh</v-icon>
+        {{ loading ? 'Checking...' : 'Refresh' }}
+      </v-btn>
+    </div>
 
-    <section v-if="results.length" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      <div class="account-tile">
-        <span class="account-tile-label">Total endpoints</span>
-        <span class="account-tile-value">{{ summary.total }}</span>
-      </div>
-      <div class="account-tile">
-        <span class="account-tile-label">Up</span>
-        <span class="account-tile-value">{{ summary.up }}</span>
-      </div>
-      <div class="account-tile">
-        <span class="account-tile-label">Down</span>
-        <span class="account-tile-value">{{ summary.total - summary.up }}</span>
-      </div>
-    </section>
+    <v-row v-if="results.length" class="mb-6">
+      <v-col cols="4" sm="3">
+        <v-card>
+          <v-card-text>
+            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Total endpoints</p>
+            <p class="text-h4 text-on-surface tabular-nums">{{ summary.total }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="4" sm="3">
+        <v-card>
+          <v-card-text>
+            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Up</p>
+            <p class="text-h4 text-success tabular-nums">{{ summary.up }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="4" sm="3">
+        <v-card>
+          <v-card-text>
+            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Down</p>
+            <p class="text-h4 text-error tabular-nums">{{ summary.total - summary.up }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <DataTable
       :data="results"
       :columns="columns"
       :searchable="true"
-      search-placeholder="Search hostname or service…"
+      search-placeholder="Search hostname or service..."
       :page-size="25"
       :row-key="(row) => row.hostname"
     >
       <template #cell-status_dot="{ row }">
-        <span class="dot" :class="row.status === 'up' ? 'bg-success' : 'bg-danger'" aria-hidden="true"></span>
+        <v-icon :color="row.status === 'up' ? 'success' : 'error'" size="small">mdi-checkbox-blank-circle</v-icon>
       </template>
       <template #cell-hostname="{ row }">
-        <span class="font-mono text-text">{{ row.hostname }}</span>
+        <span class="font-mono text-on-surface">{{ row.hostname }}</span>
       </template>
       <template #cell-service="{ row }">
-        <span class="font-mono text-xs text-text-muted truncate max-w-[260px] block">{{ row.service }}</span>
+        <span class="font-mono text-caption text-medium-emphasis text-truncate" style="max-width: 260px;">{{ row.service }}</span>
       </template>
       <template #cell-latency_ms="{ row }">
-        <span class="num">{{ row.latency || '—' }}</span>
+        <span class="tabular-nums">{{ row.latency || '\u2014' }}</span>
       </template>
       <template #cell-status="{ row }">
-        <span :class="row.status === 'up' ? 'badge-success' : 'badge-danger'">{{ row.status }}</span>
+        <v-chip :color="row.status === 'up' ? 'success' : 'error'" size="x-small" variant="tonal">{{ row.status }}</v-chip>
       </template>
       <template #empty>
-        {{ loading ? 'Checking endpoints…' : 'No endpoints to check' }}
+        {{ loading ? 'Checking endpoints...' : 'No endpoints to check' }}
       </template>
     </DataTable>
   </div>

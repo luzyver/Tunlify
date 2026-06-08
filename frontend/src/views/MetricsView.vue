@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
-import { RefreshCw } from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 
 const { apiFetch } = useApi()
@@ -22,19 +21,18 @@ interface CodeRow {
   pct: number
   scale: number
   bar: string
-  klass: string
   label: string
 }
 
-const SIGNAL: Record<string, { bar: string; klass: string; label: string }> = {
-  '2': { bar: 'bg-success', klass: 'text-success', label: 'Success' },
-  '3': { bar: 'bg-text-muted', klass: 'text-text-muted', label: 'Redirect' },
-  '4': { bar: 'bg-warning', klass: 'text-warning', label: 'Client error' },
-  '5': { bar: 'bg-danger', klass: 'text-danger', label: 'Server error' },
+const SIGNAL: Record<string, { bar: string; label: string }> = {
+  '2': { bar: 'success', label: 'Success' },
+  '3': { bar: 'secondary', label: 'Redirect' },
+  '4': { bar: 'warning', label: 'Client error' },
+  '5': { bar: 'error', label: 'Server error' },
 }
 
 function meta(code: string) {
-  return SIGNAL[code[0]] || { bar: 'bg-text-dim', klass: 'text-text-dim', label: 'Other' }
+  return SIGNAL[code[0]] || { bar: 'grey', label: 'Other' }
 }
 
 const rows = computed<CodeRow[]>(() => {
@@ -53,7 +51,6 @@ const rows = computed<CodeRow[]>(() => {
         pct: total ? (e.count / total) * 100 : 0,
         scale: max ? (e.count / max) * 100 : 0,
         bar: m.bar,
-        klass: m.klass,
         label: m.label,
       }
     })
@@ -63,7 +60,7 @@ const totalRequests = computed(() => Number(metrics.value?.total_requests ?? 0))
 const totalCounted = computed(() => rows.value.reduce((s, r) => s + r.count, 0))
 
 function formatNumber(n: number) {
-  if (n === undefined || n === null || Number.isNaN(n)) return '—'
+  if (n === undefined || n === null || Number.isNaN(n)) return '\u2014'
   return n.toLocaleString('en-US')
 }
 
@@ -71,82 +68,94 @@ function formatPct(p: number) {
   if (p >= 10) return p.toFixed(1) + '%'
   return p.toFixed(2) + '%'
 }
-
-const legend = [
-  { code: '2xx', label: 'Success', dot: 'bg-success' },
-  { code: '3xx', label: 'Redirect', dot: 'bg-text-muted' },
-  { code: '4xx', label: 'Client error', dot: 'bg-warning' },
-  { code: '5xx', label: 'Server error', dot: 'bg-danger' },
-]
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Metrics</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Cloudflared traffic</h1>
+        <p class="eyebrow mb-2">Console &middot; Metrics</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Cloudflared traffic</h1>
       </div>
-      <button class="btn-secondary" :disabled="loading" @click="fetchMetrics">
-        <RefreshCw class="w-4 h-4" :stroke-width="1.75" :class="loading && 'animate-spin'" />
+      <v-btn variant="tonal" :loading="loading" @click="fetchMetrics">
+        <v-icon start>mdi-refresh</v-icon>
         Refresh
-      </button>
-    </header>
+      </v-btn>
+    </div>
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="account-tile">
-        <span class="account-tile-label">Total requests</span>
-        <span class="account-tile-value">{{ formatNumber(totalRequests) }}</span>
-      </div>
-      <div class="account-tile">
-        <span class="account-tile-label">Distinct codes</span>
-        <span class="account-tile-value">{{ rows.length }}</span>
-      </div>
-    </section>
+    <v-row class="mb-6">
+      <v-col cols="12" sm="6">
+        <v-card>
+          <v-card-text>
+            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Total requests</p>
+            <p class="text-h4 text-on-surface tabular-nums">{{ formatNumber(totalRequests) }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-card>
+          <v-card-text>
+            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Distinct codes</p>
+            <p class="text-h4 text-on-surface tabular-nums">{{ rows.length }}</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Response codes</span>
-        <span class="text-2xs text-text-dim tabular-nums">
-          {{ formatNumber(totalCounted) }} counted · auto-refresh 10s
+    <v-card>
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Response codes</span>
+        <span class="text-caption text-medium-emphasis tabular-nums">
+          {{ formatNumber(totalCounted) }} counted &middot; auto-refresh 10s
         </span>
-      </div>
+      </v-card-title>
 
-      <div v-if="rows.length" class="p-4 space-y-1">
+      <div v-if="rows.length" class="pa-4">
         <div
           v-for="row in rows"
           :key="row.code"
-          class="grid items-center gap-4 px-2 h-9 rounded-md hover:bg-surface-alt transition-colors"
-          style="grid-template-columns: 56px 130px 1fr 96px 76px;"
+          class="d-grid align-center ga-4 px-2 rounded hover-bg-grey-lighten-4"
+          style="grid-template-columns: 56px 130px 1fr 96px 76px; height: 36px;"
         >
-          <span class="font-mono text-sm font-medium" :class="row.klass">{{ row.code }}</span>
-          <span class="text-xs text-text-muted hidden md:block truncate">{{ row.label }}</span>
-          <div class="relative h-2 bg-bg-alt rounded-full overflow-hidden">
-            <div
-              class="absolute inset-y-0 left-0 rounded-full transition-[width] duration-500 ease-out"
-              :class="row.bar"
-              :style="{ width: row.scale + '%' }"
-            ></div>
-          </div>
-          <span class="num text-sm text-text text-right">{{ formatNumber(row.count) }}</span>
-          <span class="num text-xs text-text-dim text-right">{{ formatPct(row.pct) }}</span>
+          <span class="font-mono text-body-2 font-weight-medium" :class="`text-${row.bar}`">{{ row.code }}</span>
+          <span class="text-caption text-medium-emphasis d-none d-md-block text-truncate">{{ row.label }}</span>
+          <v-progress-linear
+            :model-value="row.scale"
+            :color="row.bar"
+            height="8"
+            rounded
+            class="flex-grow-1"
+          />
+          <span class="tabular-nums text-body-2 text-on-surface text-right">{{ formatNumber(row.count) }}</span>
+          <span class="tabular-nums text-caption text-medium-emphasis text-right">{{ formatPct(row.pct) }}</span>
         </div>
       </div>
 
-      <div v-else class="p-8 text-center text-sm text-text-muted">
-        {{ metrics ? 'No response codes recorded yet' : 'Loading metrics…' }}
+      <div v-else class="pa-8 text-center text-body-2 text-medium-emphasis">
+        {{ metrics ? 'No response codes recorded yet' : 'Loading metrics...' }}
       </div>
 
-      <div
-        v-if="rows.length"
-        class="px-4 py-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border"
-      >
-        <div v-for="cls in legend" :key="cls.code" class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-sm" :class="cls.dot"></span>
-          <span class="text-2xs text-text-muted font-mono">{{ cls.code }}</span>
-          <span class="text-2xs text-text-muted">· {{ cls.label }}</span>
+      <div v-if="rows.length" class="pa-4 d-flex flex-wrap ga-4 border-top" style="border-top: 1px solid #ded9ca;">
+        <div v-for="cls in [
+          { code: '2xx', label: 'Success', color: 'success' },
+          { code: '3xx', label: 'Redirect', color: 'secondary' },
+          { code: '4xx', label: 'Client error', color: 'warning' },
+          { code: '5xx', label: 'Server error', color: 'error' },
+        ]" :key="cls.code" class="d-flex align-center ga-2">
+          <v-icon :color="cls.color" size="x-small">mdi-checkbox-blank-circle</v-icon>
+          <span class="text-caption text-medium-emphasis font-mono">{{ cls.code }}</span>
+          <span class="text-caption text-medium-emphasis">&middot; {{ cls.label }}</span>
         </div>
       </div>
-    </section>
+    </v-card>
   </div>
 </template>
+
+<style scoped>
+.hover-bg-grey-lighten-4:hover {
+  background: #f5f5f5;
+}
+.border-top {
+  border-top: 1px solid #ded9ca;
+}
+</style>

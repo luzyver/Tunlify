@@ -10,7 +10,6 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Search } from 'lucide-vue-next'
 
 export interface Column<R> {
   key: string
@@ -37,15 +36,20 @@ const props = withDefaults(
   }>(),
   {
     searchable: false,
-    searchPlaceholder: 'Search…',
+    searchPlaceholder: 'Search...',
     pageSize: 20,
     showPagination: true,
     rowKey: 'id' as any,
   }
 )
 
+const emit = defineEmits<{
+  'update:search': [value: string]
+}>()
+
 const sorting = ref<SortingState>([])
 const globalFilter = ref('')
+const searchInput = ref('')
 
 const tanstackColumns = computed<ColumnDef<T>[]>(() =>
   props.columns.map((c) => ({
@@ -82,32 +86,14 @@ const table = useVueTable({
 watch(globalFilter, () => table.setPageIndex(0))
 
 const hideBelowMap: Record<string, string> = {
-  sm: 'hidden sm:table-cell',
-  md: 'hidden md:table-cell',
-  lg: 'hidden lg:table-cell',
-  xl: 'hidden xl:table-cell',
-}
-const alignMap: Record<string, string> = {
-  left: 'text-left',
-  right: 'text-right',
-  center: 'text-center',
+  sm: 'd-sm-none d-md-table-cell',
+  md: 'd-none d-md-table-cell',
+  lg: 'd-none d-lg-table-cell',
+  xl: 'd-none d-xl-table-cell',
 }
 
-function colClass(c: Column<T>) {
-  const parts: string[] = []
-  if (c.hideBelow) parts.push(hideBelowMap[c.hideBelow])
-  if (c.align && c.align !== 'left') parts.push(alignMap[c.align])
-  if (c.cellClass) parts.push(c.cellClass)
-  return parts.join(' ')
-}
-
-function headerClass(c: Column<T>) {
-  const parts: string[] = []
-  if (c.hideBelow) parts.push(hideBelowMap[c.hideBelow])
-  if (c.align && c.align !== 'left') parts.push(alignMap[c.align])
-  if (c.headerClass) parts.push(c.headerClass)
-  return parts.join(' ')
-}
+const pageCount = computed(() => table.getPageCount())
+const pagination = computed(() => table.getState().pagination)
 
 function rowKeyFor(row: T, fallback: number) {
   if (typeof props.rowKey === 'function') return props.rowKey(row)
@@ -115,55 +101,63 @@ function rowKeyFor(row: T, fallback: number) {
   if (k && (row as any)[k] !== undefined) return (row as any)[k] as string | number
   return fallback
 }
-
-const rangeLabel = computed(() => {
-  const filtered = table.getFilteredRowModel().rows.length
-  if (!filtered) return '0'
-  const { pageIndex, pageSize } = table.getState().pagination
-  const from = pageIndex * pageSize + 1
-  const to = Math.min(from + pageSize - 1, filtered)
-  return `${from}–${to} of ${filtered}`
-})
 </script>
 
 <template>
-  <div class="space-y-3">
-    <div v-if="searchable || $slots.toolbar" class="flex items-center gap-2 flex-wrap">
-      <div v-if="searchable" class="relative">
-        <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-dim" :stroke-width="1.75" />
-        <input
-          v-model="globalFilter"
-          type="text"
-          :placeholder="searchPlaceholder"
-          class="input !pl-9 !py-1.5 w-[280px]"
-        />
-      </div>
+  <div>
+    <div v-if="searchable || $slots.toolbar" class="d-flex align-center ga-2 flex-wrap mb-3">
+      <v-text-field
+        v-if="searchable"
+        v-model="globalFilter"
+        :placeholder="searchPlaceholder"
+        prepend-inner-icon="mdi-magnify"
+        clearable
+        hide-details
+        density="compact"
+        variant="outlined"
+        style="max-width: 320px;"
+      />
       <slot name="toolbar" />
     </div>
 
-    <div class="card overflow-hidden">
-      <table class="table-tight">
+    <v-card>
+      <v-table density="compact" class="table-tight">
         <thead>
           <tr>
             <th
               v-for="header in table.getHeaderGroups()[0].headers"
               :key="header.id"
-              :class="[colClass(columns.find((c) => c.key === header.column.id)!), columns.find((c) => c.key === header.column.id)?.width && '']"
-              :style="{ width: columns.find((c) => c.key === header.column.id)?.width }"
+              :class="columns.find((c) => c.key === header.column.id)?.hideBelow ? hideBelowMap[columns.find((c) => c.key === header.column.id)!.hideBelow!] : ''"
+              :style="{ width: columns.find((c) => c.key === header.column.id)?.width, textAlign: columns.find((c) => c.key === header.column.id)?.align || 'left' }"
+              class="text-caption font-weight-bold text-uppercase text-medium-emphasis"
             >
-              <button
+              <v-btn
                 v-if="header.column.getCanSort()"
-                type="button"
-                class="inline-flex items-center gap-1.5 hover:text-text transition-colors"
+                variant="text"
+                density="compact"
+                size="small"
+                :class="columns.find((c) => c.key === header.column.id)?.align === 'right' ? 'flex-row-reverse' : ''"
                 @click="header.column.toggleSorting()"
               >
                 <slot :name="`header-${header.column.id}`" :column="header.column">
                   {{ columns.find((c) => c.key === header.column.id)?.label }}
                 </slot>
-                <ArrowUp v-if="header.column.getIsSorted() === 'asc'" class="w-3 h-3" :stroke-width="2" />
-                <ArrowDown v-else-if="header.column.getIsSorted() === 'desc'" class="w-3 h-3" :stroke-width="2" />
-                <ArrowUpDown v-else class="w-3 h-3 opacity-40" :stroke-width="2" />
-              </button>
+                <v-icon
+                  v-if="header.column.getIsSorted() === 'asc'"
+                  size="x-small"
+                  class="ml-1"
+                >mdi-arrow-up</v-icon>
+                <v-icon
+                  v-else-if="header.column.getIsSorted() === 'desc'"
+                  size="x-small"
+                  class="ml-1"
+                >mdi-arrow-down</v-icon>
+                <v-icon
+                  v-else
+                  size="x-small"
+                  class="ml-1 text-disabled"
+                >mdi-arrow-up-down</v-icon>
+              </v-btn>
               <span v-else>
                 <slot :name="`header-${header.column.id}`" :column="header.column">
                   {{ columns.find((c) => c.key === header.column.id)?.label }}
@@ -181,7 +175,8 @@ const rangeLabel = computed(() => {
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              :class="colClass(columns.find((c) => c.key === cell.column.id)!)"
+              :class="columns.find((c) => c.key === cell.column.id)?.hideBelow ? hideBelowMap[columns.find((c) => c.key === cell.column.id)!.hideBelow!] : ''"
+              :style="{ textAlign: columns.find((c) => c.key === cell.column.id)?.align || 'left' }"
             >
               <slot
                 :name="`cell-${cell.column.id}`"
@@ -194,44 +189,59 @@ const rangeLabel = computed(() => {
             </td>
           </tr>
           <tr v-if="!table.getRowModel().rows.length">
-            <td :colspan="columns.length" class="text-center text-text-muted py-8 text-sm">
+            <td :colspan="columns.length" class="text-center text-medium-emphasis py-8">
               <slot name="empty">
                 {{ globalFilter ? 'No results match your search' : 'No data' }}
               </slot>
             </td>
           </tr>
         </tbody>
-      </table>
-    </div>
+      </v-table>
+    </v-card>
 
     <div
       v-if="showPagination && table.getFilteredRowModel().rows.length > pageSize"
-      class="flex items-center justify-between gap-3"
+      class="d-flex align-center justify-space-between ga-3 mt-3"
     >
-      <span class="text-2xs text-text-dim tabular-nums">{{ rangeLabel }}</span>
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          class="btn-secondary !py-1 !px-2.5 !text-xs"
+      <span class="text-caption text-medium-emphasis tabular-nums">
+        {{ pagination.pageIndex * pagination.pageSize + 1 }}&ndash;{{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, table.getFilteredRowModel().rows.length) }} of {{ table.getFilteredRowModel().rows.length }}
+      </span>
+      <div class="d-flex align-center ga-2">
+        <v-btn
+          size="small"
+          variant="tonal"
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          <ChevronLeft class="w-3.5 h-3.5" :stroke-width="1.75" />
+          <v-icon size="small">mdi-chevron-left</v-icon>
           Previous
-        </button>
-        <span class="text-2xs text-text-dim tabular-nums">
-          Page {{ table.getState().pagination.pageIndex + 1 }} / {{ table.getPageCount() }}
+        </v-btn>
+        <span class="text-caption text-medium-emphasis tabular-nums">
+          Page {{ pagination.pageIndex + 1 }} / {{ pageCount }}
         </span>
-        <button
-          type="button"
-          class="btn-secondary !py-1 !px-2.5 !text-xs"
+        <v-btn
+          size="small"
+          variant="tonal"
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
           Next
-          <ChevronRight class="w-3.5 h-3.5" :stroke-width="1.75" />
-        </button>
+          <v-icon size="small">mdi-chevron-right</v-icon>
+        </v-btn>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.table-tight th {
+  height: 36px;
+  white-space: nowrap;
+}
+.table-tight td {
+  height: 36px;
+}
+.table-tight tbody tr:hover {
+  background: #fbfaf6;
+}
+</style>

@@ -32,48 +32,53 @@ watch(filterAction, fetchAudit)
 fetchAudit()
 
 const columns: Column<AuditEntry>[] = [
-  { key: 'created_at', label: 'Time', sortable: true, width: '200px', cellClass: 'num text-xs text-text-muted' },
+  { key: 'created_at', label: 'Time', sortable: true, width: '200px', cellClass: 'num text-caption text-medium-emphasis' },
   { key: 'action', label: 'Action', sortable: true, width: '160px' },
   { key: 'detail', label: 'Detail', hideBelow: 'md' },
-  { key: 'ip_address', label: 'IP', sortable: true, hideBelow: 'md', width: '140px', align: 'right', cellClass: 'num text-xs text-text-dim', headerClass: 'num' },
+  { key: 'ip_address', label: 'IP', sortable: true, hideBelow: 'md', width: '140px', align: 'right', cellClass: 'num text-caption text-disabled', headerClass: 'num' },
 ]
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Audit</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Audit log</h1>
+        <p class="eyebrow mb-2">Console &middot; Audit</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Audit log</h1>
       </div>
-      <span v-if="total > entries.length" class="text-2xs text-text-dim tabular-nums">
+      <span v-if="total > entries.length" class="text-caption text-medium-emphasis tabular-nums">
         showing newest {{ entries.length }} of {{ total }}
       </span>
-    </header>
+    </div>
 
     <DataTable
       :data="entries"
       :columns="columns"
       :searchable="true"
-      search-placeholder="Search detail or IP…"
+      search-placeholder="Search detail or IP..."
       :page-size="25"
     >
       <template #toolbar>
-        <select v-model="filterAction" class="input !w-auto !py-1.5 !text-xs">
-          <option v-for="a in actions" :key="a" :value="a">{{ a || 'All actions' }}</option>
-        </select>
+        <v-select
+          v-model="filterAction"
+          :items="actions.map(a => ({ title: a || 'All actions', value: a }))"
+          hide-details
+          density="compact"
+          variant="outlined"
+          style="min-width: 160px;"
+        />
       </template>
 
       <template #cell-action="{ row }">
-        <span class="badge-accent font-mono">{{ row.action }}</span>
+        <v-chip color="primary" size="x-small" variant="tonal" class="font-mono">{{ row.action }}</v-chip>
       </template>
       <template #cell-detail="{ row }">
-        <span class="text-text-muted text-xs truncate max-w-[420px] block">
-          {{ row.detail?.split('\n')[0] || '—' }}
+        <span class="text-medium-emphasis text-caption text-truncate" style="max-width: 420px;">
+          {{ row.detail?.split('\n')[0] || '\u2014' }}
         </span>
       </template>
       <template #cell-ip_address="{ row }">
-        {{ row.ip_address || '—' }}
+        {{ row.ip_address || '\u2014' }}
       </template>
       <template #empty>
         {{ filterAction ? 'No entries for this action' : 'No audit entries' }}

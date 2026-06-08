@@ -34,54 +34,74 @@ async function changePassword() {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header>
-      <p class="eyebrow mb-2">Console · Settings</p>
-      <h1 class="text-2xl font-semibold tracking-tight text-text">Account</h1>
+  <div class="pa-6" style="max-width: 1280px;">
+    <header class="mb-6">
+      <p class="eyebrow mb-2">Console &middot; Settings</p>
+      <h1 class="text-h4 font-weight-semibold text-on-surface">Account</h1>
     </header>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Profile</span>
-      </div>
-      <div class="card-body grid sm:grid-cols-2 gap-4">
-        <div>
-          <span class="field-label">Username</span>
-          <p class="font-mono text-text">{{ authStore.username || 'admin' }}</p>
-        </div>
-        <div>
-          <span class="field-label">Role</span>
-          <p class="text-text">Administrator</p>
-        </div>
-      </div>
-    </section>
+    <v-card class="mb-6">
+      <v-card-title>Profile</v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <p class="text-caption font-weight-medium text-medium-emphasis mb-1">Username</p>
+            <p class="font-mono text-on-surface">{{ authStore.username || 'admin' }}</p>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <p class="text-caption font-weight-medium text-medium-emphasis mb-1">Role</p>
+            <p class="text-on-surface">Administrator</p>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Change password</span>
-      </div>
-      <form @submit.prevent="changePassword" class="card-body space-y-4">
-        <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-danger'">
-          {{ message.text }}
-        </div>
+    <v-card>
+      <v-card-title>Change password</v-card-title>
+      <v-form @submit.prevent="changePassword">
+        <v-card-text class="d-flex flex-column ga-4">
+          <v-alert v-if="message" :type="message.type" variant="tonal">{{ message.text }}</v-alert>
 
-        <div>
-          <label class="field-label">Current password</label>
-          <input v-model="form.current_password" type="password" autocomplete="current-password" class="input" required />
-        </div>
-        <div>
-          <label class="field-label">New password</label>
-          <input v-model="form.new_password" type="password" autocomplete="new-password" class="input" required minlength="8" />
-        </div>
-        <div>
-          <label class="field-label">Confirm new password</label>
-          <input v-model="form.confirm" type="password" autocomplete="new-password" class="input" required minlength="8" />
-        </div>
+          <v-text-field
+            v-model="form.current_password"
+            label="Current password"
+            type="password"
+            autocomplete="current-password"
+            variant="outlined"
+            density="compact"
+            hide-details
+            required
+          />
 
-        <button type="submit" :disabled="loading" class="btn-primary">
-          {{ loading ? 'Updating…' : 'Update password' }}
-        </button>
-      </form>
-    </section>
+          <v-text-field
+            v-model="form.new_password"
+            label="New password"
+            type="password"
+            autocomplete="new-password"
+            variant="outlined"
+            density="compact"
+            hide-details
+            required
+            minlength="8"
+          />
+
+          <v-text-field
+            v-model="form.confirm"
+            label="Confirm new password"
+            type="password"
+            autocomplete="new-password"
+            variant="outlined"
+            density="compact"
+            hide-details
+            required
+            minlength="8"
+          />
+
+          <v-btn type="submit" color="primary" :loading="loading" class="align-self-start">
+            {{ loading ? 'Updating...' : 'Update password' }}
+          </v-btn>
+        </v-card-text>
+      </v-form>
+    </v-card>
   </div>
 </template>

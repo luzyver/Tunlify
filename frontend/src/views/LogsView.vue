@@ -66,13 +66,13 @@ watch(
 )
 
 function levelClass(msg: string) {
-  if (msg.includes('ERR') || msg.includes('error') || msg.includes('Error')) return 'text-danger'
+  if (msg.includes('ERR') || msg.includes('error') || msg.includes('Error')) return 'text-error'
   if (msg.includes('WRN') || msg.includes('warn') || msg.includes('Warn')) return 'text-warning'
-  return 'text-text'
+  return 'text-on-surface'
 }
 
 function formatTime(t?: string) {
-  return t?.split('T')[1]?.slice(0, 8) || '—'
+  return t?.split('T')[1]?.slice(0, 8) || '\u2014'
 }
 
 function logKey(e: LogEntry) {
@@ -109,71 +109,83 @@ function setRowRef(el: Element | null) {
 </script>
 
 <template>
-  <div class="space-y-6 h-[calc(100vh-3rem)] flex flex-col">
-    <header class="flex items-end justify-between gap-4 shrink-0">
+  <div class="pa-6 d-flex flex-column" style="max-width: 1280px; height: calc(100vh - 48px);">
+    <div class="d-flex align-end justify-space-between ga-4 flex-shrink-0 mb-4">
       <div>
-        <p class="eyebrow mb-2">Console · Logs</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Cloudflared stream</h1>
+        <p class="eyebrow mb-2">Console &middot; Logs</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Cloudflared stream</h1>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="badge" :class="wsStatus === 'connected' ? 'badge-success' : wsStatus === 'connecting' ? 'badge-warning' : 'badge-danger'">
-          <span class="dot" :class="wsStatus === 'connected' ? 'bg-success' : wsStatus === 'connecting' ? 'bg-warning' : 'bg-danger'"></span>
-          {{ wsStatus }}
-        </span>
-        <button @click="clear" class="btn-secondary">Clear</button>
-      </div>
-    </header>
-
-    <div class="flex flex-wrap items-center gap-2 shrink-0">
-      <div class="inline-flex border border-border rounded-md overflow-hidden bg-surface">
-        <button
-          v-for="f in ['all', 'error', 'warn', 'info'] as const"
-          :key="f"
-          type="button"
-          class="px-3 h-8 text-xs font-medium transition-colors duration-100"
-          :class="filter === f ? 'bg-accent-soft text-accent' : 'text-text-muted hover:bg-bg-alt'"
-          @click="filter = f"
+      <div class="d-flex align-center ga-2">
+        <v-chip
+          size="small"
+          :color="wsStatus === 'connected' ? 'success' : wsStatus === 'connecting' ? 'warning' : 'error'"
+          variant="tonal"
         >
-          {{ f }}
-        </button>
-      </div>
-      <input
-        v-model="search"
-        placeholder="Search…"
-        class="input !py-1.5 max-w-[260px]"
-      />
-      <div class="ml-auto flex items-center gap-3">
-        <button
-          v-if="expanded.size"
-          type="button"
-          class="text-xs text-text-muted hover:text-text transition-colors"
-          @click="collapseAll"
-        >Collapse all</button>
-        <button
-          v-else-if="filtered.length"
-          type="button"
-          class="text-xs text-text-muted hover:text-text transition-colors"
-          @click="expandAll"
-        >Expand all</button>
-        <label class="flex items-center gap-2 text-xs text-text-muted">
-          <input type="checkbox" v-model="autoScroll" class="accent-accent" /> Tail
-        </label>
-        <span class="text-2xs text-text-dim font-mono tabular-nums">
-          {{ filtered.length }} / {{ logs.length }}
-        </span>
+          <template #prepend>
+            <v-icon size="x-small">mdi-checkbox-blank-circle</v-icon>
+          </template>
+          {{ wsStatus }}
+        </v-chip>
+        <v-btn variant="tonal" @click="clear">Clear</v-btn>
       </div>
     </div>
 
-    <div class="card flex-1 overflow-hidden flex flex-col min-h-0">
-      <div class="grid border-b border-border bg-bg-alt eyebrow shrink-0" style="grid-template-columns: 120px 1fr;">
-        <div class="px-4 h-9 flex items-center">Time</div>
-        <div class="px-4 h-9 flex items-center">Message</div>
+    <div class="d-flex align-center ga-2 flex-shrink-0 mb-3 flex-wrap">
+      <v-chip-group v-model="filter" mandatory color="primary" variant="tonal" density="compact">
+        <v-chip value="all" size="small">all</v-chip>
+        <v-chip value="error" size="small">error</v-chip>
+        <v-chip value="warn" size="small">warn</v-chip>
+        <v-chip value="info" size="small">info</v-chip>
+      </v-chip-group>
+
+      <v-text-field
+        v-model="search"
+        placeholder="Search..."
+        prepend-inner-icon="mdi-magnify"
+        clearable
+        hide-details
+        density="compact"
+        variant="outlined"
+        style="max-width: 260px;"
+      />
+
+      <v-spacer />
+
+      <v-btn
+        v-if="expanded.size"
+        variant="text"
+        size="small"
+        @click="collapseAll"
+      >Collapse all</v-btn>
+      <v-btn
+        v-else-if="filtered.length"
+        variant="text"
+        size="small"
+        @click="expandAll"
+      >Expand all</v-btn>
+
+      <v-checkbox
+        v-model="autoScroll"
+        label="Tail"
+        hide-details
+        density="compact"
+      />
+
+      <span class="text-caption text-medium-emphasis font-mono tabular-nums">
+        {{ filtered.length }} / {{ logs.length }}
+      </span>
+    </div>
+
+    <v-card class="flex-grow-1 d-flex flex-column overflow-hidden">
+      <div class="d-grid border-bottom bg-grey-lighten-4 eyebrow" style="grid-template-columns: 120px 1fr; border-bottom: 1px solid #ded9ca;">
+        <div class="px-4" style="height: 36px; display: flex; align-items: center;">Time</div>
+        <div class="px-4" style="height: 36px; display: flex; align-items: center;">Message</div>
       </div>
 
-      <div ref="scrollEl" class="flex-1 overflow-auto scrollbar-thin">
+      <div ref="scrollEl" class="flex-grow-1 overflow-auto scrollbar-thin">
         <div
           v-if="filtered.length"
-          class="relative w-full"
+          class="position-relative"
           :style="{ height: rowVirtualizer.getTotalSize() + 'px' }"
         >
           <div
@@ -181,28 +193,41 @@ function setRowRef(el: Element | null) {
             :key="vrow.key"
             :ref="(el) => setRowRef(el as Element | null)"
             :data-index="vrow.index"
-            class="absolute inset-x-0 grid items-start border-b border-border cursor-pointer transition-colors"
-            :class="isExpanded(filtered[vrow.index]) ? 'bg-surface-alt' : 'hover:bg-surface-alt'"
-            :style="{ transform: `translateY(${vrow.start}px)`, gridTemplateColumns: '120px 1fr' }"
+            class="position-absolute d-grid align-start border-bottom cursor-pointer transition-colors"
+            :class="isExpanded(filtered[vrow.index]) ? 'bg-grey-lighten-3' : 'hover-bg-grey-lighten-4'"
+            :style="{ transform: `translateY(${vrow.start}px)`, gridTemplateColumns: '120px 1fr', insetInline: 0, borderBottom: '1px solid #ded9ca' }"
             tabindex="0"
             @click="toggle(filtered[vrow.index])"
             @keydown.enter.prevent="toggle(filtered[vrow.index])"
             @keydown.space.prevent="toggle(filtered[vrow.index])"
           >
-            <div class="px-4 py-1 num text-xs text-text-dim">{{ formatTime(filtered[vrow.index].time) }}</div>
+            <div class="px-4 py-1 font-mono text-caption text-medium-emphasis tabular-nums">{{ formatTime(filtered[vrow.index].time) }}</div>
             <div
-              class="px-4 py-1 font-mono text-xs leading-5"
+              class="px-4 py-1 font-mono text-caption"
               :class="[
                 levelClass(filtered[vrow.index].message),
-                isExpanded(filtered[vrow.index]) ? 'whitespace-pre-wrap break-words' : 'truncate'
+                isExpanded(filtered[vrow.index]) ? 'text-pre-wrap word-break' : 'text-truncate'
               ]"
             >{{ filtered[vrow.index].message }}</div>
           </div>
         </div>
-        <div v-else class="text-center text-text-muted py-12 text-sm">
-          {{ logs.length ? 'No logs match the current filter' : 'Waiting for logs…' }}
+        <div v-else class="text-center text-medium-emphasis py-12 text-body-2">
+          {{ logs.length ? 'No logs match the current filter' : 'Waiting for logs...' }}
         </div>
       </div>
-    </div>
+    </v-card>
   </div>
 </template>
+
+<style scoped>
+.hover-bg-grey-lighten-4:hover {
+  background: #f5f5f5;
+}
+.text-pre-wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.border-bottom {
+  border-bottom: 1px solid #ded9ca;
+}
+</style>

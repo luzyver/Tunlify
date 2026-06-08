@@ -1,42 +1,27 @@
 <script setup lang="ts">
-import {
-  Activity,
-  Archive,
-  BarChart3,
-  Bell,
-  Cog,
-  Container,
-  LayoutDashboard,
-  LogOut,
-  ScrollText,
-  Settings,
-  Shield,
-  Terminal,
-} from 'lucide-vue-next'
 import { useAuthStore } from '../stores/auth'
 import { useRouter } from 'vue-router'
 import { useApi } from '../composables/useApi'
 
-const emit = defineEmits<{
-  navigate: []
-}>()
+const emit = defineEmits<{ navigate: [] }>()
+const props = withDefaults(defineProps<{ rail: boolean }>(), { rail: false })
 
 const authStore = useAuthStore()
 const router = useRouter()
 const { apiFetch } = useApi()
 
 const nav = [
-  { to: '/', label: 'Status', icon: LayoutDashboard },
-  { to: '/projects', label: 'Projects', icon: Container },
-  { to: '/health', label: 'Health', icon: Activity },
-  { to: '/metrics', label: 'Metrics', icon: BarChart3 },
-  { to: '/logs', label: 'Logs', icon: ScrollText },
-  { to: '/config', label: 'Ingress', icon: Settings },
-  { to: '/backups', label: 'Backups', icon: Archive },
-  { to: '/tcp-access', label: 'TCP Access', icon: Terminal },
-  { to: '/notifications', label: 'Alerts', icon: Bell },
-  { to: '/audit', label: 'Audit', icon: Shield },
-  { to: '/settings', label: 'Settings', icon: Cog },
+  { to: '/', label: 'Status', icon: 'mdi-view-dashboard' },
+  { to: '/projects', label: 'Projects', icon: 'mdi-docker' },
+  { to: '/health', label: 'Health', icon: 'mdi-heart-pulse' },
+  { to: '/metrics', label: 'Metrics', icon: 'mdi-chart-bar' },
+  { to: '/logs', label: 'Logs', icon: 'mdi-text-box-search-outline' },
+  { to: '/config', label: 'Ingress', icon: 'mdi-tune' },
+  { to: '/backups', label: 'Backups', icon: 'mdi-archive' },
+  { to: '/tcp-access', label: 'TCP Access', icon: 'mdi-console' },
+  { to: '/notifications', label: 'Alerts', icon: 'mdi-bell-outline' },
+  { to: '/audit', label: 'Audit', icon: 'mdi-shield-account' },
+  { to: '/settings', label: 'Settings', icon: 'mdi-cog' },
 ]
 
 async function handleLogout() {
@@ -47,50 +32,53 @@ async function handleLogout() {
 </script>
 
 <template>
-  <aside
-    class="w-sidebar shrink-0 h-screen sticky top-0
-           bg-bg border-r border-border
-           flex flex-col"
+  <v-navigation-drawer
+    :rail="props.rail"
+    permanent
+    :width="240"
+    :rail-width="64"
+    color="background"
+    @update:rail="$emit('update:rail', $event)"
   >
-    <div class="h-14 flex items-center gap-2.5 px-4 border-b border-border shrink-0">
-      <img src="/icon.png" alt="" class="w-6 h-6 rounded-sm" />
-      <span class="text-sm font-semibold tracking-tight text-text">Tunlify</span>
-    </div>
+    <template #prepend>
+      <v-list-item
+        class="px-4 py-2"
+        :prepend-avatar="'/icon.png'"
+        title="Tunlify"
+        subtitle="Console"
+        nav
+      />
+      <v-divider />
+    </template>
 
-    <nav class="flex-1 px-2 pt-3 pb-3 space-y-px overflow-y-auto scrollbar-thin">
-      <router-link
+    <v-list density="compact" nav>
+      <v-list-item
         v-for="item in nav"
         :key="item.to"
         :to="item.to"
+        :prepend-icon="item.icon"
+        :title="item.label"
+        :active="router.currentRoute.value.path === item.to"
+        color="primary"
+        variant="text"
+        density="compact"
+        class="mb-1"
         @click="emit('navigate')"
-        class="flex items-center gap-2.5 h-8 px-3
-               rounded-md text-sm text-text-muted
-               transition-colors duration-100
-               hover:bg-bg-alt hover:text-text"
-        active-class="!text-accent !bg-accent-soft font-medium"
-      >
-        <component :is="item.icon" class="w-4 h-4 shrink-0" :stroke-width="1.75" />
-        <span class="truncate">{{ item.label }}</span>
-      </router-link>
-    </nav>
+      />
+    </v-list>
 
-    <div class="px-3 py-3 border-t border-border flex items-center gap-2 shrink-0">
-      <div
-        class="w-7 h-7 rounded-full bg-accent-soft text-accent
-               flex items-center justify-center
-               text-xs font-semibold uppercase shrink-0"
+    <template #append>
+      <v-divider />
+      <v-list-item
+        :prepend-avatar="`https://ui-avatars.com/api/?name=${authStore.username?.[0] || 'A'}&background=e2e6fb&color=5266eb&size=28`"
+        :title="authStore.username || 'admin'"
+        subtitle="Signed in"
+        class="pt-2"
       >
-        {{ authStore.username?.[0] || 'A' }}
-      </div>
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium text-text truncate leading-tight">
-          {{ authStore.username || 'admin' }}
-        </p>
-        <p class="text-2xs text-text-dim truncate leading-tight mt-0.5">Signed in</p>
-      </div>
-      <button @click="handleLogout" class="btn-icon-ghost" title="Sign out">
-        <LogOut class="w-3.5 h-3.5" :stroke-width="1.75" />
-      </button>
-    </div>
-  </aside>
+        <template #append>
+          <v-btn icon="mdi-logout" variant="text" size="small" @click="handleLogout" />
+        </template>
+      </v-list-item>
+    </template>
+  </v-navigation-drawer>
 </template>

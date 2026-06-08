@@ -31,73 +31,77 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-bg flex flex-col">
+  <v-app>
+    <v-main class="bg-background">
+      <div class="d-flex flex-column" style="min-height: 100vh;">
+        <header class="d-flex align-center justify-space-between pa-6" style="max-width: 1080px; width: 100%; margin: 0 auto;">
+          <div class="d-flex align-center ga-2">
+            <v-avatar size="28" rounded>
+              <v-img src="/icon.png" />
+            </v-avatar>
+            <span class="text-h6 font-weight-semibold text-on-surface">Tunlify</span>
+          </div>
+          <a
+            href="https://github.com/luzyver/Tunlify"
+            target="_blank"
+            rel="noopener"
+            class="text-medium-emphasis text-decoration-none"
+          >Source &Nearr;</a>
+        </header>
 
-    <header class="max-w-marketing mx-auto w-full px-6 py-6 flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <img src="/icon.png" alt="" class="w-7 h-7 rounded-sm" />
-        <span class="text-md font-semibold tracking-tight text-text">Tunlify</span>
-      </div>
-      <a
-        href="https://github.com/luzyver/Tunlify"
-        target="_blank"
-        rel="noopener"
-        class="text-sm text-text-muted hover:text-text transition-colors"
-      >Source ↗</a>
-    </header>
+        <div class="flex-grow-1 d-flex align-center justify-center pa-6">
+          <div style="max-width: 420px; width: 100%;">
+            <div class="text-center mb-12">
+              <p class="eyebrow mb-4">Tunlify &middot; Console</p>
+              <h1 class="text-display" style="font-size: 30px; line-height: 1.2; color: #2a2924;">
+                Sign in to your tunnel.
+              </h1>
+              <p class="mt-3 text-body-1 text-medium-emphasis">
+                Manage Cloudflare tunnels and Compose projects.
+              </p>
+            </div>
 
-    <div class="flex-1 flex items-center justify-center px-6 py-12">
-      <div class="w-full max-w-[420px]">
+            <v-form @submit.prevent="handleLogin">
+              <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
-        <div class="mb-12 text-center">
-          <p class="eyebrow mb-4">Tunlify · Console</p>
-          <h1 class="text-display text-3xl text-text leading-tight">
-            Sign in to your tunnel.
-          </h1>
-          <p class="mt-3 text-md text-text-muted">
-            Manage Cloudflare tunnels and Compose projects.
-          </p>
+              <v-text-field
+                v-model="form.username"
+                label="Username"
+                placeholder="admin"
+                required
+                autofocus
+                autocomplete="username"
+                class="mb-4"
+              />
+
+              <v-text-field
+                v-model="form.password"
+                label="Password"
+                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                type="password"
+                required
+                autocomplete="current-password"
+                class="mb-6"
+              />
+
+              <v-btn
+                type="submit"
+                color="primary"
+                size="large"
+                block
+                :loading="loading"
+                class="rounded-pill"
+              >
+                {{ loading ? 'Signing in...' : 'Sign in' }}
+              </v-btn>
+            </v-form>
+
+            <p class="mt-12 text-center text-caption text-disabled">
+              Self-hosted &middot; MIT licensed
+            </p>
+          </div>
         </div>
-
-        <form @submit.prevent="handleLogin" class="space-y-4">
-          <div v-if="error" class="alert-danger">{{ error }}</div>
-
-          <div>
-            <label for="login-username" class="field-label">Username</label>
-            <input
-              id="login-username"
-              v-model="form.username"
-              type="text"
-              required
-              autofocus
-              autocomplete="username"
-              class="input-pill"
-              placeholder="admin"
-            />
-          </div>
-
-          <div>
-            <label for="login-password" class="field-label">Password</label>
-            <input
-              id="login-password"
-              v-model="form.password"
-              type="password"
-              required
-              autocomplete="current-password"
-              class="input-pill"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button type="submit" :disabled="loading" class="btn-pill w-full">
-            {{ loading ? 'Signing in…' : 'Sign in' }}
-          </button>
-        </form>
-
-        <p class="mt-12 text-center text-xs text-text-dim">
-          Self-hosted · MIT licensed
-        </p>
       </div>
-    </div>
-  </div>
+    </v-main>
+  </v-app>
 </template>

@@ -1,16 +1,5 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
-import {
-  History,
-  Pencil,
-  Play,
-  Plus,
-  Rocket,
-  RotateCcw,
-  Square,
-  Trash2,
-  X,
-} from 'lucide-vue-next'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
@@ -94,7 +83,8 @@ async function save() {
 }
 
 async function remove(id: number) {
-  if (!confirm('Delete this project? This cannot be undone.')) return
+  const confirmed = await confirm('Delete this project? This cannot be undone.')
+  if (!confirmed) return
   try {
     await apiFetch(`/api/projects/${id}`, { method: 'DELETE' })
     load()
@@ -160,177 +150,164 @@ const columns: Column<Project>[] = [
   { key: 'name', label: 'Name', sortable: true },
   { key: 'path', label: 'Path', sortable: true },
   { key: 'repo_url', label: 'Repository', sortable: true, hideBelow: 'lg' },
-  { key: 'created_at', label: 'Created', sortable: true, align: 'right', width: '140px', cellClass: 'num text-xs text-text-dim', headerClass: 'num' },
+  { key: 'created_at', label: 'Created', sortable: true, align: 'right', width: '140px', cellClass: 'num text-caption text-medium-emphasis', headerClass: 'num' },
   { key: 'actions', label: '', align: 'right', width: '260px' },
 ]
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex items-end justify-between gap-4">
+  <div class="pa-6" style="max-width: 1280px;">
+    <div class="d-flex align-end justify-space-between ga-4 mb-6">
       <div>
-        <p class="eyebrow mb-2">Console · Compose</p>
-        <h1 class="text-2xl font-semibold tracking-tight text-text">Projects</h1>
+        <p class="eyebrow mb-2">Console &middot; Compose</p>
+        <h1 class="text-h4 font-weight-semibold text-on-surface">Projects</h1>
       </div>
-      <button class="btn-primary" @click="openAdd">
-        <Plus class="w-4 h-4" :stroke-width="1.75" />
+      <v-btn color="primary" @click="openAdd">
+        <v-icon start>mdi-plus</v-icon>
         New project
-      </button>
-    </header>
+      </v-btn>
+    </div>
 
-    <div v-if="error" class="alert-danger">{{ error }}</div>
+    <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
-    <section v-if="showForm" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">{{ editingId ? 'Edit project' : 'New project' }}</span>
-        <button @click="showForm = false" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
-      </div>
-      <div class="card-body grid sm:grid-cols-2 gap-4">
-        <div>
-          <label class="field-label">Name</label>
-          <input v-model="form.name" class="input" placeholder="my-app" />
-        </div>
-        <div>
-          <label class="field-label">Path</label>
-          <input v-model="form.path" class="input font-mono" placeholder="/srv/my-app" />
-        </div>
-        <div class="sm:col-span-2">
-          <label class="field-label">Repository URL <span class="text-text-dim">(optional)</span></label>
-          <input v-model="form.repo_url" class="input font-mono" placeholder="https://github.com/user/repo.git" />
-        </div>
-        <div>
-          <label class="field-label">Git username</label>
-          <input v-model="form.git_username" class="input" placeholder="git" />
-        </div>
-        <div>
-          <label class="field-label">Git token</label>
-          <input v-model="form.git_token" type="password" class="input font-mono" placeholder="ghp_…" />
-        </div>
-        <div class="sm:col-span-2 flex gap-3 pt-1">
-          <button @click="save" class="btn-primary">{{ editingId ? 'Save changes' : 'Create project' }}</button>
-          <button @click="showForm = false" class="btn-secondary">Cancel</button>
-        </div>
-      </div>
-    </section>
+    <v-card v-if="showForm" class="mb-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>{{ editingId ? 'Edit project' : 'New project' }}</span>
+        <v-btn icon="mdi-close" variant="text" size="small" @click="showForm = false" />
+      </v-card-title>
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="form.name" label="Name" placeholder="my-app" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="form.path" label="Path" placeholder="/srv/my-app" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="form.repo_url" label="Repository URL (optional)" placeholder="https://github.com/user/repo.git" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="form.git_username" label="Git username" placeholder="git" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field v-model="form.git_token" label="Git token" placeholder="ghp_..." type="password" variant="outlined" density="compact" hide-details />
+          </v-col>
+          <v-col cols="12">
+            <div class="d-flex ga-3 pt-1">
+              <v-btn color="primary" @click="save">{{ editingId ? 'Save changes' : 'Create project' }}</v-btn>
+              <v-btn variant="tonal" @click="showForm = false">Cancel</v-btn>
+            </div>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
 
-    <section v-if="deployTarget" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title flex items-center gap-2">
-          <Rocket class="w-4 h-4 text-accent" :stroke-width="1.75" />
-          Deploy — choose ref
-        </span>
-        <button @click="deployTarget = null" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
-      </div>
-      <div class="card-body flex gap-3">
-        <input
+    <v-card v-if="deployTarget" class="mb-6">
+      <v-card-title class="d-flex align-center ga-2">
+        <v-icon color="primary">mdi-rocket-launch</v-icon>
+        Deploy &mdash; choose ref
+        <v-spacer />
+        <v-btn icon="mdi-close" variant="text" size="small" @click="deployTarget = null" />
+      </v-card-title>
+      <v-card-text class="d-flex ga-3">
+        <v-text-field
           v-model="deployRef"
           placeholder="main / v1.0.0"
-          class="input flex-1 font-mono"
+          variant="outlined"
+          density="compact"
+          hide-details
           @keyup.enter="confirmDeploy"
         />
-        <button
-          @click="confirmDeploy"
+        <v-btn
+          color="primary"
           :disabled="!deployRef || actionLoading[deployTarget]"
-          class="btn-primary"
+          @click="confirmDeploy"
         >
           Deploy
-        </button>
-      </div>
-    </section>
+        </v-btn>
+      </v-card-text>
+    </v-card>
 
-    <section v-if="output || anyRunning()" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Output</span>
-        <span v-if="anyRunning()" class="badge-accent">
-          <span class="dot bg-accent"></span> Running
-        </span>
-      </div>
+    <v-card v-if="output || anyRunning()" class="mb-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Output</span>
+        <v-chip v-if="anyRunning()" color="primary" size="x-small" variant="tonal">
+          <template #prepend>
+            <v-icon size="x-small">mdi-checkbox-blank-circle</v-icon>
+          </template>
+          Running
+        </v-chip>
+      </v-card-title>
       <pre
         ref="outputEl"
-        class="font-mono text-2xs leading-5 text-text-muted bg-bg-alt
-               max-h-96 overflow-auto p-4 whitespace-pre-wrap scrollbar-thin"
+        class="font-mono text-caption text-medium-emphasis bg-grey-lighten-3 pa-4 overflow-auto scrollbar-thin"
+        style="max-height: 384px; white-space: pre-wrap; line-height: 1.25;"
       >{{ output || '(waiting)' }}</pre>
-    </section>
+    </v-card>
 
     <DataTable
       :data="projects"
       :columns="columns"
       :searchable="true"
-      search-placeholder="Search projects…"
+      search-placeholder="Search projects..."
       :page-size="25"
       :row-class="(row) => historyTarget === row.id ? 'is-selected' : undefined"
     >
       <template #cell-name="{ row }">
-        <span class="font-medium text-text">{{ row.name }}</span>
+        <span class="font-weight-medium text-on-surface">{{ row.name }}</span>
       </template>
       <template #cell-path="{ row }">
-        <span class="font-mono text-xs text-text-muted truncate max-w-[260px] block">{{ row.path }}</span>
+        <span class="font-mono text-caption text-medium-emphasis text-truncate" style="max-width: 260px;">{{ row.path }}</span>
       </template>
       <template #cell-repo_url="{ row }">
-        <span class="font-mono text-xs text-text-dim truncate max-w-[260px] block">{{ row.repo_url || '—' }}</span>
+        <span class="font-mono text-caption text-disabled text-truncate" style="max-width: 260px;">{{ row.repo_url || '\u2014' }}</span>
       </template>
       <template #cell-created_at="{ row }">
-        {{ row.created_at?.split('T')[0] || '—' }}
+        {{ row.created_at?.split('T')[0] || '\u2014' }}
       </template>
       <template #cell-actions="{ row }">
-        <div class="inline-flex items-center gap-1">
-          <button @click="action(row.id, 'up')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Up">
-            <Play class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="action(row.id, 'down')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Down">
-            <Square class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="action(row.id, 'restart')" :disabled="actionLoading[row.id]" class="btn-icon-ghost" title="Restart">
-            <RotateCcw class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="startDeploy(row)" :disabled="actionLoading[row.id]" class="btn-icon-ghost text-accent hover:bg-accent-soft" title="Deploy">
-            <Rocket class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="toggleHistory(row)" class="btn-icon-ghost" title="History">
-            <History class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="openEdit(row)" class="btn-icon-ghost" title="Edit">
-            <Pencil class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
-          <button @click="remove(row.id)" class="btn-icon-ghost text-danger hover:bg-danger/5" title="Delete">
-            <Trash2 class="w-3.5 h-3.5" :stroke-width="1.75" />
-          </button>
+        <div class="d-inline-flex align-center ga-1">
+          <v-btn icon="mdi-play" variant="text" size="small" :disabled="actionLoading[row.id]" @click="action(row.id, 'up')" />
+          <v-btn icon="mdi-stop" variant="text" size="small" :disabled="actionLoading[row.id]" @click="action(row.id, 'down')" />
+          <v-btn icon="mdi-restart" variant="text" size="small" :disabled="actionLoading[row.id]" @click="action(row.id, 'restart')" />
+          <v-btn icon="mdi-rocket-launch" color="primary" variant="text" size="small" :disabled="actionLoading[row.id]" @click="startDeploy(row)" />
+          <v-btn icon="mdi-history" variant="text" size="small" @click="toggleHistory(row)" />
+          <v-btn icon="mdi-pencil" variant="text" size="small" @click="openEdit(row)" />
+          <v-btn icon="mdi-delete" color="error" variant="text" size="small" @click="remove(row.id)" />
         </div>
       </template>
       <template #empty>
-        {{ loading ? 'Loading projects…' : 'No projects yet — click "New project" above.' }}
+        {{ loading ? 'Loading projects...' : 'No projects yet \u2014 click "New project" above.' }}
       </template>
     </DataTable>
 
-    <section v-if="historyTarget !== null" class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">
-          History · <span class="font-mono text-text-muted">{{ historyName }}</span>
-        </span>
-        <button @click="historyTarget = null" class="btn-icon-ghost"><X class="w-4 h-4" :stroke-width="1.75" /></button>
-      </div>
-      <div class="card-body space-y-1">
-        <div v-if="history.length" class="space-y-1">
-          <div v-for="h in history" :key="h.id" class="text-xs">
-            <button
-              type="button"
-              class="w-full flex items-center justify-between gap-3 py-1
-                     text-text-muted hover:text-text transition-colors"
+    <v-card v-if="historyTarget !== null" class="mt-6">
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>History &middot; <span class="font-mono text-medium-emphasis">{{ historyName }}</span></span>
+        <v-btn icon="mdi-close" variant="text" size="small" @click="historyTarget = null" />
+      </v-card-title>
+      <v-card-text class="d-flex flex-column ga-1">
+        <div v-if="history.length" class="d-flex flex-column ga-1">
+          <div v-for="h in history" :key="h.id">
+            <v-btn
+              variant="text"
+              block
+              class="d-flex align-center justify-space-between text-medium-emphasis"
               :disabled="h.action !== 'project_deploy'"
               @click="h._open = !h._open"
             >
               <span class="font-mono">{{ h.action }}</span>
-              <span class="num text-text-dim">{{ h.created_at }}</span>
-            </button>
+              <span class="tabular-nums text-disabled">{{ h.created_at }}</span>
+            </v-btn>
             <pre
               v-if="h._open"
-              class="font-mono text-2xs whitespace-pre-wrap text-text-muted
-                     border-l-2 border-border pl-3 ml-1 my-1"
+              class="font-mono text-caption text-medium-emphasis ml-3 my-1"
+              style="border-left: 2px solid #ded9ca; padding-left: 12px; white-space: pre-wrap;"
             >{{ h.detail }}</pre>
           </div>
         </div>
-        <p v-else class="text-xs text-text-dim">No history yet.</p>
-      </div>
-    </section>
+        <p v-else class="text-caption text-disabled">No history yet.</p>
+      </v-card-text>
+    </v-card>
   </div>
 </template>

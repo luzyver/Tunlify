@@ -42,60 +42,63 @@ load()
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header>
-      <p class="eyebrow mb-2">Console · Alerts</p>
-      <h1 class="text-2xl font-semibold tracking-tight text-text">Webhook notifications</h1>
+  <div class="pa-6" style="max-width: 1280px;">
+    <header class="mb-6">
+      <p class="eyebrow mb-2">Console &middot; Alerts</p>
+      <h1 class="text-h4 font-weight-semibold text-on-surface">Webhook notifications</h1>
     </header>
 
-    <div v-if="message" :class="message.type === 'success' ? 'alert-success' : 'alert-danger'">
-      {{ message.text }}
-    </div>
+    <v-alert v-if="message" :type="message.type" class="mb-4" variant="tonal">{{ message.text }}</v-alert>
 
-    <section class="card overflow-hidden">
-      <div class="card-header">
-        <span class="card-title">Configuration</span>
-        <span class="badge" :class="form.enabled ? 'badge-success' : 'badge-neutral'">
-          <span class="dot" :class="form.enabled ? 'bg-success' : 'bg-text-dim'"></span>
+    <v-card>
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>Configuration</span>
+        <v-chip
+          :color="form.enabled ? 'success' : 'default'"
+          size="x-small"
+          variant="tonal"
+        >
+          <template #prepend>
+            <v-icon size="x-small">mdi-checkbox-blank-circle</v-icon>
+          </template>
           {{ form.enabled ? 'Enabled' : 'Disabled' }}
-        </span>
-      </div>
-      <div class="card-body space-y-5">
-        <label class="flex items-center gap-3 text-sm cursor-pointer select-none">
-          <input type="checkbox" v-model="form.enabled" class="accent-accent w-4 h-4" />
-          <span class="font-medium text-text">Enable notifications</span>
-        </label>
+        </v-chip>
+      </v-card-title>
+      <v-card-text class="d-flex flex-column ga-5">
+        <v-checkbox
+          v-model="form.enabled"
+          label="Enable notifications"
+          hide-details
+          density="compact"
+        />
 
         <div>
-          <label class="field-label">Provider</label>
-          <div class="inline-flex border border-border rounded-md overflow-hidden bg-surface">
-            <button
-              v-for="t in ['discord', 'telegram', 'slack']"
-              :key="t"
-              type="button"
-              class="px-3 h-8 text-xs font-medium transition-colors duration-100"
-              :class="form.type === t ? 'bg-accent-soft text-accent' : 'text-text-muted hover:bg-bg-alt'"
-              @click="form.type = t"
-            >
-              {{ t }}
-            </button>
-          </div>
+          <p class="text-caption font-weight-medium text-medium-emphasis mb-2">Provider</p>
+          <v-chip-group v-model="form.type" mandatory color="primary" variant="tonal" density="compact">
+            <v-chip value="discord" size="small">discord</v-chip>
+            <v-chip value="telegram" size="small">telegram</v-chip>
+            <v-chip value="slack" size="small">slack</v-chip>
+          </v-chip-group>
         </div>
 
-        <div>
-          <label class="field-label">Webhook URL</label>
-          <input v-model="form.webhook_url" placeholder="https://…" class="input font-mono" />
-        </div>
+        <v-text-field
+          v-model="form.webhook_url"
+          label="Webhook URL"
+          placeholder="https://..."
+          variant="outlined"
+          density="compact"
+          hide-details
+        />
 
-        <div class="flex items-center gap-3 pt-1">
-          <button @click="save" :disabled="saving" class="btn-primary">
-            {{ saving ? 'Saving…' : 'Save settings' }}
-          </button>
-          <button @click="test" :disabled="testing || !form.enabled" class="btn-secondary">
-            {{ testing ? 'Sending…' : 'Send test alert' }}
-          </button>
+        <div class="d-flex ga-3 pt-1">
+          <v-btn color="primary" :loading="saving" @click="save">
+            {{ saving ? 'Saving...' : 'Save settings' }}
+          </v-btn>
+          <v-btn variant="tonal" :loading="testing" :disabled="testing || !form.enabled" @click="test">
+            {{ testing ? 'Sending...' : 'Send test alert' }}
+          </v-btn>
         </div>
-      </div>
-    </section>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
