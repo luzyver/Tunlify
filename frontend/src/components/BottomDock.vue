@@ -127,7 +127,7 @@ function startDrag(e: MouseEvent) {
     <div
       v-if="expanded"
       class="bottom-dock__body"
-      :style="{ maxHeight: dockHeight + 'px' }"
+      :style="{ height: dockHeight + 'px' }"
     >
       <!-- Live tunnel logs -->
       <div class="pa-2" style="background: #0A0C10;">
@@ -186,13 +186,27 @@ function startDrag(e: MouseEvent) {
   user-select: none;
 }
 .bottom-dock__resize-handle {
-  height: 4px;
+  height: 8px;
   cursor: ns-resize;
   background: rgba(30, 41, 59, 0.6);
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.bottom-dock__resize-handle::after {
+  content: '';
+  width: 32px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.3);
 }
 .bottom-dock__resize-handle:hover {
-  background: rgba(247, 147, 26, 0.4);
+  background: rgba(247, 147, 26, 0.3);
+}
+.bottom-dock__resize-handle:hover::after {
+  background: rgba(247, 147, 26, 0.5);
 }
 .bottom-dock__body {
   overflow-y: auto;
