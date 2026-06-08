@@ -144,6 +144,10 @@ pre,
   color: rgba(148, 163, 184, 0.5);
 }
 
+.rounded-2xl {
+  border-radius: 16px;
+}
+
 .text-2xs {
   font-size: 11px;
   line-height: 14px;

@@ -72,15 +72,15 @@ const columns: Column<HealthRow>[] = [
 
     <div v-if="results.length" class="mb-6">
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
           <p class="eyebrow mb-2">Total endpoints</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ summary.total }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
           <p class="eyebrow mb-2">Up</p>
           <p class="font-heading font-semibold tabular-nums" style="color: #FFD600; font-size: 24px;">{{ summary.up }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
           <p class="eyebrow mb-2">Down</p>
           <p class="font-heading font-semibold tabular-nums" style="color: #EF4444; font-size: 24px;">{{ summary.total - summary.up }}</p>
         </div>

@@ -74,11 +74,11 @@ function formatPct(p: number) {
 
     <div class="mb-6">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
           <p class="eyebrow mb-2">Total requests</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ formatNumber(totalRequests) }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
           <p class="eyebrow mb-2">Distinct codes</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ rows.length }}</p>
         </div>

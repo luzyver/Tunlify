@@ -36,11 +36,6 @@ async function control(action: string) {
   }
 }
 
-const versionLabel = computed(() => {
-  const raw = status.value?.version || ''
-  return raw.split(' ')[2] || raw || '\u2014'
-})
-
 const memory = computed(() => {
   const raw = (status.value?.memory_usage || '').trim()
   if (!raw) return { used: '\u2014', total: '' }
@@ -93,27 +88,23 @@ onUnmounted(() => clearInterval(interval))
     <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
     <div v-if="status" class="mb-8">
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
           <p class="eyebrow mb-2">Uptime</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ status.uptime || '\u2014' }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
           <p class="eyebrow mb-2">Ingress rules</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ status.ingress_count ?? 0 }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
           <p class="eyebrow mb-2">Tunnel</p>
           <p class="font-heading font-semibold font-mono text-truncate" style="color: white; font-size: 24px;">{{ status.tunnel_name || 'n/a' }}</p>
         </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
+        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
           <p class="eyebrow mb-2">Memory</p>
           <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ memory.used }}</p>
           <p v-if="memory.total" class="font-mono" style="color: #94A3B8; font-size: 12px; margin-top: 2px;">of {{ memory.total }}</p>
-        </div>
-        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6); transition: all 0.3s;" @mouseenter="$event.currentTarget.style.borderColor = 'rgba(247, 147, 26, 0.3)'; $event.currentTarget.style.boxShadow = '0 0 30px -10px rgba(247, 147, 26, 0.15)'" @mouseleave="$event.currentTarget.style.borderColor = 'rgba(30, 41, 59, 0.6)'; $event.currentTarget.style.boxShadow = 'none'">
-          <p class="eyebrow mb-2">Version</p>
-          <p class="font-heading font-semibold font-mono text-truncate" style="color: white; font-size: 24px;">{{ versionLabel }}</p>
         </div>
       </div>
     </div>
