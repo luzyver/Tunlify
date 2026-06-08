@@ -6,6 +6,7 @@ const store = useActionLogStore()
 const authStore = useAuthStore()
 
 const barHeight = 32
+const activeTab = ref<'tunnel' | 'action'>('tunnel')
 const expanded = ref(false)
 const dockHeight = ref(300)
 const dragging = ref(false)
@@ -161,93 +162,107 @@ function startDrag(e: MouseEvent) {
     :style="{ height: barHeight + (expanded ? dockHeight : 0) + 'px' }"
   >
     <div
-      class="bottom-dock__bar d-flex align-center px-4 font-mono"
-      style="height: 32px; cursor: pointer; font-size: 11px; color: #94A3B8; background: #0F1115; border-top: 1px solid rgba(30, 41, 59, 0.6); user-select: none;"
-      @click="expanded = !expanded"
+      class="bottom-dock__bar d-flex align-center px-3 font-mono"
+      style="height: 32px; font-size: 11px; color: #94A3B8; background: #0F1115; border-top: 1px solid rgba(30, 41, 59, 0.6); user-select: none;"
     >
-      <v-icon size="14">{{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
+      <v-icon size="14" style="cursor: pointer;" @click="expanded = !expanded">{{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
       <span class="ml-1" style="text-transform: uppercase; letter-spacing: 0.08em;">
         {{ store.running.length ? `${store.running.length} running` : 'Console' }}
       </span>
       <v-spacer />
-      <span class="font-mono" style="color: rgba(148, 163, 184, 0.5);">{{ liveLogs.length }} lines</span>
       <button
-        class="ml-2 font-mono"
+        v-if="expanded"
+        class="font-mono"
         style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 2px 6px; font-size: 11px;"
         @click.stop="store.clearFinished()"
       >Clear</button>
+      <span class="font-mono ml-2" style="color: rgba(148, 163, 184, 0.5);">{{ liveLogs.length }} lines</span>
     </div>
 
     <div v-if="expanded" class="bottom-dock__body" :style="{ height: dockHeight + 'px' }">
       <div class="bottom-dock__resize-handle" @mousedown="startDrag" />
 
-      <!-- Live tunnel logs -->
-      <div class="pa-2" style="background: #0A0C10;">
-        <div class="font-mono mb-1" style="color: rgba(148, 163, 184, 0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;">Live tunnel logs</div>
-        <div
-          ref="liveLogEl"
-          class="font-mono pa-2 rounded-lg"
-          style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 120px; overflow-y: auto; white-space: pre-wrap; background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);"
-        >
-          <template v-if="liveLogs.length">
-            <div v-for="(line, li) in liveLogs.slice(-100)" :key="li">
-              <template v-for="(seg, si) in colorizeLine(line)" :key="si">
-                <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
-                <span v-else>{{ seg.text }}</span>
-              </template>
-            </div>
-          </template>
-          <span v-else style="color: rgba(148,163,184,0.4);">(connecting...)</span>
-        </div>
+      <!-- Tabs -->
+      <div class="d-flex font-mono" style="border-bottom: 1px solid rgba(30, 41, 59, 0.4); background: #0A0C10;">
+        <button
+          class="px-3 py-1"
+          style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border: none; background: none; cursor: pointer;"
+          :style="{
+            color: activeTab === 'tunnel' ? '#F7931A' : 'rgba(148,163,184,0.5)',
+            borderBottom: activeTab === 'tunnel' ? '2px solid #F7931A' : '2px solid transparent',
+          }"
+          @click="activeTab = 'tunnel'"
+        >Tunnel</button>
+        <button
+          class="px-3 py-1"
+          style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border: none; background: none; cursor: pointer;"
+          :style="{
+            color: activeTab === 'action' ? '#F7931A' : 'rgba(148,163,184,0.5)',
+            borderBottom: activeTab === 'action' ? '2px solid #F7931A' : '2px solid transparent',
+          }"
+          @click="activeTab = 'action'"
+        >Action</button>
       </div>
 
-      <!-- Action logs -->
-      <div class="pa-2" style="background: #0A0C10; border-top: 1px solid rgba(30, 41, 59, 0.4);">
-        <div class="font-mono mb-1" style="color: rgba(148, 163, 184, 0.5); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;">Actions</div>
-        <div v-if="!store.actions.length" class="font-mono pa-2 text-center" style="color: rgba(148, 163, 184, 0.4); font-size: 12px;">
-          No actions yet
-        </div>
-        <div v-for="a in store.actions" :key="a.id" class="mb-1 rounded-lg" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);">
-          <div
-            class="d-flex align-center ga-2 px-3 font-mono"
-            style="height: 28px; font-size: 11px; cursor: pointer; border-bottom: 1px solid rgba(30, 41, 59, 0.2);"
-            @click="toggleSection(a.id)"
-          >
-            <span
-              class="rounded-full d-inline-block"
-              style="width: 6px; height: 6px; flex-shrink: 0;"
-              :style="{
-                background: a.status === 'running' ? '#F7931A' : a.status === 'success' ? '#FFD600' : '#EF4444',
-                boxShadow: a.status === 'running' ? '0 0 6px rgba(247,147,26,0.6)' : 'none',
-              }"
-            ></span>
-            <span style="color: white;">{{ a.label }}</span>
-            <span v-if="a.projectName" class="font-mono" style="color: #F7931A;">{{ a.projectName }}</span>
-            <span class="font-mono" style="color: rgba(148, 163, 184, 0.4);">
-              {{ a.status === 'running' ? 'RUNNING' : a.status === 'success' ? 'DONE' : 'FAILED' }}
-            </span>
-            <v-spacer />
-            <button
-              style="background: none; border: none; color: rgba(148, 163, 184, 0.4); cursor: pointer; padding: 2px; font-size: 11px;"
-              @click.stop="store.remove(a.id)"
-            >&times;</button>
-          </div>
-          <div
-            :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
-            class="font-mono pa-2"
-            style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"
-          >
-            <template v-if="a.lines.length">
-              <div v-for="(line, ai) in a.lines" :key="ai">
-                <template v-for="(seg, si) in colorizeLine(line)" :key="si">
-                  <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
-                  <span v-else>{{ seg.text }}</span>
-                </template>
-              </div>
+      <!-- Tunnel tab -->
+      <div v-show="activeTab === 'tunnel'" ref="liveLogEl" class="pa-2" style="flex: 1; overflow-y: auto; background: #0A0C10;">
+        <template v-if="liveLogs.length">
+          <div v-for="(line, li) in liveLogs.slice(-100)" :key="li">
+            <template v-for="(seg, si) in colorizeLine(line)" :key="si">
+              <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
+              <span v-else>{{ seg.text }}</span>
             </template>
-            <span v-else style="color: rgba(148,163,184,0.4);">(waiting for output...)</span>
           </div>
-        </div>
+        </template>
+        <span v-else style="color: rgba(148,163,184,0.4); font-size: 11px;">(connecting...)</span>
+      </div>
+
+      <!-- Action tab -->
+      <div v-show="activeTab === 'action'" class="pa-2" style="flex: 1; overflow-y: auto; background: #0A0C10;">
+        <template v-if="store.actions.length">
+          <div v-for="a in store.actions" :key="a.id" class="mb-1 rounded-lg" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);">
+            <div
+              class="d-flex align-center ga-2 px-3 font-mono"
+              style="height: 28px; font-size: 11px; cursor: pointer; border-bottom: 1px solid rgba(30, 41, 59, 0.2);"
+              @click="toggleSection(a.id)"
+            >
+              <span
+                class="rounded-full d-inline-block"
+                style="width: 6px; height: 6px; flex-shrink: 0;"
+                :style="{
+                  background: a.status === 'running' ? '#F7931A' : a.status === 'success' ? '#FFD600' : '#EF4444',
+                  boxShadow: a.status === 'running' ? '0 0 6px rgba(247,147,26,0.6)' : 'none',
+                }"
+              ></span>
+              <span style="color: white;">{{ a.label }}</span>
+              <span v-if="a.projectName" class="font-mono" style="color: #F7931A;">{{ a.projectName }}</span>
+              <span class="font-mono" style="color: rgba(148, 163, 184, 0.4);">
+                {{ a.status === 'running' ? 'RUNNING' : a.status === 'success' ? 'DONE' : 'FAILED' }}
+              </span>
+              <v-spacer />
+              <button
+                style="background: none; border: none; color: rgba(148, 163, 184, 0.4); cursor: pointer; padding: 2px; font-size: 11px;"
+                @click.stop="store.remove(a.id)"
+              >&times;</button>
+            </div>
+            <div
+              :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
+              class="font-mono pa-2"
+              style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 100px; overflow-y: auto; white-space: pre-wrap;"
+            >
+              <template v-if="a.lines.length">
+                <div v-for="(line, ai) in a.lines" :key="ai">
+                  <template v-for="(seg, si) in colorizeLine(line)" :key="si">
+                    <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
+                    <span v-else>{{ seg.text }}</span>
+                  </template>
+                </div>
+              </template>
+              <span v-else style="color: rgba(148,163,184,0.4);">(waiting for output...)</span>
+            </div>
+          </div>
+        </template>
+        <span v-else style="color: rgba(148,163,184,0.4); font-size: 11px;">No actions yet</span>
       </div>
     </div>
   </div>
