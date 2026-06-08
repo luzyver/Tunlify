@@ -176,7 +176,7 @@ function startDrag(e: MouseEvent) {
           ref="liveLogEl"
           class="font-mono pa-2 rounded-lg"
           style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 120px; overflow-y: auto; white-space: pre-wrap; background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);"
-          v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '<span style=\"color:#64748B\">(connecting...)</span>'"
+          v-html="liveLogs.length ? liveLogs.slice(-100).map(formatLogLine).join('\n') : '(connecting...)'"
         ></div>
       </div>
 
@@ -215,7 +215,7 @@ function startDrag(e: MouseEvent) {
             :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
             class="font-mono pa-2"
             style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 80px; overflow-y: auto; white-space: pre-wrap;"
-            v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '<span style=\"color:#64748B\">(waiting for output...)</span>'"
+            v-html="a.lines.length ? a.lines.map(formatLogLine).join('\n') : '(waiting for output...)'"
           ></div>
         </div>
       </div>
