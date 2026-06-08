@@ -1,77 +1,143 @@
+:root {
+  --bitcoin-orange: #F7931A;
+  --burnt-orange: #EA580C;
+  --digital-gold: #FFD600;
+  --true-void: #030304;
+  --dark-matter: #0F1115;
+  --surface-variant: #0A0C10;
+  --pure-light: #FFFFFF;
+  --stardust: #94A3B8;
+  --dim-boundary: #1E293B;
+  --orange-glow: 0 0 20px -5px rgba(234, 88, 12, 0.5);
+  --gold-glow: 0 0 20px rgba(255, 214, 0, 0.3);
+  --card-glow: 0 0 50px -10px rgba(247, 147, 26, 0.1);
+}
+
 html {
-  font-feature-settings: 'cv11', 'ss01', 'ss03';
-  text-rendering: optimizeLegibility;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dim-boundary) transparent;
+}
+
+body {
+  background: var(--true-void);
+  color: var(--pure-light);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  font-family: 'Inter', 'ui-sans-serif', 'system-ui', '-apple-system', sans-serif;
-  font-size: 14px;
-  line-height: 22px;
+h1, h2, h3, h4, h5, h6,
+.font-heading {
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .font-mono,
-.v-field__input,
 code,
-pre {
-  font-family: 'Berkeley Mono', 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', monospace !important;
+pre,
+.v-field__input {
+  font-family: 'JetBrains Mono', monospace !important;
 }
 
 .tabular-nums,
-.num,
-.v-field__input,
-input[type='number'],
-output {
+.num {
   font-variant-numeric: tabular-nums;
 }
 
 ::selection {
-  background: #e2e6fb;
-  color: #2a2924;
+  background: rgba(247, 147, 26, 0.3);
+  color: white;
 }
 
 :focus-visible {
-  outline: 2px solid #5266eb;
+  outline: 2px solid var(--bitcoin-orange);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-.eyebrow {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #5a5548;
+/* Grid pattern background */
+.bg-grid {
+  background-size: 50px 50px;
+  background-image:
+    linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
-.eyebrow-dim {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8a8478;
+/* Orange radial glow */
+.bg-orange-glow {
+  background: radial-gradient(ellipse at center, rgba(247, 147, 26, 0.08) 0%, transparent 70%);
 }
 
-.text-display {
-  font-family: 'Arcadia Display', 'Tiempos Headline', 'Newsreader', 'Source Serif 4', Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+/* Glass morphism */
+.glass {
+  background: rgba(15, 17, 21, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 41, 59, 0.5);
 }
 
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(to right, var(--burnt-orange), var(--bitcoin-orange));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(to right, var(--bitcoin-orange), var(--digital-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Bitcoin orange glow shadow */
+.shadow-orange {
+  box-shadow: var(--orange-glow);
+}
+.shadow-gold {
+  box-shadow: var(--gold-glow);
+}
+.shadow-card {
+  box-shadow: var(--card-glow);
+}
+
+/* Scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
+  scrollbar-color: var(--dim-boundary) transparent;
 }
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #ded9ca;
+  background: var(--dim-boundary);
   border-radius: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
+}
+
+/* Eyebrow label */
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--stardust);
+}
+.eyebrow-dim {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(148, 163, 184, 0.5);
 }
 
 .text-2xs {
@@ -79,14 +145,96 @@ output {
   line-height: 14px;
 }
 
+/* Vuetify overrides */
 .v-card {
-  border-color: #ded9ca !important;
+  border-color: rgba(30, 41, 59, 0.6) !important;
+  box-shadow: var(--card-glow) !important;
+}
+.v-card:hover {
+  border-color: rgba(247, 147, 26, 0.3) !important;
+  box-shadow: 0 0 30px -10px rgba(247, 147, 26, 0.2) !important;
 }
 
 .v-btn--variant-tonal {
-  background: #f6f5f2 !important;
+  background: rgba(247, 147, 26, 0.1) !important;
+  color: var(--bitcoin-orange) !important;
+}
+.v-btn--variant-tonal:hover {
+  background: rgba(247, 147, 26, 0.2) !important;
+}
+
+.v-btn--variant-outlined {
+  border-color: rgba(30, 41, 59, 0.8) !important;
+  color: var(--pure-light) !important;
+}
+.v-btn--variant-outlined:hover {
+  border-color: var(--bitcoin-orange) !important;
+  background: rgba(247, 147, 26, 0.05) !important;
 }
 
 .v-navigation-drawer {
-  border-right: 1px solid #ded9ca !important;
+  border-right: 1px solid rgba(30, 41, 59, 0.6) !important;
+}
+
+.v-field--variant-outlined .v-field__outline {
+  color: rgba(30, 41, 59, 0.8);
+}
+.v-field--focused .v-field__outline {
+  color: var(--bitcoin-orange) !important;
+}
+
+.v-table {
+  background: transparent !important;
+  color: var(--pure-light) !important;
+}
+.v-table .v-table__wrapper > table > thead > tr > th {
+  color: var(--stardust) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.6) !important;
+}
+.v-table .v-table__wrapper > table > tbody > tr > td {
+  border-bottom: 1px solid rgba(30, 41, 59, 0.3) !important;
+}
+.v-table .v-table__wrapper > table > tbody > tr:hover {
+  background: rgba(247, 147, 26, 0.03) !important;
+}
+
+.v-list-item--active {
+  color: var(--bitcoin-orange) !important;
+}
+.v-list-item--active .v-list-item__prepend > .v-icon {
+  color: var(--bitcoin-orange) !important;
+}
+
+.v-alert--variant-tonal {
+  background: rgba(247, 147, 26, 0.1) !important;
+}
+.v-alert--variant-tonal.v-alert--error {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+.v-alert--variant-tonal.v-alert--success {
+  background: rgba(255, 214, 0, 0.1) !important;
+}
+
+.v-chip--variant-tonal {
+  background: rgba(247, 147, 26, 0.1) !important;
+}
+
+.v-progress-linear__background {
+  background: var(--dim-boundary) !important;
+}
+
+.v-divider {
+  border-color: rgba(30, 41, 59, 0.6) !important;
+}
+
+.v-checkbox .v-selection-control {
+  color: var(--stardust);
+}
+
+.v-selection-control--focused .v-selection-control__input {
+  color: var(--bitcoin-orange);
 }

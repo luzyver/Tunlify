@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AppSidebar from './components/AppSidebar.vue'
 
 const route = useRoute()
 const isAppMode = computed(() => route.path !== '/login')
-const rail = ref(false)
 </script>
 
 <template>
   <v-app v-if="isAppMode">
-    <AppSidebar :rail="rail" @update:rail="rail = $event" />
-    <v-main>
+    <div class="bg-orange-glow pointer-events-none" style="position: fixed; inset: 0; z-index: 0;" />
+    <div class="bg-grid pointer-events-none" style="position: fixed; inset: 0; z-index: 0;" />
+    <AppSidebar />
+    <v-main style="position: relative; z-index: 1;">
       <router-view />
     </v-main>
   </v-app>

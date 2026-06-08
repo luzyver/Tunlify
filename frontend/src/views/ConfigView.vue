@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useApi } from '../composables/useApi'
+import { Plus, Trash2 } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 
@@ -97,115 +98,108 @@ loadConfig()
 
 <template>
   <div class="pa-6" style="max-width: 1280px;">
-    <div class="d-flex align-end justify-space-between ga-4 mb-6">
+    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Ingress</p>
-        <h1 class="text-h4 font-weight-semibold text-on-surface">Tunnel configuration</h1>
+        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Tunnel configuration</h1>
       </div>
-      <v-btn color="primary" @click="addRule">
-        <v-icon start>mdi-plus</v-icon>
+      <button
+        class="d-inline-flex align-center ga-2 rounded-pill px-4 font-mono"
+        style="height: 40px; background: linear-gradient(to right, #EA580C, #F7931A); border: none; color: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5); cursor: pointer; transition: all 0.3s;"
+        @click="addRule"
+        @mouseenter="$event.target.style.transform = 'scale(1.03)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
+        @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
+      >
+        <Plus :size="16" :stroke-width="1.5" />
         Add rule
-      </v-btn>
+      </button>
     </div>
 
     <v-alert v-if="message" :type="message.type" class="mb-4" variant="tonal">{{ message.text }}</v-alert>
 
-    <v-card class="mb-6">
-      <v-card-title class="d-flex align-center justify-space-between">
-        <span>Tunnel</span>
-        <span class="text-caption text-medium-emphasis">Read from cloudflared/config.yml</span>
-      </v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12" sm="6">
-            <v-text-field v-model="tunnelId" label="Tunnel ID" placeholder="00000000-0000-0000-0000-000000000000" variant="outlined" density="compact" hide-details />
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-text-field model-value="/etc/cloudflared/credentials.json" label="Credentials" disabled variant="outlined" density="compact" hide-details />
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
+    <div class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
+        <span class="font-heading font-semibold" style="color: white;">Tunnel</span>
+        <span class="font-mono" style="color: #94A3B8; font-size: 11px;">Read from cloudflared/config.yml</span>
+      </div>
+      <div class="p-6">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Tunnel ID</label>
+            <input v-model="tunnelId" placeholder="00000000-0000-0000-0000-000000000000" class="w-100 font-mono" style="background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+          </div>
+          <div>
+            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Credentials</label>
+            <input value="/etc/cloudflared/credentials.json" disabled class="w-100 font-mono" style="background: rgba(0,0,0,0.3); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.4); color: rgba(255,255,255,0.5); padding: 8px 12px; font-size: 13px; outline: none;" />
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <v-card class="mb-6">
-      <v-card-title class="d-flex align-center justify-space-between">
-        <span>Ingress rules</span>
-        <span class="text-caption text-medium-emphasis tabular-nums">{{ rules.length }} rules</span>
-      </v-card-title>
-      <v-table density="compact">
-        <thead>
-          <tr>
-            <th style="width: 34%;">Hostname</th>
-            <th style="width: 34%;">Service</th>
-            <th>TLS</th>
-            <th style="width: 40px;"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(rule, i) in rules" :key="i">
-            <td>
-              <v-text-field
-                v-model="rule.hostname"
-                placeholder="app.example.com"
-                density="compact"
-                variant="outlined"
-                hide-details
-                :disabled="isLocked(rule)"
-              />
-            </td>
-            <td>
-              <v-text-field
-                v-model="rule.service"
-                placeholder="http://container:port"
-                density="compact"
-                variant="outlined"
-                hide-details
-                :disabled="isLocked(rule)"
-              />
-            </td>
-            <td>
-              <div class="d-flex align-center ga-2">
-                <v-checkbox
-                  v-model="rule.noTLSVerify"
-                  label="Skip verify"
-                  hide-details
-                  density="compact"
-                  :disabled="isLocked(rule)"
-                />
-                <v-chip v-if="isLocked(rule)" size="x-small" variant="outlined">Locked</v-chip>
-              </div>
-            </td>
-            <td>
-              <v-btn
-                v-if="!isLocked(rule)"
-                icon="mdi-delete"
-                color="error"
-                variant="text"
-                size="small"
-                @click="removeRule(i)"
-              />
-            </td>
-          </tr>
-          <tr v-if="!rules.length">
-            <td colspan="4" class="text-center text-medium-emphasis py-8">
-              No ingress rules yet &mdash; add one above.
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-card>
+    <div class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
+        <span class="font-heading font-semibold" style="color: white;">Ingress rules</span>
+        <span class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">{{ rules.length }} rules</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th class="eyebrow text-left px-4" style="height: 40px; border-bottom: 1px solid rgba(30, 41, 59, 0.6); width: 34%;">Hostname</th>
+              <th class="eyebrow text-left px-4" style="height: 40px; border-bottom: 1px solid rgba(30, 41, 59, 0.6); width: 34%;">Service</th>
+              <th class="eyebrow text-left px-4" style="height: 40px; border-bottom: 1px solid rgba(30, 41, 59, 0.6);">TLS</th>
+              <th class="px-4" style="height: 40px; border-bottom: 1px solid rgba(30, 41, 59, 0.6); width: 40px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(rule, i) in rules" :key="i">
+              <td class="px-2" style="border-bottom: 1px solid rgba(30, 41, 59, 0.3);">
+                <input v-model="rule.hostname" placeholder="app.example.com" :disabled="isLocked(rule)" style="width: 100%; background: rgba(0,0,0,0.3); border: none; border-bottom: 1px solid rgba(30, 41, 59, 0.6); color: white; padding: 8px 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.6)'" />
+              </td>
+              <td class="px-2" style="border-bottom: 1px solid rgba(30, 41, 59, 0.3);">
+                <input v-model="rule.service" placeholder="http://container:port" :disabled="isLocked(rule)" style="width: 100%; background: rgba(0,0,0,0.3); border: none; border-bottom: 1px solid rgba(30, 41, 59, 0.6); color: white; padding: 8px 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.6)'" />
+              </td>
+              <td style="border-bottom: 1px solid rgba(30, 41, 59, 0.3);">
+                <div class="d-flex align-center ga-2">
+                  <label class="d-flex align-center ga-2 font-mono" style="color: #94A3B8; font-size: 12px; cursor: pointer;">
+                    <input type="checkbox" v-model="rule.noTLSVerify" :disabled="isLocked(rule)" style="accent-color: #F7931A;" />
+                    Skip verify
+                  </label>
+                  <span v-if="isLocked(rule)" class="rounded-pill px-2 font-mono" style="background: rgba(148, 163, 184, 0.1); border: 1px solid rgba(148, 163, 184, 0.2); color: #94A3B8; font-size: 10px; line-height: 20px;">Locked</span>
+                </div>
+              </td>
+              <td style="border-bottom: 1px solid rgba(30, 41, 59, 0.3);">
+                <button v-if="!isLocked(rule)" @click="removeRule(i)" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 4px; transition: color 0.2s;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#EF4444'">
+                  <Trash2 :size="14" :stroke-width="1.5" />
+                </button>
+              </td>
+            </tr>
+            <tr v-if="!rules.length">
+              <td colspan="4" class="text-center font-mono py-8" style="color: #94A3B8;">No ingress rules yet &mdash; add one above.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-    <p class="text-caption text-medium-emphasis mb-4">
-      Catch-all <code class="font-mono">http_status:404</code> is auto-appended on save.
+    <p class="font-mono mb-4" style="color: #94A3B8; font-size: 11px;">
+      Catch-all <code class="font-mono" style="color: #F7931A;">http_status:404</code> is auto-appended on save.
     </p>
 
     <div class="d-flex ga-3">
-      <v-btn variant="tonal" :loading="saving" @click="save">
+      <button class="rounded-pill px-5 font-mono" style="height: 40px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s;" :disabled="saving" @click="save" @mouseenter="if(!saving) { $event.target.style.background = 'rgba(247, 147, 26, 0.2)'; $event.target.style.borderColor = '#F7931A' }" @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'; $event.target.style.borderColor = 'rgba(247, 147, 26, 0.2)'">
         {{ saving ? 'Saving...' : 'Save' }}
-      </v-btn>
-      <v-btn color="primary" :loading="saving" @click="saveAndRestart">
+      </button>
+      <button
+        class="rounded-pill px-5 font-mono"
+        style="height: 40px; background: linear-gradient(to right, #EA580C, #F7931A); border: none; color: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5); cursor: pointer; transition: all 0.3s;"
+        :disabled="saving"
+        @click="saveAndRestart"
+        @mouseenter="if(!saving) { $event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)' }"
+        @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
+      >
         {{ saving ? 'Saving...' : 'Save & restart tunnel' }}
-      </v-btn>
+      </button>
     </div>
   </div>
 </template>

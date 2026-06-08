@@ -2,7 +2,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import 'vuetify/styles'
-import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
@@ -15,23 +14,24 @@ const vuetify = createVuetify({
   components,
   directives,
   theme: {
-    defaultTheme: 'tunlify',
+    defaultTheme: 'bitcoinDefi',
     themes: {
-      tunlify: {
-        dark: false,
+      bitcoinDefi: {
+        dark: true,
         colors: {
-          primary: '#5266eb',
-          secondary: '#5a5548',
-          accent: '#5266eb',
-          error: '#b54a3a',
-          info: '#5266eb',
-          success: '#2f7d57',
-          warning: '#c98a42',
-          background: '#f6f5f2',
-          surface: '#ffffff',
-          'surface-variant': '#fbfaf6',
-          'on-surface': '#2a2924',
-          'on-surface-variant': '#5a5548',
+          background: '#030304',
+          surface: '#0F1115',
+          'surface-variant': '#0A0C10',
+          primary: '#F7931A',
+          secondary: '#EA580C',
+          accent: '#FFD600',
+          error: '#EF4444',
+          info: '#F7931A',
+          success: '#FFD600',
+          warning: '#F7931A',
+          'on-background': '#FFFFFF',
+          'on-surface': '#FFFFFF',
+          'on-surface-variant': '#94A3B8',
         },
       },
     },
@@ -40,15 +40,19 @@ const vuetify = createVuetify({
     VCard: {
       variant: 'outlined',
       flat: true,
+      color: 'surface',
     },
     VTextField: {
       variant: 'outlined',
       density: 'compact',
       hideDetails: 'auto',
+      color: 'primary',
+      baseColor: 'grey',
     },
     VBtn: {
       variant: 'tonal',
       density: 'compact',
+      color: 'primary',
     },
     VSelect: {
       variant: 'outlined',
@@ -66,6 +70,9 @@ const vuetify = createVuetify({
     VAlert: {
       variant: 'tonal',
       density: 'compact',
+    },
+    VNavigationDrawer: {
+      color: 'background',
     },
   },
 })

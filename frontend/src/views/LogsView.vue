@@ -65,169 +65,135 @@ watch(
   }
 )
 
-function levelClass(msg: string) {
-  if (msg.includes('ERR') || msg.includes('error') || msg.includes('Error')) return 'text-error'
-  if (msg.includes('WRN') || msg.includes('warn') || msg.includes('Warn')) return 'text-warning'
-  return 'text-on-surface'
+function levelColor(msg: string) {
+  if (msg.includes('ERR') || msg.includes('error') || msg.includes('Error')) return '#EF4444'
+  if (msg.includes('WRN') || msg.includes('warn') || msg.includes('Warn')) return '#F7931A'
+  return 'white'
 }
 
 function formatTime(t?: string) {
   return t?.split('T')[1]?.slice(0, 8) || '\u2014'
 }
 
-function logKey(e: LogEntry) {
-  return `${e.time}|${e.message}`
-}
-
-function isExpanded(e: LogEntry) {
-  return expanded.value.has(logKey(e))
-}
+function logKey(e: LogEntry) { return `${e.time}|${e.message}` }
+function isExpanded(e: LogEntry) { return expanded.value.has(logKey(e)) }
 
 function toggle(e: LogEntry) {
   const k = logKey(e)
   const next = new Set(expanded.value)
-  if (next.has(k)) next.delete(k)
-  else next.add(k)
+  if (next.has(k)) next.delete(k); else next.add(k)
   expanded.value = next
 }
 
-function expandAll() {
-  expanded.value = new Set(filtered.value.map(logKey))
-}
-function collapseAll() {
-  expanded.value = new Set()
-}
-
-function clear() {
-  logs.value = []
-  expanded.value = new Set()
-}
+function expandAll() { expanded.value = new Set(filtered.value.map(logKey)) }
+function collapseAll() { expanded.value = new Set() }
+function clear() { logs.value = []; expanded.value = new Set() }
 
 function setRowRef(el: Element | null) {
   if (el instanceof HTMLElement) rowVirtualizer.value.measureElement(el)
+}
+
+function handleMouseLeave(e: MouseEvent, entry: LogEntry) {
+  if (!isExpanded(entry)) {
+    (e.currentTarget as HTMLElement).style.background = 'transparent'
+  }
 }
 </script>
 
 <template>
   <div class="pa-6 d-flex flex-column" style="max-width: 1280px; height: calc(100vh - 48px);">
-    <div class="d-flex align-end justify-space-between ga-4 flex-shrink-0 mb-4">
+    <div class="d-flex align-center justify-space-between ga-4 flex-shrink-0 mb-4 flex-wrap" style="gap: 12px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Logs</p>
-        <h1 class="text-h4 font-weight-semibold text-on-surface">Cloudflared stream</h1>
+        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Cloudflared stream</h1>
       </div>
       <div class="d-flex align-center ga-2">
-        <v-chip
-          size="small"
-          :color="wsStatus === 'connected' ? 'success' : wsStatus === 'connecting' ? 'warning' : 'error'"
-          variant="tonal"
-        >
-          <template #prepend>
-            <v-icon size="x-small">mdi-checkbox-blank-circle</v-icon>
-          </template>
+        <span class="rounded-pill px-3 font-mono d-inline-flex align-center ga-1" :style="{ height: '28px', background: wsStatus === 'connected' ? 'rgba(255, 214, 0, 0.1)' : wsStatus === 'connecting' ? 'rgba(247, 147, 26, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid ' + (wsStatus === 'connected' ? 'rgba(255, 214, 0, 0.3)' : wsStatus === 'connecting' ? 'rgba(247, 147, 26, 0.3)' : 'rgba(239, 68, 68, 0.3)'), color: wsStatus === 'connected' ? '#FFD600' : wsStatus === 'connecting' ? '#F7931A' : '#EF4444', fontSize: '11px' }">
+          <span class="rounded-full d-inline-block" :style="{ width: '6px', height: '6px', background: wsStatus === 'connected' ? '#FFD600' : wsStatus === 'connecting' ? '#F7931A' : '#EF4444' }"></span>
           {{ wsStatus }}
-        </v-chip>
-        <v-btn variant="tonal" @click="clear">Clear</v-btn>
+        </span>
+        <button
+          class="rounded-pill px-3 font-mono"
+          style="height: 28px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 11px; cursor: pointer; transition: all 0.2s;"
+          @click="clear"
+          @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'"
+          @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'"
+        >Clear</button>
       </div>
     </div>
 
-    <div class="d-flex align-center ga-2 flex-shrink-0 mb-3 flex-wrap">
-      <v-chip-group v-model="filter" mandatory color="primary" variant="tonal" density="compact">
-        <v-chip value="all" size="small">all</v-chip>
-        <v-chip value="error" size="small">error</v-chip>
-        <v-chip value="warn" size="small">warn</v-chip>
-        <v-chip value="info" size="small">info</v-chip>
-      </v-chip-group>
+    <div class="d-flex align-center ga-2 flex-shrink-0 mb-3 flex-wrap" style="gap: 8px;">
+      <div class="d-inline-flex rounded-lg overflow-hidden" style="border: 1px solid rgba(30, 41, 59, 0.6);">
+        <button v-for="f in ['all', 'error', 'warn', 'info'] as const" :key="f"
+          class="px-3 font-mono"
+          :style="{ height: '32px', background: filter === f ? 'rgba(247, 147, 26, 0.15)' : 'transparent', border: 'none', color: filter === f ? '#F7931A' : '#94A3B8', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s' }"
+          @click="filter = f"
+          @mouseenter="$event.target.style.background = filter === f ? 'rgba(247, 147, 26, 0.15)' : 'rgba(255,255,255,0.05)'"
+          @mouseleave="$event.target.style.background = filter === f ? 'rgba(247, 147, 26, 0.15)' : 'transparent'"
+        >{{ f }}</button>
+      </div>
 
-      <v-text-field
-        v-model="search"
-        placeholder="Search..."
-        prepend-inner-icon="mdi-magnify"
-        clearable
-        hide-details
-        density="compact"
-        variant="outlined"
-        style="max-width: 260px;"
-      />
+      <div class="position-relative" style="max-width: 260px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); z-index: 1;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input v-model="search" placeholder="Search..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(30, 41, 59, 0.8); border-radius: 8px; color: white; padding: 6px 10px 6px 32px; font-family: 'JetBrains Mono', monospace; font-size: 12px; height: 32px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+      </div>
 
       <v-spacer />
 
-      <v-btn
-        v-if="expanded.size"
-        variant="text"
-        size="small"
-        @click="collapseAll"
-      >Collapse all</v-btn>
-      <v-btn
-        v-else-if="filtered.length"
-        variant="text"
-        size="small"
-        @click="expandAll"
-      >Expand all</v-btn>
+      <button v-if="expanded.size" class="font-mono text-decoration-none" style="background: none; border: none; color: #94A3B8; font-size: 11px; cursor: pointer; transition: color 0.2s;" @click="collapseAll" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'">Collapse all</button>
+      <button v-else-if="filtered.length" class="font-mono text-decoration-none" style="background: none; border: none; color: #94A3B8; font-size: 11px; cursor: pointer; transition: color 0.2s;" @click="expandAll" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'">Expand all</button>
 
-      <v-checkbox
-        v-model="autoScroll"
-        label="Tail"
-        hide-details
-        density="compact"
-      />
+      <label class="d-flex align-center ga-1 font-mono" style="color: #94A3B8; font-size: 11px; cursor: pointer;">
+        <input type="checkbox" v-model="autoScroll" style="accent-color: #F7931A;" /> Tail
+      </label>
 
-      <span class="text-caption text-medium-emphasis font-mono tabular-nums">
-        {{ filtered.length }} / {{ logs.length }}
-      </span>
+      <span class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">{{ filtered.length }} / {{ logs.length }}</span>
     </div>
 
-    <v-card class="flex-grow-1 d-flex flex-column overflow-hidden">
-      <div class="d-grid border-bottom bg-grey-lighten-4 eyebrow" style="grid-template-columns: 120px 1fr; border-bottom: 1px solid #ded9ca;">
+    <div class="rounded-xl flex-grow-1 d-flex flex-column overflow-hidden" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-grid eyebrow" style="grid-template-columns: 120px 1fr; border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
         <div class="px-4" style="height: 36px; display: flex; align-items: center;">Time</div>
         <div class="px-4" style="height: 36px; display: flex; align-items: center;">Message</div>
       </div>
 
       <div ref="scrollEl" class="flex-grow-1 overflow-auto scrollbar-thin">
-        <div
-          v-if="filtered.length"
-          class="position-relative"
-          :style="{ height: rowVirtualizer.getTotalSize() + 'px' }"
-        >
+        <div v-if="filtered.length" class="position-relative" :style="{ height: rowVirtualizer.getTotalSize() + 'px' }">
           <div
-            v-for="vrow in rowVirtualizer.getVirtualItems()"
-            :key="vrow.key"
+            v-for="vrow in rowVirtualizer.getVirtualItems()" :key="vrow.key"
             :ref="(el) => setRowRef(el as Element | null)"
             :data-index="vrow.index"
-            class="position-absolute d-grid align-start border-bottom cursor-pointer transition-colors"
-            :class="isExpanded(filtered[vrow.index]) ? 'bg-grey-lighten-3' : 'hover-bg-grey-lighten-4'"
-            :style="{ transform: `translateY(${vrow.start}px)`, gridTemplateColumns: '120px 1fr', insetInline: 0, borderBottom: '1px solid #ded9ca' }"
+            class="position-absolute d-grid align-start"
+            :style="{
+              transform: `translateY(${vrow.start}px)`,
+              gridTemplateColumns: '120px 1fr',
+              insetInline: 0,
+              borderBottom: '1px solid rgba(30, 41, 59, 0.2)',
+              background: isExpanded(filtered[vrow.index]) ? 'rgba(247, 147, 26, 0.03)' : 'transparent',
+            }"
             tabindex="0"
             @click="toggle(filtered[vrow.index])"
             @keydown.enter.prevent="toggle(filtered[vrow.index])"
             @keydown.space.prevent="toggle(filtered[vrow.index])"
+            @mouseenter="$event.currentTarget.style.background = 'rgba(247, 147, 26, 0.03)'"
+            @mouseleave="handleMouseLeave($event, filtered[vrow.index])"
           >
-            <div class="px-4 py-1 font-mono text-caption text-medium-emphasis tabular-nums">{{ formatTime(filtered[vrow.index].time) }}</div>
+            <div class="px-4 py-1 font-mono" style="color: #94A3B8; font-size: 12px; font-variant-numeric: tabular-nums;">{{ formatTime(filtered[vrow.index].time) }}</div>
             <div
-              class="px-4 py-1 font-mono text-caption"
-              :class="[
-                levelClass(filtered[vrow.index].message),
-                isExpanded(filtered[vrow.index]) ? 'text-pre-wrap word-break' : 'text-truncate'
-              ]"
+              class="px-4 py-1 font-mono" style="font-size: 12px; line-height: 1.5; cursor: pointer;"
+              :style="{
+                color: levelColor(filtered[vrow.index].message),
+                whiteSpace: isExpanded(filtered[vrow.index]) ? 'pre-wrap' : 'nowrap',
+                overflow: isExpanded(filtered[vrow.index]) ? 'visible' : 'hidden',
+                textOverflow: isExpanded(filtered[vrow.index]) ? 'clip' : 'ellipsis',
+                wordBreak: isExpanded(filtered[vrow.index]) ? 'break-word' : 'normal',
+              }"
             >{{ filtered[vrow.index].message }}</div>
           </div>
         </div>
-        <div v-else class="text-center text-medium-emphasis py-12 text-body-2">
+        <div v-else class="text-center font-mono py-12" style="color: #94A3B8; font-size: 13px;">
           {{ logs.length ? 'No logs match the current filter' : 'Waiting for logs...' }}
         </div>
       </div>
-    </v-card>
+    </div>
   </div>
 </template>
-
-<style scoped>
-.hover-bg-grey-lighten-4:hover {
-  background: #f5f5f5;
-}
-.text-pre-wrap {
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-.border-bottom {
-  border-bottom: 1px solid #ded9ca;
-}
-</style>

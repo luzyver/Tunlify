@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
 import { useApi } from '../composables/useApi'
+import { RefreshCw } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 const metrics = ref<any>(null)
@@ -15,25 +16,16 @@ fetchMetrics()
 const interval = setInterval(fetchMetrics, 10_000)
 onUnmounted(() => clearInterval(interval))
 
-interface CodeRow {
-  code: string
-  count: number
-  pct: number
-  scale: number
-  bar: string
-  label: string
+interface CodeRow { code: string; count: number; pct: number; scale: number; color: string; label: string }
+
+const SIGNAL: Record<string, { color: string; label: string }> = {
+  '2': { color: '#FFD600', label: 'Success' },
+  '3': { color: '#94A3B8', label: 'Redirect' },
+  '4': { color: '#F7931A', label: 'Client error' },
+  '5': { color: '#EF4444', label: 'Server error' },
 }
 
-const SIGNAL: Record<string, { bar: string; label: string }> = {
-  '2': { bar: 'success', label: 'Success' },
-  '3': { bar: 'secondary', label: 'Redirect' },
-  '4': { bar: 'warning', label: 'Client error' },
-  '5': { bar: 'error', label: 'Server error' },
-}
-
-function meta(code: string) {
-  return SIGNAL[code[0]] || { bar: 'grey', label: 'Other' }
-}
+function meta(code: string) { return SIGNAL[code[0]] || { color: '#475569', label: 'Other' } }
 
 const rows = computed<CodeRow[]>(() => {
   const codes = metrics.value?.response_codes || {}
@@ -41,19 +33,10 @@ const rows = computed<CodeRow[]>(() => {
   if (!entries.length) return []
   const max = Math.max(...entries.map((e) => e.count))
   const total = entries.reduce((s, e) => s + e.count, 0)
-  return entries
-    .sort((a, b) => b.count - a.count)
-    .map((e) => {
-      const m = meta(e.code)
-      return {
-        code: e.code,
-        count: e.count,
-        pct: total ? (e.count / total) * 100 : 0,
-        scale: max ? (e.count / max) * 100 : 0,
-        bar: m.bar,
-        label: m.label,
-      }
-    })
+  return entries.sort((a, b) => b.count - a.count).map((e) => {
+    const m = meta(e.code)
+    return { code: e.code, count: e.count, pct: total ? (e.count / total) * 100 : 0, scale: max ? (e.count / max) * 100 : 0, color: m.color, label: m.label }
+  })
 })
 
 const totalRequests = computed(() => Number(metrics.value?.total_requests ?? 0))
@@ -63,7 +46,6 @@ function formatNumber(n: number) {
   if (n === undefined || n === null || Number.isNaN(n)) return '\u2014'
   return n.toLocaleString('en-US')
 }
-
 function formatPct(p: number) {
   if (p >= 10) return p.toFixed(1) + '%'
   return p.toFixed(2) + '%'
@@ -72,90 +54,76 @@ function formatPct(p: number) {
 
 <template>
   <div class="pa-6" style="max-width: 1280px;">
-    <div class="d-flex align-end justify-space-between ga-4 mb-6">
+    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Metrics</p>
-        <h1 class="text-h4 font-weight-semibold text-on-surface">Cloudflared traffic</h1>
+        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Cloudflared traffic</h1>
       </div>
-      <v-btn variant="tonal" :loading="loading" @click="fetchMetrics">
-        <v-icon start>mdi-refresh</v-icon>
+      <button
+        class="d-inline-flex align-center ga-2 rounded-pill px-4 font-mono"
+        style="height: 36px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 12px; cursor: pointer; transition: all 0.3s;"
+        :disabled="loading"
+        @click="fetchMetrics"
+        @mouseenter="if(!loading) { $event.target.style.background = 'rgba(247, 147, 26, 0.2)'; $event.target.style.borderColor = '#F7931A' }"
+        @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'; $event.target.style.borderColor = 'rgba(247, 147, 26, 0.2)'"
+      >
+        <RefreshCw :size="14" :stroke-width="1.5" :class="{ 'spin': loading }" />
         Refresh
-      </v-btn>
+      </button>
     </div>
 
-    <v-row class="mb-6">
-      <v-col cols="12" sm="6">
-        <v-card>
-          <v-card-text>
-            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Total requests</p>
-            <p class="text-h4 text-on-surface tabular-nums">{{ formatNumber(totalRequests) }}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6">
-        <v-card>
-          <v-card-text>
-            <p class="text-caption font-weight-bold text-uppercase text-medium-emphasis mb-1">Distinct codes</p>
-            <p class="text-h4 text-on-surface tabular-nums">{{ rows.length }}</p>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <div class="mb-6">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+          <p class="eyebrow mb-2">Total requests</p>
+          <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ formatNumber(totalRequests) }}</p>
+        </div>
+        <div class="rounded-2xl p-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+          <p class="eyebrow mb-2">Distinct codes</p>
+          <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ rows.length }}</p>
+        </div>
+      </div>
+    </div>
 
-    <v-card>
-      <v-card-title class="d-flex align-center justify-space-between">
-        <span>Response codes</span>
-        <span class="text-caption text-medium-emphasis tabular-nums">
-          {{ formatNumber(totalCounted) }} counted &middot; auto-refresh 10s
-        </span>
-      </v-card-title>
+    <div class="rounded-2xl" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
+        <span class="font-heading font-semibold" style="color: white;">Response codes</span>
+        <span class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">{{ formatNumber(totalCounted) }} counted &middot; auto-refresh 10s</span>
+      </div>
 
       <div v-if="rows.length" class="pa-4">
-        <div
-          v-for="row in rows"
-          :key="row.code"
-          class="d-grid align-center ga-4 px-2 rounded hover-bg-grey-lighten-4"
-          style="grid-template-columns: 56px 130px 1fr 96px 76px; height: 36px;"
-        >
-          <span class="font-mono text-body-2 font-weight-medium" :class="`text-${row.bar}`">{{ row.code }}</span>
-          <span class="text-caption text-medium-emphasis d-none d-md-block text-truncate">{{ row.label }}</span>
-          <v-progress-linear
-            :model-value="row.scale"
-            :color="row.bar"
-            height="8"
-            rounded
-            class="flex-grow-1"
-          />
-          <span class="tabular-nums text-body-2 text-on-surface text-right">{{ formatNumber(row.count) }}</span>
-          <span class="tabular-nums text-caption text-medium-emphasis text-right">{{ formatPct(row.pct) }}</span>
+        <div v-for="row in rows" :key="row.code" class="d-grid align-center ga-4 px-3 rounded-lg" style="grid-template-columns: 56px 130px 1fr 96px 76px; height: 36px; transition: background 0.2s;" @mouseenter="$event.currentTarget.style.background = 'rgba(247, 147, 26, 0.03)'" @mouseleave="$event.currentTarget.style.background = 'transparent'">
+          <span class="font-mono font-weight-medium" :style="{ color: row.color, fontSize: '14px' }">{{ row.code }}</span>
+          <span class="font-mono d-none d-md-block text-truncate" style="color: #94A3B8; font-size: 12px;">{{ row.label }}</span>
+          <div style="height: 8px; border-radius: 9999px; overflow: hidden; background: rgba(30, 41, 59, 0.6);">
+            <div :style="{ width: row.scale + '%', height: '100%', background: row.color, borderRadius: '9999px', transition: 'width 0.5s ease-out' }"></div>
+          </div>
+          <span class="tabular-nums text-right font-mono" style="color: white; font-size: 14px;">{{ formatNumber(row.count) }}</span>
+          <span class="tabular-nums text-right font-mono" style="color: #94A3B8; font-size: 12px;">{{ formatPct(row.pct) }}</span>
         </div>
       </div>
 
-      <div v-else class="pa-8 text-center text-body-2 text-medium-emphasis">
+      <div v-else class="pa-8 text-center font-mono" style="color: #94A3B8; font-size: 13px;">
         {{ metrics ? 'No response codes recorded yet' : 'Loading metrics...' }}
       </div>
 
-      <div v-if="rows.length" class="pa-4 d-flex flex-wrap ga-4 border-top" style="border-top: 1px solid #ded9ca;">
+      <div v-if="rows.length" class="d-flex flex-wrap ga-4 px-6 py-3" style="border-top: 1px solid rgba(30, 41, 59, 0.6);">
         <div v-for="cls in [
-          { code: '2xx', label: 'Success', color: 'success' },
-          { code: '3xx', label: 'Redirect', color: 'secondary' },
-          { code: '4xx', label: 'Client error', color: 'warning' },
-          { code: '5xx', label: 'Server error', color: 'error' },
+          { code: '2xx', label: 'Success', color: '#FFD600' },
+          { code: '3xx', label: 'Redirect', color: '#94A3B8' },
+          { code: '4xx', label: 'Client error', color: '#F7931A' },
+          { code: '5xx', label: 'Server error', color: '#EF4444' },
         ]" :key="cls.code" class="d-flex align-center ga-2">
-          <v-icon :color="cls.color" size="x-small">mdi-checkbox-blank-circle</v-icon>
-          <span class="text-caption text-medium-emphasis font-mono">{{ cls.code }}</span>
-          <span class="text-caption text-medium-emphasis">&middot; {{ cls.label }}</span>
+          <span class="rounded-full d-inline-block" :style="{ width: '10px', height: '10px', background: cls.color }"></span>
+          <span class="font-mono" style="color: #94A3B8; font-size: 11px;">{{ cls.code }}</span>
+          <span class="font-mono" style="color: #94A3B8; font-size: 11px;">&middot; {{ cls.label }}</span>
         </div>
       </div>
-    </v-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.hover-bg-grey-lighten-4:hover {
-  background: #f5f5f5;
-}
-.border-top {
-  border-top: 1px solid #ded9ca;
-}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
 </style>

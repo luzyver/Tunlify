@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useApi } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
+import { Eye, RotateCcw, X } from '@lucide/vue'
 
 const { apiFetch } = useApi()
 
@@ -23,14 +24,10 @@ async function showPreview(id: number) {
   previewContent.value = b.content
 }
 
-function closePreview() {
-  previewId.value = null
-  previewContent.value = ''
-}
+function closePreview() { previewId.value = null; previewContent.value = '' }
 
 async function restore(id: number) {
-  const confirmed = await confirm('Restore this backup? Current configuration will be overwritten.')
-  if (!confirmed) return
+  if (!confirm('Restore this backup? Current configuration will be overwritten.')) return
   restoring.value = id
   try {
     const b = await apiFetch<{ content: string }>(`/api/config/backups/${id}`)
@@ -38,9 +35,7 @@ async function restore(id: number) {
     message.value = 'Configuration restored'
     closePreview()
     setTimeout(() => (message.value = ''), 3000)
-  } finally {
-    restoring.value = null
-  }
+  } finally { restoring.value = null }
 }
 
 load()
@@ -53,12 +48,12 @@ const columns: Column<Backup>[] = [
 
 <template>
   <div class="pa-6" style="max-width: 1280px;">
-    <div class="d-flex align-end justify-space-between ga-4 mb-6">
+    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
       <div>
         <p class="eyebrow mb-2">Console &middot; Config</p>
-        <h1 class="text-h4 font-weight-semibold text-on-surface">Backups</h1>
+        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Backups</h1>
       </div>
-      <span class="text-caption text-medium-emphasis tabular-nums">{{ backups.length }} snapshots</span>
+      <span class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">{{ backups.length }} snapshots</span>
     </div>
 
     <v-alert v-if="message" type="success" class="mb-4" variant="tonal">{{ message }}</v-alert>
@@ -71,34 +66,40 @@ const columns: Column<Backup>[] = [
     >
       <template #cell-actions="{ row }">
         <div class="d-inline-flex align-center ga-2">
-          <v-btn variant="tonal" size="small" @click="showPreview(row.id)">
-            <v-icon start size="x-small">mdi-eye</v-icon>
+          <button
+            class="d-inline-flex align-center ga-1 rounded-pill px-3 font-mono"
+            style="height: 28px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 11px; cursor: pointer; transition: all 0.2s;"
+            @click="showPreview(row.id)"
+            @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'"
+            @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'"
+          >
+            <Eye :size="12" :stroke-width="1.5" />
             View
-          </v-btn>
-          <v-btn
-            color="primary"
-            size="small"
-            :loading="restoring === row.id"
+          </button>
+          <button
+            class="d-inline-flex align-center ga-1 rounded-pill px-3 font-mono"
+            :style="{ height: '28px', background: 'linear-gradient(to right, #EA580C, #F7931A)', border: 'none', color: 'white', fontSize: '11px', cursor: restoring === row.id ? 'not-allowed' : 'pointer', boxShadow: '0 0 20px -5px rgba(234, 88, 12, 0.5)', transition: 'all 0.3s', opacity: restoring === row.id ? 0.6 : 1 }"
             :disabled="restoring === row.id"
             @click="restore(row.id)"
+            @mouseenter="if(restoring !== row.id) { $event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)' }"
+            @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
           >
-            <v-icon start size="x-small">mdi-restore</v-icon>
+            <RotateCcw :size="12" :stroke-width="1.5" />
             {{ restoring === row.id ? 'Restoring...' : 'Restore' }}
-          </v-btn>
+          </button>
         </div>
       </template>
       <template #empty>No backups yet</template>
     </DataTable>
 
-    <v-card v-if="previewId !== null" class="mt-6">
-      <v-card-title class="d-flex align-center justify-space-between">
-        <span>Preview</span>
-        <v-btn icon="mdi-close" variant="text" size="small" @click="closePreview" />
-      </v-card-title>
-      <pre
-        class="font-mono text-caption text-medium-emphasis bg-grey-lighten-3 pa-4 overflow-auto scrollbar-thin"
-        style="max-height: 384px; white-space: pre; line-height: 1.25;"
-      >{{ previewContent }}</pre>
-    </v-card>
+    <div v-if="previewId !== null" class="rounded-2xl mt-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
+        <span class="font-heading font-semibold" style="color: white;">Preview</span>
+        <button @click="closePreview" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'">
+          <X :size="16" :stroke-width="1.5" />
+        </button>
+      </div>
+      <pre class="font-mono pa-4 overflow-auto scrollbar-thin" style="color: #94A3B8; font-size: 12px; line-height: 1.25; max-height: 384px; white-space: pre;">{{ previewContent }}</pre>
+    </div>
   </div>
 </template>

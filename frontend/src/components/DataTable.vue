@@ -10,6 +10,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
+import { Search, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from '@lucide/vue'
 
 export interface Column<R> {
   key: string
@@ -43,13 +44,8 @@ const props = withDefaults(
   }
 )
 
-const emit = defineEmits<{
-  'update:search': [value: string]
-}>()
-
 const sorting = ref<SortingState>([])
 const globalFilter = ref('')
-const searchInput = ref('')
 
 const tanstackColumns = computed<ColumnDef<T>[]>(() =>
   props.columns.map((c) => ({
@@ -85,13 +81,6 @@ const table = useVueTable({
 
 watch(globalFilter, () => table.setPageIndex(0))
 
-const hideBelowMap: Record<string, string> = {
-  sm: 'd-sm-none d-md-table-cell',
-  md: 'd-none d-md-table-cell',
-  lg: 'd-none d-lg-table-cell',
-  xl: 'd-none d-xl-table-cell',
-}
-
 const pageCount = computed(() => table.getPageCount())
 const pagination = computed(() => table.getState().pagination)
 
@@ -106,58 +95,56 @@ function rowKeyFor(row: T, fallback: number) {
 <template>
   <div>
     <div v-if="searchable || $slots.toolbar" class="d-flex align-center ga-2 flex-wrap mb-3">
-      <v-text-field
-        v-if="searchable"
-        v-model="globalFilter"
-        :placeholder="searchPlaceholder"
-        prepend-inner-icon="mdi-magnify"
-        clearable
-        hide-details
-        density="compact"
-        variant="outlined"
-        style="max-width: 320px;"
-      />
+      <div v-if="searchable" class="position-relative" style="max-width: 320px; width: 100%;">
+        <Search
+          :size="16"
+          :stroke-width="1.5"
+          class="position-absolute"
+          style="color: #94A3B8; left: 12px; top: 50%; transform: translateY(-50%); z-index: 1;"
+        />
+        <input
+          v-model="globalFilter"
+          :placeholder="searchPlaceholder"
+          class="w-100"
+          style="
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(30, 41, 59, 0.8);
+            border-radius: 8px; color: white; padding: 8px 12px 8px 36px;
+            font-family: 'JetBrains Mono', monospace; font-size: 12px;
+            outline: none; transition: border-color 0.2s;
+          "
+          @focus="$event.target.style.borderColor = '#F7931A'"
+          @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'"
+        />
+      </div>
       <slot name="toolbar" />
     </div>
 
-    <v-card>
-      <v-table density="compact" class="table-tight">
+    <div class="rounded-xl overflow-hidden" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
+      <v-table density="compact">
         <thead>
           <tr>
             <th
               v-for="header in table.getHeaderGroups()[0].headers"
               :key="header.id"
-              :class="columns.find((c) => c.key === header.column.id)?.hideBelow ? hideBelowMap[columns.find((c) => c.key === header.column.id)!.hideBelow!] : ''"
-              :style="{ width: columns.find((c) => c.key === header.column.id)?.width, textAlign: columns.find((c) => c.key === header.column.id)?.align || 'left' }"
-              class="text-caption font-weight-bold text-uppercase text-medium-emphasis"
+              :style="{
+                width: columns.find((c) => c.key === header.column.id)?.width,
+                textAlign: columns.find((c) => c.key === header.column.id)?.align || 'left',
+              }"
+              class="eyebrow"
             >
-              <v-btn
+              <button
                 v-if="header.column.getCanSort()"
-                variant="text"
-                density="compact"
-                size="small"
-                :class="columns.find((c) => c.key === header.column.id)?.align === 'right' ? 'flex-row-reverse' : ''"
+                class="d-inline-flex align-center ga-1"
+                style="background: none; border: none; color: inherit; cursor: pointer; font-family: inherit; font-size: inherit; letter-spacing: inherit; text-transform: inherit;"
                 @click="header.column.toggleSorting()"
               >
                 <slot :name="`header-${header.column.id}`" :column="header.column">
                   {{ columns.find((c) => c.key === header.column.id)?.label }}
                 </slot>
-                <v-icon
-                  v-if="header.column.getIsSorted() === 'asc'"
-                  size="x-small"
-                  class="ml-1"
-                >mdi-arrow-up</v-icon>
-                <v-icon
-                  v-else-if="header.column.getIsSorted() === 'desc'"
-                  size="x-small"
-                  class="ml-1"
-                >mdi-arrow-down</v-icon>
-                <v-icon
-                  v-else
-                  size="x-small"
-                  class="ml-1 text-disabled"
-                >mdi-arrow-up-down</v-icon>
-              </v-btn>
+                <ArrowUp v-if="header.column.getIsSorted() === 'asc'" :size="12" :stroke-width="2" style="color: #F7931A;" />
+                <ArrowDown v-else-if="header.column.getIsSorted() === 'desc'" :size="12" :stroke-width="2" style="color: #F7931A;" />
+                <ArrowUpDown v-else :size="12" :stroke-width="1.5" style="opacity: 0.3;" />
+              </button>
               <span v-else>
                 <slot :name="`header-${header.column.id}`" :column="header.column">
                   {{ columns.find((c) => c.key === header.column.id)?.label }}
@@ -171,11 +158,13 @@ function rowKeyFor(row: T, fallback: number) {
             v-for="(row, i) in table.getRowModel().rows"
             :key="rowKeyFor(row.original, i)"
             :class="rowClass ? rowClass(row.original) : undefined"
+            style="transition: background 0.2s;"
+            @mouseenter="$event.currentTarget.style.background = 'rgba(247, 147, 26, 0.03)'"
+            @mouseleave="$event.currentTarget.style.background = 'transparent'"
           >
             <td
               v-for="cell in row.getVisibleCells()"
               :key="cell.id"
-              :class="columns.find((c) => c.key === cell.column.id)?.hideBelow ? hideBelowMap[columns.find((c) => c.key === cell.column.id)!.hideBelow!] : ''"
               :style="{ textAlign: columns.find((c) => c.key === cell.column.id)?.align || 'left' }"
             >
               <slot
@@ -189,7 +178,7 @@ function rowKeyFor(row: T, fallback: number) {
             </td>
           </tr>
           <tr v-if="!table.getRowModel().rows.length">
-            <td :colspan="columns.length" class="text-center text-medium-emphasis py-8">
+            <td :colspan="columns.length" class="text-center py-8" style="color: #94A3B8;">
               <slot name="empty">
                 {{ globalFilter ? 'No results match your search' : 'No data' }}
               </slot>
@@ -197,51 +186,40 @@ function rowKeyFor(row: T, fallback: number) {
           </tr>
         </tbody>
       </v-table>
-    </v-card>
+    </div>
 
     <div
       v-if="showPagination && table.getFilteredRowModel().rows.length > pageSize"
       class="d-flex align-center justify-space-between ga-3 mt-3"
     >
-      <span class="text-caption text-medium-emphasis tabular-nums">
+      <span class="font-mono text-caption" style="color: #94A3B8;">
         {{ pagination.pageIndex * pagination.pageSize + 1 }}&ndash;{{ Math.min((pagination.pageIndex + 1) * pagination.pageSize, table.getFilteredRowModel().rows.length) }} of {{ table.getFilteredRowModel().rows.length }}
       </span>
       <div class="d-flex align-center ga-2">
-        <v-btn
-          size="small"
-          variant="tonal"
+        <button
+          class="d-inline-flex align-center ga-1 rounded-pill px-3"
+          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s; opacity: 1;"
           :disabled="!table.getCanPreviousPage()"
+          :style="{ opacity: !table.getCanPreviousPage() ? 0.4 : 1, cursor: !table.getCanPreviousPage() ? 'not-allowed' : 'pointer' }"
           @click="table.previousPage()"
         >
-          <v-icon size="small">mdi-chevron-left</v-icon>
-          Previous
-        </v-btn>
-        <span class="text-caption text-medium-emphasis tabular-nums">
-          Page {{ pagination.pageIndex + 1 }} / {{ pageCount }}
+          <ChevronLeft :size="14" :stroke-width="1.5" />
+          Prev
+        </button>
+        <span class="font-mono text-caption" style="color: #94A3B8;">
+          {{ pagination.pageIndex + 1 }} / {{ pageCount }}
         </span>
-        <v-btn
-          size="small"
-          variant="tonal"
+        <button
+          class="d-inline-flex align-center ga-1 rounded-pill px-3"
+          style="height: 32px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-family: 'JetBrains Mono', monospace; font-size: 12px; cursor: pointer; transition: all 0.2s; opacity: 1;"
           :disabled="!table.getCanNextPage()"
+          :style="{ opacity: !table.getCanNextPage() ? 0.4 : 1, cursor: !table.getCanNextPage() ? 'not-allowed' : 'pointer' }"
           @click="table.nextPage()"
         >
           Next
-          <v-icon size="small">mdi-chevron-right</v-icon>
-        </v-btn>
+          <ChevronRight :size="14" :stroke-width="1.5" />
+        </button>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.table-tight th {
-  height: 36px;
-  white-space: nowrap;
-}
-.table-tight td {
-  height: 36px;
-}
-.table-tight tbody tr:hover {
-  background: #fbfaf6;
-}
-</style>
