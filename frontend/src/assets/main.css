@@ -19,7 +19,7 @@ html {
 }
 
 body {
-  background: var(--true-void);
+  background: linear-gradient(135deg, #0d0400 0%, #030304 40%, #00040d 100%);
   color: var(--pure-light);
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 14px;
@@ -61,18 +61,18 @@ pre,
 .bg-grid {
   background-size: 50px 50px;
   background-image:
-    linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+    linear-gradient(to right, rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+  mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 50%, transparent 100%);
 }
 
 /* Accent radial glows */
 .bg-orange-glow {
-  background: radial-gradient(ellipse at 30% 50%, rgba(247, 147, 26, 0.1) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 25% 50%, rgba(247, 147, 26, 0.2) 0%, rgba(234, 88, 12, 0.05) 40%, transparent 70%);
 }
 .bg-blue-glow {
-  background: radial-gradient(ellipse at 70% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 75% 50%, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.08) 40%, transparent 70%);
 }
 
 /* Glass morphism */
@@ -150,6 +150,10 @@ pre,
 }
 
 /* Vuetify overrides */
+.v-application {
+  background: transparent !important;
+}
+
 .v-card {
   border-color: rgba(30, 41, 59, 0.6) !important;
   box-shadow: var(--card-glow) !important;
