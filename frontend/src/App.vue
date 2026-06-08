@@ -14,11 +14,13 @@ const isAppMode = computed(() => route.path !== '/login')
     <div class="bg-blue-glow pointer-events-none" style="position: fixed; inset: 0; z-index: 0;" />
     <div class="bg-grid pointer-events-none" style="position: fixed; inset: 0; z-index: 0;" />
     <AppSidebar />
-    <v-main style="position: relative; z-index: 1; overflow: hidden;">
-      <div style="height: 100%; overflow: auto;">
-        <router-view />
+    <v-main style="position: relative; z-index: 1;">
+      <div style="display: flex; flex-direction: column; height: 100%;">
+        <div style="flex: 1; overflow: auto;">
+          <router-view />
+        </div>
+        <BottomDock />
       </div>
-      <BottomDock />
     </v-main>
   </v-app>
 

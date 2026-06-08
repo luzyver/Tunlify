@@ -181,13 +181,9 @@ function startDrag(e: MouseEvent) {
 
 <style scoped>
 .bottom-dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
   background: #0F1115;
   border-top: 1px solid rgba(30, 41, 59, 0.6);
+  flex-shrink: 0;
 }
 .bottom-dock--dragging {
   user-select: none;
