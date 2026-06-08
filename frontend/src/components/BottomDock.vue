@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import { useActionLogStore } from '../stores/actionLog'
 
 const store = useActionLogStore()
+const authStore = useAuthStore()
 const expanded = ref(false)
 const dockHeight = ref(300)
 const dragging = ref(false)
@@ -11,13 +13,30 @@ const liveLogs = ref<string[]>([])
 const liveLogEl = ref<HTMLElement | null>(null)
 let ws: WebSocket | null = null
 let wsReconnectTimer: number | null = null
+const historyLoaded = ref(false)
+
+async function loadHistory() {
+  if (!authStore.token || historyLoaded.value) return
+  try {
+    const res = await fetch(`/api/logs/history?limit=200`, {
+      headers: { Authorization: `Bearer ${authStore.token}` }
+    })
+    const data = await res.json()
+    if (data.logs?.length) {
+      liveLogs.value = data.logs.map((l: any) => typeof l === 'string' ? l : l.text || JSON.stringify(l))
+      historyLoaded.value = true
+      nextTick(() => { if (liveLogEl.value) liveLogEl.value.scrollTop = liveLogEl.value.scrollHeight })
+    }
+  } catch {}
+}
 
 function connectWs() {
+  if (!authStore.token) return
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
-  ws = new WebSocket(`${proto}//${location.host}/api/logs/ws`)
+  ws = new WebSocket(`${proto}//${location.host}/api/logs/ws?token=${encodeURIComponent(authStore.token)}`)
   ws.onmessage = (e) => {
     liveLogs.value.push(e.data)
-    if (liveLogs.value.length > 1000) liveLogs.value.splice(0, liveLogs.value.length - 1000)
+    if (liveLogs.value.length > 2000) liveLogs.value.splice(0, liveLogs.value.length - 2000)
     nextTick(() => { if (liveLogEl.value) liveLogEl.value.scrollTop = liveLogEl.value.scrollHeight })
   }
   ws.onclose = () => {
@@ -27,7 +46,7 @@ function connectWs() {
 }
 
 onMounted(() => {
-  if (expanded.value) connectWs()
+  if (expanded.value) { loadHistory(); connectWs() }
 })
 
 onUnmounted(() => {
@@ -36,7 +55,7 @@ onUnmounted(() => {
 })
 
 watch(expanded, (v) => {
-  if (v && !ws) connectWs()
+  if (v) { if (!historyLoaded.value) loadHistory(); if (!ws) connectWs() }
   if (!v && ws) { ws.onclose = null; ws.close(); ws = null }
   if (!v && wsReconnectTimer !== null) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null }
 })
