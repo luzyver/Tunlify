@@ -79,12 +79,10 @@ async function handleLogin() {
                     required
                     autofocus
                     autocomplete="username"
-                    prepend-inner-icon
                     class="mb-2"
                     hide-details="auto"
-                    variant="outlined"
+                    variant="filled"
                     color="primary"
-                    base-color="grey"
                   />
 
                   <v-text-field
@@ -93,12 +91,10 @@ async function handleLogin() {
                     type="password"
                     required
                     autocomplete="current-password"
-                    prepend-inner-icon
                     class="mb-6"
                     hide-details="auto"
-                    variant="outlined"
+                    variant="filled"
                     color="primary"
-                    base-color="grey"
                   />
 
                   <v-btn
