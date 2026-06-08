@@ -52,7 +52,7 @@ async function handleLogin() {
             style="color: #94A3B8; font-size: 13px; transition: color 0.2s;"
             @mouseenter="($event.target as HTMLElement).style.color = '#F7931A'"
             @mouseleave="($event.target as HTMLElement).style.color = '#94A3B8'"
-          >Source &Nearr;</a>
+          >Source &rarr;</a>
         </header>
 
         <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 24px;">
@@ -117,7 +117,7 @@ async function handleLogin() {
             </v-card>
 
             <p class="text-center font-mono" style="margin-top: 48px; color: rgba(148, 163, 184, 0.5); font-size: 11px;">
-              Self-hosted &middot; MIT licensed
+              &copy; 2026 Tunlify
             </p>
           </div>
         </div>
