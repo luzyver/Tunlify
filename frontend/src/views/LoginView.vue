@@ -34,6 +34,7 @@ async function handleLogin() {
   <v-app>
     <v-main>
       <div class="bg-orange-glow" style="position: fixed; inset: 0; z-index: 0;" />
+      <div class="bg-blue-glow" style="position: fixed; inset: 0; z-index: 0;" />
       <div class="bg-grid" style="position: fixed; inset: 0; z-index: 0;" />
       <div style="position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column;">
         <header style="display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; max-width: 1280px; width: 100%; margin: 0 auto;">

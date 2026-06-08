@@ -67,9 +67,12 @@ pre,
   -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
-/* Orange radial glow */
+/* Accent radial glows */
 .bg-orange-glow {
-  background: radial-gradient(ellipse at center, rgba(247, 147, 26, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 30% 50%, rgba(247, 147, 26, 0.1) 0%, transparent 60%);
+}
+.bg-blue-glow {
+  background: radial-gradient(ellipse at 70% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 60%);
 }
 
 /* Glass morphism */
