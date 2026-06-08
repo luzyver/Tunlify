@@ -24,7 +24,7 @@ async function loadHistory() {
     })
     const data = await res.json()
     if (data.logs?.length) {
-      liveLogs.value = data.logs.map((l: any) => typeof l === 'string' ? l : l.text || JSON.stringify(l))
+      liveLogs.value = data.logs.map((l: any) => decodeLog(typeof l === 'string' ? l : l.text || JSON.stringify(l)))
       historyLoaded.value = true
       nextTick(() => { if (liveLogEl.value) liveLogEl.value.scrollTop = liveLogEl.value.scrollHeight })
     }
@@ -36,7 +36,7 @@ function connectWs() {
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
   ws = new WebSocket(`${proto}//${location.host}/api/logs/ws?token=${encodeURIComponent(authStore.token)}`)
   ws.onmessage = (e) => {
-    liveLogs.value.push(e.data)
+    liveLogs.value.push(decodeLog(e.data))
     if (liveLogs.value.length > 2000) liveLogs.value.splice(0, liveLogs.value.length - 2000)
     nextTick(() => { if (liveLogEl.value) liveLogEl.value.scrollTop = liveLogEl.value.scrollHeight })
   }
@@ -81,6 +81,25 @@ watch(
 function toggleSection(id: number) {
   const a = store.actions.find((a) => a.id === id)
   if (a) a.lines = [...a.lines]
+}
+
+function decodeLog(raw: string): string {
+  try {
+    const decoded = atob(raw)
+    try {
+      const parsed = JSON.parse(decoded)
+      return parsed.message || parsed.text || decoded
+    } catch {
+      return decoded
+    }
+  } catch {
+    try {
+      const parsed = JSON.parse(raw)
+      return parsed.message || parsed.text || raw
+    } catch {
+      return raw
+    }
+  }
 }
 
 function formatLogLine(line: string): string {
