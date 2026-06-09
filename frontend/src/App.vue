@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 import AppSidebar from './components/AppSidebar.vue'
 import BottomDock from './components/BottomDock.vue'
 
 const route = useRoute()
-const isAppMode = computed(() => route.path !== '/login')
+const authStore = useAuthStore()
+const isAppMode = computed(() => authStore.isAuthenticated && route.path !== '/login')
 </script>
 
 <template>

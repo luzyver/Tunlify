@@ -40,15 +40,7 @@ async function handleLogin() {
     <header class="login-header">
       <div class="login-brand">
         <div class="brand-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 2v20" />
-            <path d="M2 12h20" />
-            <path d="M12 12 2 2" />
-            <path d="M12 12 22 2" />
-            <path d="M12 12 2 22" />
-            <path d="M12 12 22 22" />
-          </svg>
+          <img src="/icon.png" alt="Tunlify" class="brand-img" />
         </div>
         <span class="brand-name">Tunlify</span>
       </div>
@@ -111,9 +103,12 @@ async function handleLogin() {
               :loading="loading"
               block
               size="large"
+              color="primary"
+              variant="flat"
               class="login-btn"
+              style="background: linear-gradient(135deg, #EA580C, #F7931A); box-shadow: 0 0 24px -6px rgba(234, 88, 12, 0.4);"
             >
-              <span class="btn-text">Sign in</span>
+              Sign in
             </v-btn>
           </form>
         </div>
@@ -219,7 +214,11 @@ async function handleLogin() {
   border-radius: 10px;
   border: 1px solid rgba(247, 147, 26, 0.25);
   background: rgba(247, 147, 26, 0.06);
-  color: #F7931A;
+}
+
+.brand-img {
+  width: 20px;
+  height: 20px;
 }
 
 .brand-name {
@@ -339,25 +338,18 @@ async function handleLogin() {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: none;
-  background: linear-gradient(135deg, #EA580C, #F7931A) !important;
-  box-shadow: 0 0 24px -6px rgba(234, 88, 12, 0.4);
   position: relative;
   overflow: hidden;
   transition: box-shadow 0.3s, transform 0.2s;
 }
 
 .login-btn:hover {
-  box-shadow: 0 0 32px -4px rgba(234, 88, 12, 0.6);
+  box-shadow: 0 0 32px -4px rgba(234, 88, 12, 0.6) !important;
   transform: scale(1.01);
 }
 
 .login-btn:active {
   transform: scale(0.98);
-}
-
-.btn-text {
-  position: relative;
-  z-index: 1;
 }
 
 .login-footer {
