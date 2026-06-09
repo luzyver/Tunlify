@@ -35,13 +35,13 @@ const columns: Column<AuditEntry>[] = [
 </script>
 
 <template>
-  <div class="pa-6">
-    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
+  <div class="page">
+    <div class="page-header">
       <div>
-        <p class="eyebrow mb-2">Console &middot; Audit</p>
-        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Audit log</h1>
+        <span class="page-badge">Console &middot; Audit</span>
+        <h1 class="page-title">Audit log</h1>
       </div>
-      <span v-if="total > entries.length" class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">
+      <span v-if="total > entries.length" class="stat-label" style="margin-bottom: 0; color: #71717A;">
         showing newest {{ entries.length }} of {{ total }}
       </span>
     </div>
@@ -55,7 +55,7 @@ const columns: Column<AuditEntry>[] = [
     >
       <template #toolbar>
         <div class="position-relative" style="min-width: 160px;">
-          <select v-model="filterAction" style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(30, 41, 59, 0.8); border-radius: 8px; color: white; padding: 6px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; height: 32px; outline: none; cursor: pointer; appearance: auto;">
+          <select v-model="filterAction" class="input-line" style="border: 1px solid rgba(30, 41, 59, 0.8); border-radius: 8px; padding: 6px 12px; height: 32px; cursor: pointer; appearance: auto;">
             <option v-for="a in actions" :key="a" :value="a" style="background: #0F1115;">{{ a || 'All actions' }}</option>
           </select>
         </div>

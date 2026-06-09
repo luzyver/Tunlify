@@ -123,20 +123,36 @@ const columns: Column<Project>[] = [
 ]
 </script>
 
+<style scoped>
+.history-row {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 12px;
+  padding: 6px 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+.history-row:hover {
+  background: rgba(247, 147, 26, 0.03);
+}
+.running-dot {
+  width: 6px;
+  height: 6px;
+  background: #F7931A;
+  border-radius: 50%;
+}
+</style>
+
 <template>
-  <div class="pa-6">
-    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
+  <div class="page">
+    <div class="page-header">
       <div>
-        <p class="eyebrow mb-2">Console &middot; Compose</p>
-        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Projects</h1>
+        <span class="page-badge">Console &middot; Compose</span>
+        <h1 class="page-title">Projects</h1>
       </div>
-      <button
-        class="d-inline-flex align-center ga-2 rounded-pill px-4 font-mono"
-        style="height: 40px; background: linear-gradient(to right, #EA580C, #F7931A); border: none; color: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5); cursor: pointer; transition: all 0.3s;"
-        @click="openAdd"
-        @mouseenter="$event.target.style.transform = 'scale(1.03)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
-        @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
-      >
+      <button class="btn btn-primary" @click="openAdd">
         <v-icon size="16">mdi-plus</v-icon>
         New project
       </button>
@@ -145,72 +161,64 @@ const columns: Column<Project>[] = [
     <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
     <!-- Form -->
-    <div v-if="showForm" class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <span class="font-heading font-semibold" style="color: white;">{{ editingId ? 'Edit project' : 'New project' }}</span>
-        <button @click="showForm = false" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="16">mdi-close</v-icon></button>
+    <div v-if="showForm" class="card mb-6">
+      <div class="card-header">
+        <span class="card-title">{{ editingId ? 'Edit project' : 'New project' }}</span>
+        <button class="btn-ghost" @click="showForm = false"><v-icon size="16">mdi-close</v-icon></button>
       </div>
-      <div class="pa-6">
+      <div class="card-body">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
           <div>
-            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Name</label>
-            <input v-model="form.name" placeholder="my-app" style="width: 100%; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+            <label class="label-upper">Name</label>
+            <input v-model="form.name" placeholder="my-app" class="input-line" />
           </div>
           <div>
-            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Path</label>
-            <input v-model="form.path" placeholder="/srv/my-app" style="width: 100%; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+            <label class="label-upper">Path</label>
+            <input v-model="form.path" placeholder="/srv/my-app" class="input-line" />
           </div>
           <div style="grid-column: span 2;">
-            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Repository URL <span style="color: rgba(148, 163, 184, 0.5);">(optional)</span></label>
-            <input v-model="form.repo_url" placeholder="https://github.com/user/repo.git" style="width: 100%; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+            <label class="label-upper">Repository URL <span style="color: #71717A;">(optional)</span></label>
+            <input v-model="form.repo_url" placeholder="https://github.com/user/repo.git" class="input-line" />
           </div>
           <div>
-            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Git username</label>
-            <input v-model="form.git_username" placeholder="git" style="width: 100%; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+            <label class="label-upper">Git username</label>
+            <input v-model="form.git_username" placeholder="git" class="input-line" />
           </div>
           <div>
-            <label class="font-mono d-block mb-2" style="color: #94A3B8; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;">Git token</label>
-            <input v-model="form.git_token" type="password" placeholder="ghp_..." style="width: 100%; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" />
+            <label class="label-upper">Git token</label>
+            <input v-model="form.git_token" type="password" placeholder="ghp_..." class="input-line" />
           </div>
           <div style="grid-column: span 2;" class="d-flex ga-3 pt-1">
-            <button
-              class="rounded-pill px-5 font-mono" style="height: 40px; background: linear-gradient(to right, #EA580C, #F7931A); border: none; color: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5); cursor: pointer; transition: all 0.3s;"
-              @click="save"
-              @mouseenter="$event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)'"
-              @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
-            >{{ editingId ? 'Save changes' : 'Create project' }}</button>
-            <button class="rounded-pill px-4 font-mono" style="height: 40px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 12px; cursor: pointer; transition: all 0.3s;" @click="showForm = false" @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'" @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'">Cancel</button>
+            <button class="btn btn-primary" @click="save">{{ editingId ? 'Save changes' : 'Create project' }}</button>
+            <button class="btn btn-secondary" @click="showForm = false">Cancel</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Deploy prompt -->
-    <div v-if="deployTarget" class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-      <div class="d-flex align-center px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <v-icon size="18" color="#F7931A" class="mr-1">mdi-rocket</v-icon>
-        <span class="font-heading font-semibold" style="color: white;">Deploy &mdash; choose ref</span>
-        <v-spacer />
-        <button @click="deployTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><v-icon size="16">mdi-close</v-icon></button>
+    <div v-if="deployTarget" class="card mb-6">
+      <div class="card-header">
+        <div class="d-flex align-center ga-2">
+          <v-icon size="18" color="#F7931A">mdi-rocket</v-icon>
+          <span class="card-title">Deploy &mdash; choose ref</span>
+        </div>
+        <button class="btn-ghost" @click="deployTarget = null"><v-icon size="16">mdi-close</v-icon></button>
       </div>
-      <div class="pa-6 d-flex ga-3">
-        <input v-model="deployRef" placeholder="main / v1.0.0" style="flex: 1; background: rgba(0,0,0,0.5); border: none; border-bottom: 2px solid rgba(30, 41, 59, 0.8); color: white; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.2s;" @focus="$event.target.style.borderColor = '#F7931A'" @blur="$event.target.style.borderColor = 'rgba(30, 41, 59, 0.8)'" @keyup.enter="confirmDeploy" />
-        <button
-          class="rounded-pill px-4 font-mono" style="height: 40px; background: linear-gradient(to right, #EA580C, #F7931A); border: none; color: white; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; box-shadow: 0 0 20px -5px rgba(234, 88, 12, 0.5); cursor: pointer; transition: all 0.3s;"
-          :disabled="!deployRef || actionLoading[deployTarget]"
-          @click="confirmDeploy"
-        >
+      <div class="card-body d-flex ga-3">
+        <input v-model="deployRef" placeholder="main / v1.0.0" class="input-line" style="flex: 1;" @keyup.enter="confirmDeploy" />
+        <button class="btn btn-primary" :disabled="!deployRef || actionLoading[deployTarget]" @click="confirmDeploy">
           Deploy
         </button>
       </div>
     </div>
 
     <!-- Output -->
-    <div v-if="output || anyRunning()" class="rounded-2xl mb-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <span class="font-heading font-semibold" style="color: white;">Output</span>
+    <div v-if="output || anyRunning()" class="card mb-6">
+      <div class="card-header">
+        <span class="card-title">Output</span>
         <span v-if="anyRunning()" class="rounded-pill px-2 font-mono d-inline-flex align-center ga-1" style="background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.3); color: #F7931A; font-size: 11px; line-height: 22px;">
-          <span class="rounded-full d-inline-block" style="width: 6px; height: 6px; background: #F7931A;"></span> Running
+          <span class="rounded-full d-inline-block running-dot"></span> Running
         </span>
       </div>
       <pre ref="outputEl" class="font-mono pa-4 overflow-auto scrollbar-thin" style="color: #94A3B8; background: rgba(0,0,0,0.3); font-size: 12px; line-height: 1.25; max-height: 384px; white-space: pre-wrap;">{{ output || '(waiting)' }}</pre>
@@ -238,13 +246,13 @@ const columns: Column<Project>[] = [
       </template>
       <template #cell-actions="{ row }">
         <div class="d-inline-flex align-center ga-1">
-          <button title="Up" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'up')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-play</v-icon></button>
-          <button title="Down" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'down')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-stop-circle</v-icon></button>
-          <button title="Restart" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="action(row.id, 'restart')" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-refresh</v-icon></button>
-          <button title="Deploy" :disabled="actionLoading[row.id]" style="background: none; border: none; color: #F7931A; cursor: pointer; padding: 4px;" @click="startDeploy(row)"><v-icon size="14">mdi-rocket</v-icon></button>
-          <button title="History" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="toggleHistory(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-history</v-icon></button>
-          <button title="Edit" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @click="openEdit(row)" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'"><v-icon size="14">mdi-pencil</v-icon></button>
-          <button title="Delete" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 4px;" @click="remove(row.id)"><v-icon size="14">mdi-delete</v-icon></button>
+          <button title="Up" class="btn-ghost" :disabled="actionLoading[row.id]" @click="action(row.id, 'up')"><v-icon size="14">mdi-play</v-icon></button>
+          <button title="Down" class="btn-ghost" :disabled="actionLoading[row.id]" @click="action(row.id, 'down')"><v-icon size="14">mdi-stop-circle</v-icon></button>
+          <button title="Restart" class="btn-ghost" :disabled="actionLoading[row.id]" @click="action(row.id, 'restart')"><v-icon size="14">mdi-refresh</v-icon></button>
+          <button title="Deploy" class="btn-ghost" style="color: #F7931A;" :disabled="actionLoading[row.id]" @click="startDeploy(row)"><v-icon size="14">mdi-rocket</v-icon></button>
+          <button title="History" class="btn-ghost" @click="toggleHistory(row)"><v-icon size="14">mdi-history</v-icon></button>
+          <button title="Edit" class="btn-ghost" @click="openEdit(row)"><v-icon size="14">mdi-pencil</v-icon></button>
+          <button title="Delete" class="btn-ghost btn-ghost--danger" @click="remove(row.id)"><v-icon size="14">mdi-delete</v-icon></button>
         </div>
       </template>
       <template #empty>
@@ -253,21 +261,18 @@ const columns: Column<Project>[] = [
     </DataTable>
 
     <!-- History -->
-    <div v-if="historyTarget !== null" class="rounded-2xl mt-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <span class="font-heading font-semibold" style="color: white;">History &middot; <span class="font-mono" style="color: #F7931A;">{{ historyName }}</span></span>
-        <button @click="historyTarget = null" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px;"><v-icon size="16">mdi-close</v-icon></button>
+    <div v-if="historyTarget !== null" class="card mt-6">
+      <div class="card-header">
+        <span class="card-title">History &middot; <span class="font-mono" style="color: #F7931A;">{{ historyName }}</span></span>
+        <button class="btn-ghost" @click="historyTarget = null"><v-icon size="16">mdi-close</v-icon></button>
       </div>
       <div class="pa-4 d-flex flex-column ga-1">
         <div v-if="history.length" class="d-flex flex-column ga-1">
           <div v-for="h in history" :key="h.id">
             <button
-              class="w-100 d-flex align-center justify-space-between font-mono px-2 rounded-lg"
-              style="background: none; border: none; color: #94A3B8; font-size: 12px; padding: 6px 8px; cursor: pointer; text-align: left; transition: background 0.2s;"
+              class="w-100 d-flex align-center justify-space-between font-mono px-2 rounded-lg history-row"
               :disabled="h.action !== 'project_deploy'"
               @click="h._open = !h._open"
-              @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.03)'"
-              @mouseleave="$event.target.style.background = 'transparent'"
             >
               <span class="font-mono">{{ h.action }}</span>
               <span class="tabular-nums" style="color: rgba(148, 163, 184, 0.5);">{{ h.created_at }}</span>

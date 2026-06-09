@@ -161,108 +161,77 @@ function startDrag(e: MouseEvent) {
     :class="{ 'bottom-dock--expanded': expanded, 'bottom-dock--dragging': dragging }"
     :style="{ height: barHeight + (expanded ? dockHeight : 0) + 'px' }"
   >
-    <div
-      class="bottom-dock__bar d-flex align-center px-3 font-mono"
-      style="height: 32px; font-size: 11px; color: #94A3B8; background: #0F1115; border-top: 1px solid rgba(30, 41, 59, 0.6); user-select: none;"
-    >
-      <v-icon size="14" style="cursor: pointer;" @click="expanded = !expanded">{{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
-      <span class="ml-1" style="text-transform: uppercase; letter-spacing: 0.08em;">
+    <div class="bottom-dock__bar">
+      <v-icon size="14" class="dock-toggle" @click="expanded = !expanded">{{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up' }}</v-icon>
+      <span class="dock-title">
         {{ store.running.length ? `${store.running.length} running` : 'Console' }}
       </span>
       <v-spacer />
-      <button
-        v-if="expanded"
-        class="font-mono"
-        style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 2px 6px; font-size: 11px;"
-        @click.stop="store.clearFinished()"
-      >Clear</button>
-      <span class="font-mono ml-2" style="color: rgba(148, 163, 184, 0.5);">{{ liveLogs.length }} lines</span>
+      <button v-if="expanded" class="dock-clear" @click.stop="store.clearFinished()">Clear</button>
+      <span class="dock-lines">{{ liveLogs.length }} lines</span>
     </div>
 
     <div v-if="expanded" class="bottom-dock__body" :style="{ height: dockHeight + 'px' }">
       <div class="bottom-dock__resize-handle" @mousedown="startDrag" />
 
-      <!-- Tabs -->
-      <div class="d-flex font-mono" style="border-bottom: 1px solid rgba(30, 41, 59, 0.4); background: #0A0C10;">
+      <div class="dock-tabs">
         <button
-          class="px-3 py-1"
-          style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border: none; background: none; cursor: pointer;"
-          :style="{
-            color: activeTab === 'tunnel' ? '#F7931A' : 'rgba(148,163,184,0.5)',
-            borderBottom: activeTab === 'tunnel' ? '2px solid #F7931A' : '2px solid transparent',
-          }"
+          class="dock-tab"
+          :class="{ 'dock-tab--active': activeTab === 'tunnel' }"
           @click="activeTab = 'tunnel'"
         >Tunnel</button>
         <button
-          class="px-3 py-1"
-          style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; border: none; background: none; cursor: pointer;"
-          :style="{
-            color: activeTab === 'action' ? '#F7931A' : 'rgba(148,163,184,0.5)',
-            borderBottom: activeTab === 'action' ? '2px solid #F7931A' : '2px solid transparent',
-          }"
+          class="dock-tab"
+          :class="{ 'dock-tab--active': activeTab === 'action' }"
           @click="activeTab = 'action'"
         >Action</button>
       </div>
 
-      <!-- Tunnel tab -->
-      <div v-show="activeTab === 'tunnel'" ref="liveLogEl" class="pa-2" style="flex: 1; overflow-y: auto; background: #0A0C10;">
+      <div v-show="activeTab === 'tunnel'" ref="liveLogEl" class="dock-content">
         <template v-if="liveLogs.length">
-          <div v-for="(line, li) in liveLogs.slice(-100)" :key="li">
+          <div v-for="(line, li) in liveLogs.slice(-100)" :key="li" class="dock-log-line">
             <template v-for="(seg, si) in colorizeLine(line)" :key="si">
               <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
               <span v-else>{{ seg.text }}</span>
             </template>
           </div>
         </template>
-        <span v-else style="color: rgba(148,163,184,0.4); font-size: 11px;">(connecting...)</span>
+        <span class="dock-muted">(connecting...)</span>
       </div>
 
-      <!-- Action tab -->
-      <div v-show="activeTab === 'action'" class="pa-2" style="flex: 1; overflow-y: auto; background: #0A0C10;">
+      <div v-show="activeTab === 'action'" class="dock-content">
         <template v-if="store.actions.length">
-          <div v-for="a in store.actions" :key="a.id" class="mb-1 rounded-lg" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(30, 41, 59, 0.4);">
-            <div
-              class="d-flex align-center ga-2 px-3 font-mono"
-              style="height: 28px; font-size: 11px; cursor: pointer; border-bottom: 1px solid rgba(30, 41, 59, 0.2);"
-              @click="toggleSection(a.id)"
-            >
+          <div v-for="a in store.actions" :key="a.id" class="dock-action-card">
+            <div class="dock-action-header" @click="toggleSection(a.id)">
               <span
-                class="rounded-full d-inline-block"
-                style="width: 6px; height: 6px; flex-shrink: 0;"
-                :style="{
-                  background: a.status === 'running' ? '#F7931A' : a.status === 'success' ? '#FFD600' : '#EF4444',
-                  boxShadow: a.status === 'running' ? '0 0 6px rgba(247,147,26,0.6)' : 'none',
-                }"
+                class="dock-action-dot"
+                :class="`dock-action-dot--${a.status}`"
               ></span>
-              <span style="color: white;">{{ a.label }}</span>
-              <span v-if="a.projectName" class="font-mono" style="color: #F7931A;">{{ a.projectName }}</span>
-              <span class="font-mono" style="color: rgba(148, 163, 184, 0.4);">
+              <span class="dock-action-label">{{ a.label }}</span>
+              <span v-if="a.projectName" class="dock-action-project">{{ a.projectName }}</span>
+              <span class="dock-action-status" :class="`dock-action-status--${a.status}`">
                 {{ a.status === 'running' ? 'RUNNING' : a.status === 'success' ? 'DONE' : 'FAILED' }}
               </span>
               <v-spacer />
-              <button
-                style="background: none; border: none; color: rgba(148, 163, 184, 0.4); cursor: pointer; padding: 2px; font-size: 11px;"
-                @click.stop="store.remove(a.id)"
-              >&times;</button>
+              <button class="dock-action-remove" @click.stop="store.remove(a.id)">&times;</button>
             </div>
             <div
               :ref="(el) => setLogEl(a.id, el as HTMLElement | null)"
-              class="font-mono pa-2"
-              style="color: #94A3B8; font-size: 11px; line-height: 1.35; max-height: 100px; overflow-y: auto; white-space: pre-wrap;"
+              class="dock-action-body"
             >
               <template v-if="a.lines.length">
-                <div v-for="(line, ai) in a.lines" :key="ai">
+                <div v-for="(line, ai) in a.lines" :key="ai" class="dock-log-line">
                   <template v-for="(seg, si) in colorizeLine(line)" :key="si">
                     <span v-if="seg.color" :style="{ color: seg.color }">{{ seg.text }}</span>
                     <span v-else>{{ seg.text }}</span>
                   </template>
                 </div>
               </template>
-              <span v-else style="color: rgba(148,163,184,0.4);">(waiting for output...)</span>
+              <span class="dock-muted">(waiting for output...)</span>
             </div>
           </div>
         </template>
-        <span v-else style="color: rgba(148,163,184,0.4); font-size: 11px;">No actions yet</span>
+        <span class="dock-muted" style="font-size: 11px;">No actions yet</span>
       </div>
     </div>
   </div>
@@ -281,9 +250,57 @@ function startDrag(e: MouseEvent) {
 .bottom-dock--dragging {
   user-select: none;
 }
+
+/* Bar */
 .bottom-dock__bar {
-  border-top: none !important;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  height: 32px;
+  font-size: 11px;
+  color: #94A3B8;
+  background: #0F1115;
+  user-select: none;
+  border-top: 1px solid rgba(30, 41, 59, 0.6);
+  gap: 8px;
 }
+.dock-toggle {
+  cursor: pointer;
+  color: #71717A;
+  transition: color 0.2s;
+}
+.dock-toggle:hover {
+  color: #F7931A;
+}
+.dock-title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+}
+.dock-clear {
+  background: none;
+  border: none;
+  color: #71717A;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: 'Sora', sans-serif;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.dock-clear:hover {
+  color: #F7931A;
+}
+.dock-lines {
+  font-family: 'Sora', sans-serif;
+  font-size: 10px;
+  color: rgba(148, 163, 184, 0.4);
+}
+
+/* Resize handle */
 .bottom-dock__resize-handle {
   height: 8px;
   cursor: ns-resize;
@@ -301,6 +318,7 @@ function startDrag(e: MouseEvent) {
   height: 3px;
   border-radius: 2px;
   background: rgba(148, 163, 184, 0.3);
+  transition: background 0.2s;
 }
 .bottom-dock__resize-handle:hover {
   background: rgba(247, 147, 26, 0.3);
@@ -308,10 +326,131 @@ function startDrag(e: MouseEvent) {
 .bottom-dock__resize-handle:hover::after {
   background: rgba(247, 147, 26, 0.5);
 }
+
+/* Body */
 .bottom-dock__body {
   overflow-y: auto;
   background: #0A0C10;
   display: flex;
   flex-direction: column;
+}
+
+/* Tabs */
+.dock-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.4);
+  background: #0A0C10;
+  padding: 0 8px;
+}
+.dock-tab {
+  padding: 6px 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: rgba(148, 163, 184, 0.5);
+  border-bottom: 2px solid transparent;
+  font-family: 'Sora', sans-serif;
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+}
+.dock-tab:hover {
+  color: #94A3B8;
+}
+.dock-tab--active {
+  color: #F7931A !important;
+  border-bottom-color: #F7931A;
+}
+
+/* Content */
+.dock-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  background: #0A0C10;
+}
+.dock-log-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #94A3B8;
+}
+.dock-muted {
+  color: rgba(148, 163, 184, 0.4);
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Action cards */
+.dock-action-card {
+  margin-bottom: 4px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(30, 41, 59, 0.4);
+  overflow: hidden;
+}
+.dock-action-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 28px;
+  font-size: 11px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.2);
+  font-family: 'JetBrains Mono', monospace;
+}
+.dock-action-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dock-action-dot--running {
+  background: #F7931A;
+  box-shadow: 0 0 6px rgba(247,147,26,0.6);
+}
+.dock-action-dot--success {
+  background: #FFD600;
+}
+.dock-action-dot--error {
+  background: #EF4444;
+}
+.dock-action-label {
+  color: white;
+}
+.dock-action-project {
+  color: #F7931A;
+}
+.dock-action-status {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.dock-action-status--running { color: #F7931A; }
+.dock-action-status--success { color: #FFD600; }
+.dock-action-status--error { color: #EF4444; }
+.dock-action-remove {
+  background: none;
+  border: none;
+  color: rgba(148, 163, 184, 0.4);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 13px;
+  transition: color 0.2s;
+}
+.dock-action-remove:hover {
+  color: #EF4444;
+}
+.dock-action-body {
+  padding: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #94A3B8;
+  font-size: 11px;
+  line-height: 1.35;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-wrap;
 }
 </style>

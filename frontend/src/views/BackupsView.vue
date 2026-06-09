@@ -47,13 +47,13 @@ const columns: Column<Backup>[] = [
 </script>
 
 <template>
-  <div class="pa-6">
-    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
+  <div class="page">
+    <div class="page-header">
       <div>
-        <p class="eyebrow mb-2">Console &middot; Config</p>
-        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Backups</h1>
+        <span class="page-badge">Console &middot; Config</span>
+        <h1 class="page-title">Backups</h1>
       </div>
-      <span class="font-mono tabular-nums" style="color: #94A3B8; font-size: 11px;">{{ backups.length }} snapshots</span>
+      <span class="stat-label" style="margin-bottom: 0; color: #71717A;">{{ backups.length }} snapshots</span>
     </div>
 
     <v-alert v-if="message" type="success" class="mb-4" variant="tonal">{{ message }}</v-alert>
@@ -66,23 +66,14 @@ const columns: Column<Backup>[] = [
     >
       <template #cell-actions="{ row }">
         <div class="d-inline-flex align-center ga-2">
-          <button
-            class="d-inline-flex align-center ga-1 rounded-pill px-3 font-mono"
-            style="height: 28px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 11px; cursor: pointer; transition: all 0.2s;"
-            @click="showPreview(row.id)"
-            @mouseenter="$event.target.style.background = 'rgba(247, 147, 26, 0.2)'"
-            @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'"
-          >
+          <button class="btn btn-secondary btn-sm" @click="showPreview(row.id)">
             <v-icon size="12">mdi-eye</v-icon>
             View
           </button>
           <button
-            class="d-inline-flex align-center ga-1 rounded-pill px-3 font-mono"
-            :style="{ height: '28px', background: 'linear-gradient(to right, #EA580C, #F7931A)', border: 'none', color: 'white', fontSize: '11px', cursor: restoring === row.id ? 'not-allowed' : 'pointer', boxShadow: '0 0 20px -5px rgba(234, 88, 12, 0.5)', transition: 'all 0.3s', opacity: restoring === row.id ? 0.6 : 1 }"
+            class="btn btn-primary btn-sm"
             :disabled="restoring === row.id"
             @click="restore(row.id)"
-            @mouseenter="if(restoring !== row.id) { $event.target.style.transform = 'scale(1.02)'; $event.target.style.boxShadow = '0 0 30px -5px rgba(247, 147, 26, 0.6)' }"
-            @mouseleave="$event.target.style.transform = 'scale(1)'; $event.target.style.boxShadow = '0 0 20px -5px rgba(234, 88, 12, 0.5)'"
           >
             <v-icon size="12">mdi-refresh</v-icon>
             {{ restoring === row.id ? 'Restoring...' : 'Restore' }}
@@ -92,10 +83,10 @@ const columns: Column<Backup>[] = [
       <template #empty>No backups yet</template>
     </DataTable>
 
-    <div v-if="previewId !== null" class="rounded-2xl mt-6" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-      <div class="d-flex align-center justify-space-between px-6 py-4" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
-        <span class="font-heading font-semibold" style="color: white;">Preview</span>
-        <button @click="closePreview" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; transition: color 0.2s;" @mouseenter="$event.target.style.color = '#F7931A'" @mouseleave="$event.target.style.color = '#94A3B8'">
+    <div v-if="previewId !== null" class="card mt-6">
+      <div class="card-header">
+        <span class="card-title">Preview</span>
+        <button class="btn-ghost" @click="closePreview">
           <v-icon size="16">mdi-close</v-icon>
         </button>
       </div>

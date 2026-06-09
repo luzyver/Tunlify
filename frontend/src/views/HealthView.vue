@@ -51,38 +51,31 @@ const columns: Column<HealthRow>[] = [
 </script>
 
 <template>
-  <div class="pa-6">
-    <div class="d-flex align-center justify-space-between ga-4 mb-6 flex-wrap" style="gap: 16px;">
+  <div class="page">
+    <div class="page-header">
       <div>
-        <p class="eyebrow mb-2">Console &middot; Health</p>
-        <h1 class="font-heading" style="font-size: 28px; font-weight: 600; color: white;">Endpoint reachability</h1>
+        <span class="page-badge">Console &middot; Health</span>
+        <h1 class="page-title">Endpoint reachability</h1>
       </div>
-      <button
-        class="d-inline-flex align-center ga-2 rounded-pill px-4 font-mono"
-        style="height: 36px; background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.2); color: #F7931A; font-size: 12px; cursor: pointer; transition: all 0.3s;"
-        :disabled="loading"
-        @click="check"
-        @mouseenter="if(!loading) { $event.target.style.background = 'rgba(247, 147, 26, 0.2)'; $event.target.style.borderColor = '#F7931A' }"
-        @mouseleave="$event.target.style.background = 'rgba(247, 147, 26, 0.1)'; $event.target.style.borderColor = 'rgba(247, 147, 26, 0.2)'"
-      >
+      <button class="btn btn-secondary" :disabled="loading" @click="check">
         <v-icon size="14" :class="{ 'spin': loading }">mdi-refresh</v-icon>
         {{ loading ? 'Checking...' : 'Refresh' }}
       </button>
     </div>
 
     <div v-if="results.length" class="mb-6">
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-          <p class="eyebrow mb-2">Total endpoints</p>
-          <p class="font-heading font-semibold tabular-nums" style="color: white; font-size: 24px;">{{ summary.total }}</p>
+      <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="card stat-card card-hover">
+          <p class="stat-label">Total endpoints</p>
+          <p class="stat-value tabular-nums">{{ summary.total }}</p>
         </div>
-        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-          <p class="eyebrow mb-2">Up</p>
-          <p class="font-heading font-semibold tabular-nums" style="color: #FFD600; font-size: 24px;">{{ summary.up }}</p>
+        <div class="card stat-card card-hover">
+          <p class="stat-label">Up</p>
+          <p class="stat-value stat-value--gold tabular-nums">{{ summary.up }}</p>
         </div>
-        <div class="rounded-2xl pa-5" style="background: #0F1115; border: 1px solid rgba(30, 41, 59, 0.6);">
-          <p class="eyebrow mb-2">Down</p>
-          <p class="font-heading font-semibold tabular-nums" style="color: #EF4444; font-size: 24px;">{{ summary.total - summary.up }}</p>
+        <div class="card stat-card card-hover">
+          <p class="stat-label">Down</p>
+          <p class="stat-value stat-value--red tabular-nums">{{ summary.total - summary.up }}</p>
         </div>
       </div>
     </div>
@@ -119,6 +112,5 @@ const columns: Column<HealthRow>[] = [
 </template>
 
 <style scoped>
-@keyframes spin { to { transform: rotate(360deg); } }
-.spin { animation: spin 1s linear infinite; }
+.spin { animation: pg-spin 1s linear infinite; }
 </style>

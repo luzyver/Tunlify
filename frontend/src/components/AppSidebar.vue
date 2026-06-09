@@ -37,10 +37,10 @@ async function handleLogout() {
         <div class="rounded-lg d-flex align-center justify-center" style="width: 32px; height: 32px; background: rgba(247, 147, 26, 0.15); border: 1px solid rgba(247, 147, 26, 0.3);">
           <img src="/icon.png" alt="" style="width: 20px; height: 20px;" />
         </div>
-        <div>
-          <div class="font-heading font-semibold text-body-1" style="color: white;">Tunlify</div>
-          <div class="eyebrow-dim" style="font-size: 10px;">Console</div>
-        </div>
+          <div>
+            <div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: white; letter-spacing: -0.01em;">Tunlify</div>
+            <div class="eyebrow-dim" style="font-size: 10px;">Console</div>
+          </div>
       </div>
     </template>
 
@@ -64,7 +64,7 @@ async function handleLogout() {
           <v-icon size="18">{{ item.icon }}</v-icon>
         </template>
         <template #title>
-          <span class="font-mono" style="font-size: 13px;">{{ item.label }}</span>
+          <span style="font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;">{{ item.label }}</span>
         </template>
       </v-list-item>
     </v-list>
