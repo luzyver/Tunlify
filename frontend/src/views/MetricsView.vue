@@ -19,8 +19,8 @@ onUnmounted(() => clearInterval(interval))
 interface CodeRow { code: string; count: number; pct: number; scale: number; color: string; label: string }
 
 const SIGNAL: Record<string, { color: string; label: string }> = {
-  '2': { color: '#FFD600', label: 'Success' },
-  '3': { color: '#94A3B8', label: 'Redirect' },
+  '2': { color: '#10B981', label: 'Success' },
+  '3': { color: '#64748B', label: 'Redirect' },
   '4': { color: '#F7931A', label: 'Client error' },
   '5': { color: '#EF4444', label: 'Server error' },
 }
@@ -125,6 +125,6 @@ function formatPct(p: number) {
 .spin { animation: pg-spin 1s linear infinite; }
 .metric-row { transition: background 0.2s; border-radius: 8px; }
 .metric-row:hover { background: rgba(247, 147, 26, 0.03); }
-.metric-bar { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(30, 41, 59, 0.6); }
+.metric-bar { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(255, 255, 255, 0.03); }
 .metric-bar > div { height: 100%; border-radius: 999px; transition: width 0.5s ease-out; }
 </style>

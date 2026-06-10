@@ -37,9 +37,9 @@ load()
   line-height: 22px;
 }
 .status-badge--on {
-  background: rgba(255, 214, 0, 0.1);
-  border: 1px solid rgba(255, 214, 0, 0.3);
-  color: #FFD600;
+  background: rgba(247, 147, 26, 0.1);
+  border: 1px solid rgba(247, 147, 26, 0.2);
+  color: #F7931A;
 }
 .status-badge--off {
   background: rgba(148, 163, 184, 0.1);
@@ -50,7 +50,7 @@ load()
   width: 6px;
   height: 6px;
 }
-.status-dot--on { background: #FFD600; }
+.status-dot--on { background: #F7931A; }
 .status-dot--off { background: #94A3B8; }
 .provider-btn {
   height: 32px;

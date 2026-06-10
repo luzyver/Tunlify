@@ -127,7 +127,7 @@ onUnmounted(() => clearInterval(interval))
         :row-key="(row) => row.hostname"
       >
         <template #cell-status>
-          <v-icon size="14" color="#FFD600">mdi-check-circle</v-icon>
+          <v-icon size="14" color="#10B981">mdi-check-circle</v-icon>
         </template>
         <template #cell-hostname="{ row }">
           <span class="font-mono" style="color: white;">{{ row.hostname }}</span>

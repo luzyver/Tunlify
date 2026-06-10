@@ -33,12 +33,12 @@ async function handleLogout() {
 <template>
   <v-navigation-drawer permanent :width="240" color="background">
     <template #prepend>
-      <div class="d-flex align-center ga-3 px-4 py-3 border-bottom" style="border-bottom: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="d-flex align-center ga-3 px-4 py-3 border-bottom" style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
         <div class="rounded-lg d-flex align-center justify-center" style="width: 32px; height: 32px; background: rgba(247, 147, 26, 0.15); border: 1px solid rgba(247, 147, 26, 0.3);">
           <img src="/icon.png" alt="" style="width: 20px; height: 20px;" />
         </div>
           <div>
-            <div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: white; letter-spacing: -0.01em;">Tunlify</div>
+            <div style="font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 16px; color: white; letter-spacing: -0.01em;">Tunlify</div>
             <div class="eyebrow-dim" style="font-size: 10px;">Console</div>
           </div>
       </div>
@@ -64,13 +64,13 @@ async function handleLogout() {
           <v-icon size="18">{{ item.icon }}</v-icon>
         </template>
         <template #title>
-          <span style="font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;">{{ item.label }}</span>
+          <span style="font-family: 'Archivo', sans-serif; font-size: 13px; font-weight: 500;">{{ item.label }}</span>
         </template>
       </v-list-item>
     </v-list>
 
     <template #append>
-      <div class="border-top pa-4" style="border-top: 1px solid rgba(30, 41, 59, 0.6);">
+      <div class="border-top pa-4" style="border-top: 1px solid rgba(255, 255, 255, 0.05);">
         <div class="d-flex align-center ga-3">
           <div
             class="rounded-full d-flex align-center justify-center font-mono font-weight-bold"

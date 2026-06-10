@@ -76,7 +76,7 @@ function copyCommand() {
         </div>
         <div>
           <p class="label-upper">Mode</p>
-          <div class="d-inline-flex rounded-lg overflow-hidden" style="border: 1px solid rgba(30, 41, 59, 0.6);">
+          <div class="d-inline-flex rounded-lg overflow-hidden" style="border: 1px solid rgba(255, 255, 255, 0.05);">
             <button
               v-for="m in ['foreground', 'nohup', 'systemd']"
               :key="m"

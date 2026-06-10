@@ -245,7 +245,7 @@ function startDrag(e: MouseEvent) {
   bottom: 0;
   z-index: 100;
   background: #0F1115;
-  border-top: 1px solid rgba(30, 41, 59, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 .bottom-dock--dragging {
   user-select: none;
@@ -261,7 +261,7 @@ function startDrag(e: MouseEvent) {
   color: #94A3B8;
   background: #0F1115;
   user-select: none;
-  border-top: 1px solid rgba(30, 41, 59, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   gap: 8px;
 }
 .dock-toggle {
@@ -273,7 +273,7 @@ function startDrag(e: MouseEvent) {
   color: #F7931A;
 }
 .dock-title {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
@@ -287,7 +287,7 @@ function startDrag(e: MouseEvent) {
   cursor: pointer;
   padding: 2px 6px;
   font-size: 11px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-weight: 500;
   transition: color 0.2s;
 }
@@ -295,7 +295,7 @@ function startDrag(e: MouseEvent) {
   color: #F7931A;
 }
 .dock-lines {
-  font-family: 'Sora', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-size: 10px;
   color: rgba(148, 163, 184, 0.4);
 }
@@ -304,7 +304,7 @@ function startDrag(e: MouseEvent) {
 .bottom-dock__resize-handle {
   height: 8px;
   cursor: ns-resize;
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(255, 255, 255, 0.03);
   transition: background 0.2s;
   display: flex;
   align-items: center;
@@ -338,7 +338,7 @@ function startDrag(e: MouseEvent) {
 /* Tabs */
 .dock-tabs {
   display: flex;
-  border-bottom: 1px solid rgba(30, 41, 59, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   background: #0A0C10;
   padding: 0 8px;
 }
@@ -352,7 +352,7 @@ function startDrag(e: MouseEvent) {
   cursor: pointer;
   color: rgba(148, 163, 184, 0.5);
   border-bottom: 2px solid transparent;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Archivo', sans-serif;
   font-weight: 600;
   transition: color 0.2s, border-color 0.2s;
 }
@@ -388,7 +388,7 @@ function startDrag(e: MouseEvent) {
   margin-bottom: 4px;
   border-radius: 8px;
   background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   overflow: hidden;
 }
 .dock-action-header {
@@ -399,7 +399,7 @@ function startDrag(e: MouseEvent) {
   height: 28px;
   font-size: 11px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(30, 41, 59, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   font-family: 'JetBrains Mono', monospace;
 }
 .dock-action-dot {

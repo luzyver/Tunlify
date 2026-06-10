@@ -89,7 +89,7 @@ const columns: Column<HealthRow>[] = [
       :row-key="(row) => row.hostname"
     >
       <template #cell-status_dot="{ row }">
-        <v-icon v-if="row.status === 'up'" size="14" color="#FFD600">mdi-check-circle</v-icon>
+        <v-icon v-if="row.status === 'up'" size="14" color="#F7931A">mdi-check-circle</v-icon>
         <v-icon v-else size="14" color="#EF4444">mdi-close-circle</v-icon>
       </template>
       <template #cell-hostname="{ row }">
@@ -102,7 +102,7 @@ const columns: Column<HealthRow>[] = [
         <span class="tabular-nums" style="color: #94A3B8;">{{ row.latency || '\u2014' }}</span>
       </template>
       <template #cell-status="{ row }">
-        <span class="rounded-pill px-2 font-mono" :style="{ background: row.status === 'up' ? 'rgba(255, 214, 0, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid ' + (row.status === 'up' ? 'rgba(255, 214, 0, 0.3)' : 'rgba(239, 68, 68, 0.3)'), color: row.status === 'up' ? '#FFD600' : '#EF4444', fontSize: '11px' }">{{ row.status }}</span>
+        <span class="rounded-pill px-2 font-mono" :style="{ background: row.status === 'up' ? 'rgba(247, 147, 26, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid ' + (row.status === 'up' ? 'rgba(247, 147, 26, 0.2)' : 'rgba(239, 68, 68, 0.3)'), color: row.status === 'up' ? '#F7931A' : '#EF4444', fontSize: '11px' }">{{ row.status }}</span>
       </template>
       <template #empty>
         {{ loading ? 'Checking endpoints...' : 'No endpoints to check' }}
