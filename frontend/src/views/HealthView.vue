@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
 
@@ -22,7 +22,7 @@ async function check() {
   try {
     const raw = (await apiFetch<HealthRow[]>('/api/health')) || []
     results.value = raw.map((r) => ({ ...r, latency_ms: parseLatency(r.latency) }))
-  } catch {}
+  } catch (e) { reportError('failed to run health check', e) }
   finally { loading.value = false }
 }
 check()

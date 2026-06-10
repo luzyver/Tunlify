@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 
 
 const { apiFetch } = useApi()
@@ -16,7 +16,10 @@ async function loadConfig() {
   try {
     const data = await apiFetch<{ content: string }>('/api/config')
     parseYaml(data.content)
-  } catch {}
+  } catch (e: any) {
+    reportError('failed to load config', e)
+    message.value = { type: 'error', text: e?.message || 'Failed to load config' }
+  }
 }
 
 function parseYaml(content: string) {

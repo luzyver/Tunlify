@@ -2,6 +2,7 @@
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useActionLogStore } from '../stores/actionLog'
+import { reportError } from '../composables/useApi'
 const store = useActionLogStore()
 const authStore = useAuthStore()
 
@@ -29,7 +30,7 @@ async function loadHistory() {
       historyLoaded.value = true
       nextTick(() => { if (liveLogEl.value) liveLogEl.value.scrollTop = liveLogEl.value.scrollHeight })
     }
-  } catch {}
+  } catch (e) { reportError('failed to load log history', e) }
 }
 
 function connectWs() {

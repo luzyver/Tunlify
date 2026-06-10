@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 import { useActionLogStore } from '../stores/actionLog'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
@@ -17,10 +17,10 @@ interface HostRow { hostname: string }
 interface ProjectRow { id: number; name: string; path: string; created_at: string }
 
 async function fetchStatus() {
-  try { status.value = await apiFetch('/api/status') } catch {}
+  try { status.value = await apiFetch('/api/status') } catch (e) { reportError('failed to load status', e) }
 }
 async function fetchProjects() {
-  try { projects.value = await apiFetch('/api/projects') } catch {}
+  try { projects.value = await apiFetch('/api/projects') } catch (e) { reportError('failed to load projects', e) }
 }
 const actionLog = useActionLogStore()
 

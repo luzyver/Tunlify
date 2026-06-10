@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 
 
 const { apiFetch } = useApi()
@@ -9,7 +9,7 @@ const loading = ref(false)
 
 async function fetchMetrics() {
   loading.value = true
-  try { metrics.value = await apiFetch('/api/metrics') } catch {}
+  try { metrics.value = await apiFetch('/api/metrics') } catch (e) { reportError('failed to load metrics', e) }
   finally { loading.value = false }
 }
 fetchMetrics()

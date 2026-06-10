@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '../stores/auth'
 import { useRoute, useRouter } from 'vue-router'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 
 const emit = defineEmits<{ navigate: [] }>()
 
@@ -24,7 +24,8 @@ const nav = [
 ]
 
 async function handleLogout() {
-  try { await apiFetch('/auth/logout', { method: 'POST' }) } catch {}
+  // Logout proceeds locally even if the server call fails; just record it.
+  try { await apiFetch('/auth/logout', { method: 'POST' }) } catch (e) { reportError('logout request failed', e) }
   authStore.logout()
   router.push('/login')
 }

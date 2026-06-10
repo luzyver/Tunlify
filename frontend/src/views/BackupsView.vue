@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 import DataTable, { type Column } from '../components/DataTable.vue'
 
 
@@ -15,7 +15,7 @@ const message = ref('')
 const restoring = ref<number | null>(null)
 
 async function load() {
-  try { backups.value = await apiFetch('/api/config/backups') } catch {}
+  try { backups.value = await apiFetch('/api/config/backups') } catch (e) { reportError('failed to load backups', e) }
 }
 
 async function showPreview(id: number) {

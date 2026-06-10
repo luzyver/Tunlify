@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useApi } from '../composables/useApi'
+import { useApi, reportError } from '../composables/useApi'
 
 
 const { apiFetch } = useApi()
@@ -10,7 +10,7 @@ const testing = ref(false)
 const saving = ref(false)
 
 async function load() {
-  try { Object.assign(form, await apiFetch('/api/notifications')) } catch {}
+  try { Object.assign(form, await apiFetch('/api/notifications')) } catch (e) { reportError('failed to load notifications', e) }
 }
 async function save() {
   saving.value = true; message.value = null
