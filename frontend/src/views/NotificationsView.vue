@@ -72,7 +72,7 @@ load()
 
 <template>
   <div class="page">
-    <header class="mb-6">
+    <header class="mb-4">
       <span class="page-badge">Console &middot; Alerts</span>
       <h1 class="page-title" style="margin-top: 4px;">Webhook notifications</h1>
     </header>

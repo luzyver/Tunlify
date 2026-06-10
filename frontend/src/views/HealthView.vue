@@ -63,7 +63,7 @@ const columns: Column<HealthRow>[] = [
       </button>
     </div>
 
-    <div v-if="results.length" class="mb-6">
+    <div v-if="results.length" class="mb-4">
       <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
         <div class="card stat-card card-hover">
           <p class="stat-label">Total endpoints</p>

@@ -161,7 +161,7 @@ const columns: Column<Project>[] = [
     <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
     <!-- Form -->
-    <div v-if="showForm" class="card mb-6">
+    <div v-if="showForm" class="card mb-4">
       <div class="card-header">
         <span class="card-title">{{ editingId ? 'Edit project' : 'New project' }}</span>
         <button class="btn-ghost" @click="showForm = false"><v-icon size="16">mdi-close</v-icon></button>
@@ -197,7 +197,7 @@ const columns: Column<Project>[] = [
     </div>
 
     <!-- Deploy prompt -->
-    <div v-if="deployTarget" class="card mb-6">
+    <div v-if="deployTarget" class="card mb-4">
       <div class="card-header">
         <div class="d-flex align-center ga-2">
           <v-icon size="18" color="#F7931A">mdi-rocket</v-icon>
@@ -214,7 +214,7 @@ const columns: Column<Project>[] = [
     </div>
 
     <!-- Output -->
-    <div v-if="output || anyRunning()" class="card mb-6">
+    <div v-if="output || anyRunning()" class="card mb-4">
       <div class="card-header">
         <span class="card-title">Output</span>
         <span v-if="anyRunning()" class="rounded-pill px-2 font-mono d-inline-flex align-center ga-1" style="background: rgba(247, 147, 26, 0.1); border: 1px solid rgba(247, 147, 26, 0.3); color: #F7931A; font-size: 11px; line-height: 22px;">

@@ -211,7 +211,7 @@ pre,
 /* ─── Dashboard Pages ─── */
 
 .page {
-  padding: 24px 32px;
+  padding: 16px 24px;
   animation: pg-enter 0.5s ease-out both;
 }
 
@@ -225,13 +225,13 @@ pre,
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
 }
 
 .page-title {
   font-family: 'Archivo', sans-serif;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: #E4E8EE;
   margin: 4px 0 0;
@@ -275,7 +275,7 @@ pre,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -287,20 +287,20 @@ pre,
 }
 
 .card-body {
-  padding: 24px;
+  padding: 16px;
 }
 
 /* ─── Stat Grid ─── */
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .stat-card {
-  padding: 20px 24px;
+  padding: 14px 16px;
   transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
@@ -317,13 +317,13 @@ pre,
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #94A3B8;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .stat-value {
   font-family: 'Archivo', sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 20px;
   color: #E4E8EE;
   letter-spacing: -0.02em;
 }
@@ -438,8 +438,8 @@ pre,
 }
 
 .btn-lg {
-  height: 44px;
-  padding: 0 24px;
+  height: 40px;
+  padding: 0 20px;
   font-size: 13px;
 }
 
@@ -484,7 +484,7 @@ pre,
 
 .empty {
   text-align: center;
-  padding: 32px;
+  padding: 20px;
   color: #94A3B8;
   font-size: 13px;
 }
@@ -548,6 +548,11 @@ pre,
   text-transform: uppercase;
   letter-spacing: 0.08em;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+.v-table .v-table__wrapper > table > thead > tr > th,
+.v-table .v-table__wrapper > table > tbody > tr > td {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
 }
 .v-table .v-table__wrapper > table > tbody > tr > td {
   border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;

@@ -26,12 +26,12 @@ async function changePassword() {
 
 <template>
   <div class="page">
-    <header class="mb-6">
+    <header class="mb-4">
       <span class="page-badge">Console &middot; Settings</span>
       <h1 class="page-title" style="margin-top: 4px;">Account</h1>
     </header>
 
-    <div class="card mb-6">
+    <div class="card mb-4">
       <div class="card-header">
         <span class="card-title">Profile</span>
       </div>

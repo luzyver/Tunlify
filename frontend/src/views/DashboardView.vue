@@ -93,7 +93,7 @@ onUnmounted(() => clearInterval(interval))
 
     <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
-    <div v-if="status" class="mb-8">
+    <div v-if="status" class="mb-5">
       <div class="stat-grid">
         <div class="card stat-card card-hover">
           <p class="stat-label">Uptime</p>
@@ -115,7 +115,7 @@ onUnmounted(() => clearInterval(interval))
       </div>
     </div>
 
-    <div v-if="hostnameRows.length" class="mb-8">
+    <div v-if="hostnameRows.length" class="mb-5">
       <div class="d-flex align-center justify-space-between mb-4">
         <span class="stat-label" style="margin-bottom: 0;">Active hostnames</span>
         <span class="stat-label" style="margin-bottom: 0; color: #71717A;">{{ hostnameRows.length }} total</span>
@@ -145,7 +145,7 @@ onUnmounted(() => clearInterval(interval))
       </DataTable>
     </div>
 
-    <div v-if="projects.length" class="mb-8">
+    <div v-if="projects.length" class="mb-5">
       <div class="d-flex align-center justify-space-between mb-4">
         <span class="stat-label" style="margin-bottom: 0;">Projects</span>
         <router-link to="/projects" class="btn-ghost" style="font-size: 12px;">

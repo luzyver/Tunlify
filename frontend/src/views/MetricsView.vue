@@ -65,7 +65,7 @@ function formatPct(p: number) {
       </button>
     </div>
 
-    <div class="mb-6">
+    <div class="mb-4">
       <div class="stat-grid" style="grid-template-columns: 1fr 1fr;">
         <div class="card stat-card card-hover">
           <p class="stat-label">Total requests</p>
@@ -101,7 +101,7 @@ function formatPct(p: number) {
         </div>
       </div>
 
-      <div v-else class="empty" style="padding: 32px;">
+      <div v-else class="empty">
         {{ metrics ? 'No response codes recorded yet' : 'Loading metrics...' }}
       </div>
 

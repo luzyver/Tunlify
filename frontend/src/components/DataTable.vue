@@ -94,7 +94,7 @@ function rowKeyFor(row: T, fallback: number) {
 
 <template>
   <div>
-    <div v-if="searchable || $slots.toolbar" class="d-flex align-center ga-2 flex-wrap mb-3">
+    <div v-if="searchable || $slots.toolbar" class="d-flex align-center ga-2 flex-wrap mb-2">
       <div v-if="searchable" class="position-relative" style="max-width: 320px; width: 100%;">
         <v-icon size="16" color="#94A3B8" class="position-absolute" style="left: 12px; top: 50%; transform: translateY(-50%); z-index: 1;">mdi-magnify</v-icon>
         <input
@@ -173,7 +173,7 @@ function rowKeyFor(row: T, fallback: number) {
             </td>
           </tr>
           <tr v-if="!table.getRowModel().rows.length">
-            <td :colspan="columns.length" class="text-center py-8" style="color: #94A3B8;">
+            <td :colspan="columns.length" class="text-center py-6" style="color: #94A3B8;">
               <slot name="empty">
                 {{ globalFilter ? 'No results match your search' : 'No data' }}
               </slot>

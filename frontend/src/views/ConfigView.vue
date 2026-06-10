@@ -114,7 +114,7 @@ loadConfig()
 
     <v-alert v-if="message" :type="message.type" class="mb-4" variant="tonal">{{ message.text }}</v-alert>
 
-    <div class="card mb-6">
+    <div class="card mb-4">
       <div class="card-header">
         <span class="card-title">Tunnel</span>
         <span class="stat-label" style="margin-bottom: 0;">Read from cloudflared/config.yml</span>
@@ -133,7 +133,7 @@ loadConfig()
       </div>
     </div>
 
-    <div class="card mb-6">
+    <div class="card mb-4">
       <div class="card-header">
         <span class="card-title">Ingress rules</span>
         <span class="stat-label" style="margin-bottom: 0; color: #71717A;">{{ rules.length }} rules</span>

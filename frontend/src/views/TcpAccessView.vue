@@ -51,14 +51,14 @@ function copyCommand() {
 
 <template>
   <div class="page">
-    <header class="mb-6">
+    <header class="mb-4">
       <span class="page-badge">Console &middot; TCP</span>
       <h1 class="page-title" style="margin-top: 4px;">TCP access command</h1>
     </header>
 
     <v-alert v-if="error" type="error" class="mb-4" variant="tonal">{{ error }}</v-alert>
 
-    <div class="card mb-6">
+    <div class="card mb-4">
       <div class="card-header">
         <div class="d-flex align-center ga-2">
           <v-icon size="18" color="#F7931A">mdi-console</v-icon>
