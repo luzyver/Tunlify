@@ -35,12 +35,31 @@ async function handleLogin() {
   <v-app>
     <div class="login-root">
       <div class="login-bg">
-        <div class="bg-orb bg-orb--orange" />
-        <div class="bg-orb bg-orb--blue" />
-        <div class="bg-orb bg-orb--orange-sm" />
+        <div class="bg-glow bg-glow--orange" />
+        <div class="bg-glow bg-glow--blue" />
+        <div class="bg-glow bg-glow--orange-sm" />
+        <div class="bg-glow bg-glow--blue-sm" />
         <div class="bg-grid" />
 
         <svg class="network-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="g-orange" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#EA580C" stop-opacity="0.08" />
+            </linearGradient>
+            <linearGradient id="g-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#1D4ED8" stop-opacity="0.05" />
+            </linearGradient>
+            <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#F59E0B" stop-opacity="0.3" />
+              <stop offset="60%" stop-color="#3B82F6" stop-opacity="0.08" />
+              <stop offset="100%" stop-color="transparent" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+
+          <circle cx="400" cy="300" r="160" fill="url(#center-glow)" />
+
           <line class="net-line net-line--orange" x1="400" y1="300" x2="140" y2="120" />
           <line class="net-line net-line--orange" x1="400" y1="300" x2="660" y2="100" />
           <line class="net-line net-line--orange" x1="400" y1="300" x2="100" y2="480" />
@@ -176,7 +195,7 @@ async function handleLogin() {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  background: #07080B;
+  background: #0a0c12;
   font-family: 'DM Sans', sans-serif;
   overflow: hidden;
 }
@@ -190,59 +209,69 @@ async function handleLogin() {
   overflow: hidden;
 }
 
-.bg-orb {
+.bg-glow {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
+  filter: blur(80px);
 }
 
-.bg-orb--orange {
-  width: 640px;
-  height: 640px;
-  top: -20%;
-  left: -10%;
-  background: radial-gradient(circle, rgba(247, 147, 26, 0.07) 0%, transparent 60%);
-  animation: orb-float-a 22s ease-in-out infinite;
+.bg-glow--orange {
+  width: 700px;
+  height: 700px;
+  top: -25%;
+  left: -15%;
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.25) 0%, rgba(234, 88, 12, 0.08) 40%, transparent 70%);
+  animation: orb-float-a 20s ease-in-out infinite;
 }
 
-.bg-orb--blue {
-  width: 520px;
-  height: 520px;
-  bottom: -15%;
-  right: -5%;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 60%);
-  animation: orb-float-b 26s ease-in-out infinite;
+.bg-glow--blue {
+  width: 600px;
+  height: 600px;
+  bottom: -20%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.06) 40%, transparent 70%);
+  animation: orb-float-b 24s ease-in-out infinite;
 }
 
-.bg-orb--orange-sm {
-  width: 360px;
-  height: 360px;
-  top: 40%;
-  left: 35%;
-  background: radial-gradient(circle, rgba(247, 147, 26, 0.04) 0%, transparent 60%);
+.bg-glow--orange-sm {
+  width: 400px;
+  height: 400px;
+  top: 50%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.12) 0%, transparent 60%);
   animation: orb-float-a 18s ease-in-out infinite reverse;
+}
+
+.bg-glow--blue-sm {
+  width: 350px;
+  height: 350px;
+  top: 10%;
+  right: 25%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 60%);
+  animation: orb-float-b 16s ease-in-out infinite reverse;
 }
 
 @keyframes orb-float-a {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -30px) scale(1.06); }
-  66% { transform: translate(-25px, 20px) scale(0.95); }
+  33% { transform: translate(50px, -35px) scale(1.08); }
+  66% { transform: translate(-30px, 25px) scale(0.93); }
 }
 
 @keyframes orb-float-b {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-35px, 25px) scale(1.04); }
+  50% { transform: translate(-45px, 30px) scale(1.06); }
 }
 
 .bg-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.008) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at 50% 50%, black 25%, transparent 65%);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 25%, transparent 65%);
+  mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 50%, black 30%, transparent 70%);
 }
 
 /* ─── Network SVG ─── */
@@ -252,48 +281,48 @@ async function handleLogin() {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.5;
+  opacity: 0.6;
   pointer-events: none;
 }
 
 .net-line {
-  stroke-width: 1.2;
-  stroke-dasharray: 5 7;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 8;
 }
 
 .net-line--orange {
-  stroke: rgba(247, 147, 26, 0.18);
-  animation: flow 2.5s linear infinite;
+  stroke: url(#g-orange);
+  animation: flow 3s linear infinite;
 }
 
 .net-line--blue {
-  stroke: rgba(37, 99, 235, 0.1);
-  stroke-dasharray: 3 9;
-  animation: flow-reverse 3.5s linear infinite;
+  stroke: url(#g-blue);
+  stroke-dasharray: 4 10;
+  animation: flow-reverse 4s linear infinite;
 }
 
 @keyframes flow {
-  to { stroke-dashoffset: -24; }
+  to { stroke-dashoffset: -28; }
 }
 
 @keyframes flow-reverse {
-  to { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 28; }
 }
 
 .tunnel-ring {
   fill: none;
-  stroke-width: 1;
+  stroke-width: 1.5;
   transform-origin: 400px 300px;
 }
 
 .tunnel-ring--orange {
-  stroke: rgba(247, 147, 26, 0.07);
-  animation: ring-spin 28s linear infinite;
+  stroke: rgba(247, 147, 26, 0.12);
+  animation: ring-spin 30s linear infinite;
 }
 
 .tunnel-ring--blue {
-  stroke: rgba(37, 99, 235, 0.05);
-  animation: ring-spin 40s linear infinite reverse;
+  stroke: rgba(59, 130, 246, 0.08);
+  animation: ring-spin 42s linear infinite reverse;
 }
 
 @keyframes ring-spin {
@@ -301,37 +330,38 @@ async function handleLogin() {
 }
 
 .net-node {
-  fill-opacity: 0.4;
-  stroke-width: 1;
+  stroke-width: 1.5;
   animation: node-pulse 3s ease-in-out infinite;
 }
 
 .net-node--center {
-  fill: rgba(247, 147, 26, 0.55);
-  stroke: rgba(247, 147, 26, 0.4);
+  fill: rgba(247, 147, 26, 0.6);
+  stroke: rgba(247, 147, 26, 0.5);
   stroke-width: 2.5;
-  filter: drop-shadow(0 0 12px rgba(247, 147, 26, 0.35));
+  filter: drop-shadow(0 0 16px rgba(247, 147, 26, 0.5));
   animation: node-pulse-center 3s ease-in-out infinite;
 }
 
 .net-node--orange {
-  fill: rgba(247, 147, 26, 0.4);
-  stroke: rgba(247, 147, 26, 0.15);
+  fill: rgba(247, 147, 26, 0.5);
+  stroke: rgba(247, 147, 26, 0.25);
+  filter: drop-shadow(0 0 6px rgba(247, 147, 26, 0.3));
 }
 
 .net-node--blue {
-  fill: rgba(37, 99, 235, 0.25);
-  stroke: rgba(37, 99, 235, 0.12);
+  fill: rgba(59, 130, 246, 0.35);
+  stroke: rgba(59, 130, 246, 0.2);
+  filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.25));
 }
 
 @keyframes node-pulse {
-  0%, 100% { opacity: 0.4; }
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
 }
 
 @keyframes node-pulse-center {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.15); }
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
 }
 
 /* ─── Content ─── */
@@ -351,22 +381,19 @@ async function handleLogin() {
 .form-card {
   width: 100%;
   max-width: 400px;
-  background: rgba(10, 12, 16, 0.75);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(8, 10, 15, 0.7);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(247, 147, 26, 0.08);
   border-radius: 20px;
   padding: 36px;
   box-shadow:
-    0 0 80px -30px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 0 60px -20px rgba(247, 147, 26, 0.15),
+    0 0 120px -40px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 /* ─── Brand inside card ─── */
-
-.form-brand {
-  margin-bottom: 0;
-}
 
 .brand-logo {
   display: flex;
@@ -381,8 +408,8 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(247, 147, 26, 0.12), rgba(234, 88, 12, 0.08));
-  border: 1px solid rgba(247, 147, 26, 0.15);
+  background: linear-gradient(135deg, rgba(247, 147, 26, 0.15), rgba(234, 88, 12, 0.1));
+  border: 1px solid rgba(247, 147, 26, 0.2);
   color: #F59E0B;
   flex-shrink: 0;
 }
@@ -413,7 +440,7 @@ async function handleLogin() {
 
 .form-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.1), rgba(37, 99, 235, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.15), rgba(59, 130, 246, 0.12), transparent);
   margin: 24px 0;
 }
 
@@ -447,7 +474,6 @@ async function handleLogin() {
   gap: 14px;
 }
 
-/* Vuetify overrides */
 .form-card :deep(.v-field) {
   background: rgba(255, 255, 255, 0.02) !important;
 }
@@ -457,12 +483,12 @@ async function handleLogin() {
 }
 
 .form-card :deep(.v-field:hover .v-field__outline) {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.18);
 }
 
 .form-card :deep(.v-field--focused .v-field__outline) {
   color: #F59E0B !important;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .form-card :deep(.v-field-label--floating) {
@@ -470,11 +496,11 @@ async function handleLogin() {
 }
 
 .form-card :deep(.v-field .v-icon) {
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.18);
 }
 
 .form-card :deep(.v-field--focused .v-icon) {
-  color: rgba(247, 147, 26, 0.6);
+  color: rgba(247, 147, 26, 0.7);
 }
 
 .form-card :deep(.v-field__input) {
@@ -503,14 +529,14 @@ async function handleLogin() {
   border: none !important;
   color: white !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 0 30px -8px rgba(247, 147, 26, 0.3) !important;
+  box-shadow: 0 0 40px -8px rgba(247, 147, 26, 0.4) !important;
   overflow: hidden !important;
   position: relative !important;
 }
 
 .submit-btn:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 0 40px -6px rgba(247, 147, 26, 0.5) !important;
+  box-shadow: 0 0 50px -4px rgba(247, 147, 26, 0.55) !important;
 }
 
 .submit-btn:active {
@@ -575,7 +601,7 @@ async function handleLogin() {
   }
 
   .network-svg {
-    opacity: 0.3;
+    opacity: 0.35;
   }
 }
 </style>
