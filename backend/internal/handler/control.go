@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -26,19 +25,16 @@ func (h *Control) Execute(w http.ResponseWriter, r *http.Request) {
 	case "restart":
 		err = h.cfd.Restart()
 	default:
-		http.Error(w, `{"error":"invalid action"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid action")
 		return
 	}
 
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	h.audit.Log(userID, action, "", r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok", "action": action})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok", "action": action})
 }

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -28,12 +27,11 @@ func (h *Audit) List(w http.ResponseWriter, r *http.Request) {
 
 	entries, total, err := h.audit.List(limit, offset, action)
 	if err != nil {
-		http.Error(w, `{"error":"failed to fetch audit logs"}`, http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to fetch audit logs")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"entries": entries,
 		"total":   total,
 		"limit":   limit,

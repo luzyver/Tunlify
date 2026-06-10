@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -28,8 +29,7 @@ func (h *Notifications) configFile() string {
 func (h *Notifications) Get(w http.ResponseWriter, r *http.Request) {
 	data, err := os.ReadFile(h.configFile())
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(notifConfig{})
+		writeJSON(w, http.StatusOK, notifConfig{})
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -39,22 +39,27 @@ func (h *Notifications) Get(w http.ResponseWriter, r *http.Request) {
 func (h *Notifications) Update(w http.ResponseWriter, r *http.Request) {
 	var cfg notifConfig
 	if err := json.NewDecoder(r.Body).Decode(&cfg); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
 	data, _ := json.MarshalIndent(cfg, "", "  ")
-	os.MkdirAll(h.dataPath, 0755)
-	os.WriteFile(h.configFile(), data, 0644)
+	if err := os.MkdirAll(h.dataPath, 0755); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to save config")
+		return
+	}
+	if err := os.WriteFile(h.configFile(), data, 0644); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to save config")
+		return
+	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func (h *Notifications) Test(w http.ResponseWriter, r *http.Request) {
 	data, err := os.ReadFile(h.configFile())
 	if err != nil {
-		http.Error(w, `{"error":"no config"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "no config")
 		return
 	}
 
@@ -62,7 +67,7 @@ func (h *Notifications) Test(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(data, &cfg)
 
 	if cfg.WebhookURL == "" {
-		http.Error(w, `{"error":"no webhook url"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "no webhook url")
 		return
 	}
 
@@ -76,31 +81,11 @@ func (h *Notifications) Test(w http.ResponseWriter, r *http.Request) {
 		payload, _ = json.Marshal(map[string]string{"text": "🟢 Tunlify test notification"})
 	}
 
-	resp, err := http.Post(cfg.WebhookURL, "application/json", jsonReader(payload))
+	resp, err := http.Post(cfg.WebhookURL, "application/json", bytes.NewReader(payload))
 	if err != nil || resp.StatusCode >= 400 {
-		http.Error(w, `{"error":"webhook failed"}`, http.StatusBadGateway)
+		writeError(w, http.StatusBadGateway, "webhook failed")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "sent"})
-}
-
-func jsonReader(data []byte) *jsonBody { return &jsonBody{data: data} }
-
-type jsonBody struct {
-	data []byte
-	i    int
-}
-
-func (b *jsonBody) Read(p []byte) (int, error) {
-	if b.i >= len(b.data) {
-		return 0, nil
-	}
-	n := copy(p, b.data[b.i:])
-	b.i += n
-	if b.i >= len(b.data) {
-		return n, nil
-	}
-	return n, nil
+	writeJSON(w, http.StatusOK, map[string]string{"status": "sent"})
 }

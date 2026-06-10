@@ -21,14 +21,13 @@ func NewProjects(svc *service.Projects, audit *service.AuditLogger) *Projects {
 func (h *Projects) List(w http.ResponseWriter, r *http.Request) {
 	projects, err := h.svc.List()
 	if err != nil {
-		jsonError(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if projects == nil {
 		projects = []service.Project{}
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(projects)
+	writeJSON(w, http.StatusOK, projects)
 }
 
 func (h *Projects) Create(w http.ResponseWriter, r *http.Request) {
@@ -40,22 +39,20 @@ func (h *Projects) Create(w http.ResponseWriter, r *http.Request) {
 		GitToken    string `json:"git_token"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" || body.Path == "" {
-		jsonError(w, "name and path required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "name and path required")
 		return
 	}
 
 	p, err := h.svc.Create(body.Name, body.Path, body.RepoURL, body.GitUsername, body.GitToken)
 	if err != nil {
-		jsonError(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	userID, _ := r.Context().Value("user_id").(int)
 	h.audit.Log(userID, "project_create", body.Name, r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(p)
+	writeJSON(w, http.StatusCreated, p)
 }
 
 func (h *Projects) Update(w http.ResponseWriter, r *http.Request) {
@@ -68,57 +65,53 @@ func (h *Projects) Update(w http.ResponseWriter, r *http.Request) {
 		GitToken    string `json:"git_token"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Name == "" || body.Path == "" {
-		jsonError(w, "name and path required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "name and path required")
 		return
 	}
 
 	if err := h.svc.Update(id, body.Name, body.Path, body.RepoURL, body.GitUsername, body.GitToken); err != nil {
-		jsonError(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	userID, _ := r.Context().Value("user_id").(int)
 	h.audit.Log(userID, "project_update", body.Name, r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func (h *Projects) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	if err := h.svc.Delete(id); err != nil {
-		jsonError(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	userID, _ := r.Context().Value("user_id").(int)
 	h.audit.Log(userID, "project_delete", chi.URLParam(r, "id"), r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func (h *Projects) History(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	p, err := h.svc.GetByID(id)
 	if err != nil {
-		jsonError(w, "project not found", http.StatusNotFound)
+		writeError(w, http.StatusNotFound, "project not found")
 		return
 	}
 	logs, err := h.audit.ByDetail(p.Name, 20)
 	if err != nil {
-		jsonError(w, err.Error(), http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(logs)
+	writeJSON(w, http.StatusOK, logs)
 }
 
 func (h *Projects) Output(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	lines, done := h.svc.GetOutput(id)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"lines": lines, "done": done})
+	writeJSON(w, http.StatusOK, map[string]interface{}{"lines": lines, "done": done})
 }
 
 func (h *Projects) Action(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +120,7 @@ func (h *Projects) Action(w http.ResponseWriter, r *http.Request) {
 
 	p, err := h.svc.GetByID(id)
 	if err != nil {
-		jsonError(w, "project not found", http.StatusNotFound)
+		writeError(w, http.StatusNotFound, "project not found")
 		return
 	}
 
@@ -137,7 +130,7 @@ func (h *Projects) Action(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&reqBody)
 
 	if action == "deploy" && reqBody.Ref == "" && p.RepoURL != "" {
-		jsonError(w, "ref (branch/tag) required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "ref (branch/tag) required")
 		return
 	}
 
@@ -162,16 +155,9 @@ func (h *Projects) Action(w http.ResponseWriter, r *http.Request) {
 	case "deploy":
 		h.svc.DeployStream(id, p, reqBody.Ref, onDone)
 	default:
-		jsonError(w, "invalid action", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid action")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
-}
-
-func jsonError(w http.ResponseWriter, msg string, code int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{"error": msg})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

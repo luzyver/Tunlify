@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"regexp"
@@ -29,8 +28,7 @@ type metricsResponse struct {
 func (h *Metrics) Get(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Get(h.cfg.MetricsAddr)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(metricsResponse{})
+		writeJSON(w, http.StatusOK, metricsResponse{})
 		return
 	}
 	defer resp.Body.Close()
@@ -58,6 +56,5 @@ func (h *Metrics) Get(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(m)
+	writeJSON(w, http.StatusOK, m)
 }

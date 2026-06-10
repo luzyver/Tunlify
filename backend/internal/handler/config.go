@@ -22,11 +22,10 @@ func NewConfig(mgr *service.ConfigManager, audit *service.AuditLogger) *Config {
 func (h *Config) Get(w http.ResponseWriter, r *http.Request) {
 	content, err := h.mgr.Read()
 	if err != nil {
-		http.Error(w, `{"error":"failed to read config"}`, http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to read config")
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"content": content})
+	writeJSON(w, http.StatusOK, map[string]string{"content": content})
 }
 
 func (h *Config) Update(w http.ResponseWriter, r *http.Request) {
@@ -34,27 +33,24 @@ func (h *Config) Update(w http.ResponseWriter, r *http.Request) {
 		Content string `json:"content"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
 	if err := h.mgr.Validate(req.Content); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "validation failed: " + err.Error()})
+		writeError(w, http.StatusBadRequest, "validation failed: "+err.Error())
 		return
 	}
 
 	userID, _ := r.Context().Value("user_id").(int)
 	if err := h.mgr.Write(req.Content, userID); err != nil {
-		http.Error(w, `{"error":"failed to write config"}`, http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to write config")
 		return
 	}
 
 	h.audit.Log(userID, "config_edit", "", r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func (h *Config) Validate(w http.ResponseWriter, r *http.Request) {
@@ -65,14 +61,11 @@ func (h *Config) Validate(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(body, &req)
 
 	if err := h.mgr.Validate(req.Content); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"valid": "false", "error": err.Error()})
+		writeJSON(w, http.StatusBadRequest, map[string]string{"valid": "false", "error": err.Error()})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"valid": "true"})
+	writeJSON(w, http.StatusOK, map[string]string{"valid": "true"})
 }
 
 func (h *Config) ListBackups(w http.ResponseWriter, r *http.Request) {
@@ -86,27 +79,25 @@ func (h *Config) ListBackups(w http.ResponseWriter, r *http.Request) {
 
 	backups, err := h.mgr.ListBackups(limit, offset)
 	if err != nil {
-		http.Error(w, `{"error":"failed to list backups"}`, http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "failed to list backups")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(backups)
+	writeJSON(w, http.StatusOK, backups)
 }
 
 func (h *Config) GetBackup(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, `{"error":"invalid id"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 
 	backup, err := h.mgr.GetBackup(id)
 	if err != nil {
-		http.Error(w, `{"error":"backup not found"}`, http.StatusNotFound)
+		writeError(w, http.StatusNotFound, "backup not found")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(backup)
+	writeJSON(w, http.StatusOK, backup)
 }

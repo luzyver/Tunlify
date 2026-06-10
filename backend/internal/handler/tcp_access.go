@@ -27,7 +27,7 @@ type tcpRequest struct {
 func (h *TcpAccess) Generate(w http.ResponseWriter, r *http.Request) {
 	var req tcpRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
@@ -53,43 +53,36 @@ WantedBy=multi-user.target`, req.Hostname, base)
 		command = base
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"command": command})
+	writeJSON(w, http.StatusOK, map[string]string{"command": command})
 }
 
 func (h *TcpAccess) Run(w http.ResponseWriter, r *http.Request) {
 	var req tcpRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
 	pid, err := h.cfd.StartTcpAccess(req.Hostname, req.LocalURL)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		writeError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{"pid": pid, "status": "running"})
+	writeJSON(w, http.StatusOK, map[string]interface{}{"pid": pid, "status": "running"})
 }
 
 func (h *TcpAccess) Stop(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(chi.URLParam(r, "pid"))
 	if err != nil {
-		http.Error(w, `{"error":"invalid pid"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid pid")
 		return
 	}
 
 	if err := h.cfd.StopTcpAccess(pid); err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		writeError(w, http.StatusNotFound, err.Error())
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "stopped"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "stopped"})
 }

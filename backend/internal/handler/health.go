@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net"
 	"net/http"
 	"net/url"
@@ -37,7 +36,7 @@ func (h *HealthCheck) Check(w http.ResponseWriter, r *http.Request) {
 
 	data, err := os.ReadFile(h.configPath)
 	if err != nil {
-		http.Error(w, `{"error":"cannot read config"}`, http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "cannot read config")
 		return
 	}
 	yaml.Unmarshal(data, &cfg)
@@ -78,6 +77,5 @@ func (h *HealthCheck) Check(w http.ResponseWriter, r *http.Request) {
 		results = append(results, s)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(results)
+	writeJSON(w, http.StatusOK, results)
 }

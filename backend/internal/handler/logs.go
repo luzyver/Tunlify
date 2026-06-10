@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,14 +26,14 @@ func NewLogs(hub *ws.Hub, secret string) *Logs {
 func (h *Logs) Stream(w http.ResponseWriter, r *http.Request) {
 	tokenStr := r.URL.Query().Get("token")
 	if tokenStr == "" {
-		http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "unauthorized")
 		return
 	}
 	_, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 		return []byte(h.secret), nil
 	})
 	if err != nil {
-		http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "invalid token")
 		return
 	}
 
@@ -81,8 +80,7 @@ func (h *Logs) History(w http.ResponseWriter, r *http.Request) {
 	}
 
 	entries := h.hub.History(limit)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	writeJSON(w, http.StatusOK, map[string]interface{}{
 		"logs":  entries,
 		"count": len(entries),
 	})

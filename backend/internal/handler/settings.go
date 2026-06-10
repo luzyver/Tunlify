@@ -24,7 +24,7 @@ func (h *Settings) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		NewPassword     string `json:"new_password"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
@@ -34,15 +34,17 @@ func (h *Settings) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	h.db.QueryRow(`SELECT password_hash FROM users WHERE id = ?`, userID).Scan(&hash)
 
 	if bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.CurrentPassword)) != nil {
-		http.Error(w, `{"error":"current password incorrect"}`, http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "current password incorrect")
 		return
 	}
 
 	newHash, _ := bcrypt.GenerateFromPassword([]byte(req.NewPassword), 12)
-	h.db.Exec(`UPDATE users SET password_hash = ? WHERE id = ?`, string(newHash), userID)
+	if _, err := h.db.Exec(`UPDATE users SET password_hash = ? WHERE id = ?`, string(newHash), userID); err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to update password")
+		return
+	}
 
 	h.audit.Log(userID, "password_change", "", r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -20,7 +21,9 @@ type Auth struct {
 
 func NewAuth(cfg *config.Config, db *db.DB, audit *service.AuditLogger) *Auth {
 	hash, _ := bcrypt.GenerateFromPassword([]byte(cfg.AdminPassword), 12)
-	db.Exec(`INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)`, cfg.AdminUsername, string(hash))
+	if _, err := db.Exec(`INSERT OR IGNORE INTO users (username, password_hash) VALUES (?, ?)`, cfg.AdminUsername, string(hash)); err != nil {
+		log.Printf("failed to seed admin user: %v", err)
+	}
 	return &Auth{cfg: cfg, db: db, audit: audit}
 }
 
@@ -38,7 +41,7 @@ type tokenResponse struct {
 func (h *Auth) Login(w http.ResponseWriter, r *http.Request) {
 	var req loginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error":"invalid request"}`, http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
@@ -46,7 +49,7 @@ func (h *Auth) Login(w http.ResponseWriter, r *http.Request) {
 	var hash string
 	err := h.db.QueryRow(`SELECT id, password_hash FROM users WHERE username = ?`, req.Username).Scan(&id, &hash)
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(hash), []byte(req.Password)) != nil {
-		http.Error(w, `{"error":"invalid credentials"}`, http.StatusUnauthorized)
+		writeError(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
@@ -55,8 +58,7 @@ func (h *Auth) Login(w http.ResponseWriter, r *http.Request) {
 
 	h.audit.Log(id, "login", "", r.RemoteAddr)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tokenResponse{
+	writeJSON(w, http.StatusOK, tokenResponse{
 		AccessToken:  access,
 		RefreshToken: refresh,
 		ExpiresIn:    900,
@@ -66,8 +68,7 @@ func (h *Auth) Login(w http.ResponseWriter, r *http.Request) {
 func (h *Auth) Logout(w http.ResponseWriter, r *http.Request) {
 	userID, _ := r.Context().Value("user_id").(int)
 	h.audit.Log(userID, "logout", "", r.RemoteAddr)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"ok":true}`))
+	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
 func (h *Auth) Refresh(w http.ResponseWriter, r *http.Request) {
@@ -76,8 +77,7 @@ func (h *Auth) Refresh(w http.ResponseWriter, r *http.Request) {
 
 	access, _ := h.generateToken(userID, username, 15*time.Minute)
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tokenResponse{
+	writeJSON(w, http.StatusOK, tokenResponse{
 		AccessToken: access,
 		ExpiresIn:   900,
 	})
