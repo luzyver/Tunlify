@@ -35,54 +35,54 @@ async function handleLogin() {
   <v-app>
     <div class="login-root">
       <div class="login-bg">
-        <div class="bg-orb bg-orb--1" />
-        <div class="bg-orb bg-orb--2" />
-        <div class="bg-orb bg-orb--3" />
+        <div class="bg-orb bg-orb--orange" />
+        <div class="bg-orb bg-orb--blue" />
+        <div class="bg-orb bg-orb--orange-sm" />
         <div class="bg-grid" />
 
         <svg class="network-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
-          <line class="net-line" x1="400" y1="300" x2="140" y2="120" />
-          <line class="net-line" x1="400" y1="300" x2="660" y2="100" />
-          <line class="net-line" x1="400" y1="300" x2="100" y2="480" />
-          <line class="net-line" x1="400" y1="300" x2="700" y2="500" />
-          <line class="net-line" x1="140" y1="120" x2="660" y2="100" />
-          <line class="net-line" x1="100" y1="480" x2="700" y2="500" />
-          <line class="net-line" x1="140" y1="120" x2="100" y2="480" />
-          <line class="net-line" x1="660" y1="100" x2="700" y2="500" />
+          <line class="net-line net-line--orange" x1="400" y1="300" x2="140" y2="120" />
+          <line class="net-line net-line--orange" x1="400" y1="300" x2="660" y2="100" />
+          <line class="net-line net-line--orange" x1="400" y1="300" x2="100" y2="480" />
+          <line class="net-line net-line--orange" x1="400" y1="300" x2="700" y2="500" />
+          <line class="net-line net-line--orange" x1="140" y1="120" x2="660" y2="100" />
+          <line class="net-line net-line--orange" x1="100" y1="480" x2="700" y2="500" />
+          <line class="net-line net-line--orange" x1="140" y1="120" x2="100" y2="480" />
+          <line class="net-line net-line--orange" x1="660" y1="100" x2="700" y2="500" />
 
-          <line class="net-line net-line--s" x1="400" y1="300" x2="260" y2="200" />
-          <line class="net-line net-line--s" x1="400" y1="300" x2="540" y2="220" />
-          <line class="net-line net-line--s" x1="400" y1="300" x2="290" y2="420" />
-          <line class="net-line net-line--s" x1="400" y1="300" x2="530" y2="400" />
-          <line class="net-line net-line--s" x1="260" y1="200" x2="540" y2="220" />
-          <line class="net-line net-line--s" x1="290" y1="420" x2="530" y2="400" />
-          <line class="net-line net-line--s" x1="260" y1="200" x2="290" y2="420" />
-          <line class="net-line net-line--s" x1="540" y1="220" x2="530" y2="400" />
+          <line class="net-line net-line--blue" x1="400" y1="300" x2="260" y2="200" />
+          <line class="net-line net-line--blue" x1="400" y1="300" x2="540" y2="220" />
+          <line class="net-line net-line--blue" x1="400" y1="300" x2="290" y2="420" />
+          <line class="net-line net-line--blue" x1="400" y1="300" x2="530" y2="400" />
+          <line class="net-line net-line--blue" x1="260" y1="200" x2="540" y2="220" />
+          <line class="net-line net-line--blue" x1="290" y1="420" x2="530" y2="400" />
+          <line class="net-line net-line--blue" x1="260" y1="200" x2="290" y2="420" />
+          <line class="net-line net-line--blue" x1="540" y1="220" x2="530" y2="400" />
 
-          <ellipse class="tunnel-ring" cx="400" cy="300" rx="90" ry="55" />
-          <ellipse class="tunnel-ring tunnel-ring--b" cx="400" cy="300" rx="170" ry="105" />
-          <ellipse class="tunnel-ring tunnel-ring--c" cx="400" cy="300" rx="280" ry="175" />
+          <ellipse class="tunnel-ring tunnel-ring--orange" cx="400" cy="300" rx="90" ry="55" />
+          <ellipse class="tunnel-ring tunnel-ring--blue" cx="400" cy="300" rx="170" ry="105" />
+          <ellipse class="tunnel-ring tunnel-ring--orange" cx="400" cy="300" rx="280" ry="175" />
 
           <circle class="net-node net-node--center" cx="400" cy="300" r="14" />
-          <circle class="net-node" cx="140" cy="120" r="7" style="animation-delay: 0s" />
-          <circle class="net-node" cx="660" cy="100" r="7" style="animation-delay: 0.8s" />
-          <circle class="net-node" cx="100" cy="480" r="7" style="animation-delay: 1.6s" />
-          <circle class="net-node" cx="700" cy="500" r="7" style="animation-delay: 2.4s" />
-          <circle class="net-node net-node--s" cx="260" cy="200" r="5" style="animation-delay: 0.4s" />
-          <circle class="net-node net-node--s" cx="540" cy="220" r="5" style="animation-delay: 1.2s" />
-          <circle class="net-node net-node--s" cx="290" cy="420" r="5" style="animation-delay: 2s" />
-          <circle class="net-node net-node--s" cx="530" cy="400" r="5" style="animation-delay: 2.8s" />
+          <circle class="net-node net-node--orange" cx="140" cy="120" r="7" style="animation-delay: 0s" />
+          <circle class="net-node net-node--orange" cx="660" cy="100" r="7" style="animation-delay: 0.8s" />
+          <circle class="net-node net-node--orange" cx="100" cy="480" r="7" style="animation-delay: 1.6s" />
+          <circle class="net-node net-node--orange" cx="700" cy="500" r="7" style="animation-delay: 2.4s" />
+          <circle class="net-node net-node--blue" cx="260" cy="200" r="5" style="animation-delay: 0.4s" />
+          <circle class="net-node net-node--blue" cx="540" cy="220" r="5" style="animation-delay: 1.2s" />
+          <circle class="net-node net-node--blue" cx="290" cy="420" r="5" style="animation-delay: 2s" />
+          <circle class="net-node net-node--blue" cx="530" cy="400" r="5" style="animation-delay: 2.8s" />
         </svg>
       </div>
 
       <div class="login-content">
         <div
-          class="brand-section"
-          v-motion="'brand'"
-          :initial="{ opacity: 0, x: -60 }"
-          :visible="{ opacity: 1, x: 0, transition: { duration: 700, ease: 'easeOut' } }"
+          v-motion
+          :initial="{ opacity: 0, y: 30, scale: 0.97 }"
+          :visible="{ opacity: 1, y: 0, scale: 1, transition: { duration: 600, ease: 'easeOut' } }"
+          class="form-card"
         >
-          <div class="brand-header">
+          <div class="form-brand">
             <div class="brand-logo">
               <div class="logo-icon">
                 <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
@@ -91,120 +91,79 @@ async function handleLogin() {
                   <path d="M7 9.5l5-2.5 5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                 </svg>
               </div>
-              <span class="logo-text">Tunlify</span>
-            </div>
-          </div>
-
-          <div class="brand-body">
-            <h1 class="brand-title">
-              Tunnel infrastructure,<br />
-              <span class="text-highlight">reimagined.</span>
-            </h1>
-            <p class="brand-desc">
-              Manage Cloudflare tunnels and Docker Compose projects from a single, unified command center.
-            </p>
-          </div>
-
-          <div class="brand-footer">
-            <div class="status-badge">
-              <span class="status-dot" />
-              <span>All systems operational</span>
-            </div>
-            <div class="brand-metrics">
-              <div class="metric">
-                <span class="metric-value">99.9%</span>
-                <span class="metric-label">Uptime</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">&lt;15ms</span>
-                <span class="metric-label">Latency</span>
-              </div>
-              <div class="metric">
-                <span class="metric-value">Real-time</span>
-                <span class="metric-label">Logs</span>
+              <div class="logo-text-group">
+                <span class="logo-wordmark">Tunlify</span>
+                <span class="logo-tagline">Tunnel Management</span>
               </div>
             </div>
           </div>
-        </div>
 
-        <div
-          class="form-section"
-          v-motion="'form'"
-          :initial="{ opacity: 0, x: 60 }"
-          :visible="{ opacity: 1, x: 0, transition: { duration: 700, delay: 200, ease: 'easeOut' } }"
-        >
-          <div class="form-card">
-            <div class="form-header">
-              <div class="form-badge">
-                <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
-                  <rect x="2" y="6" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2" />
-                  <path d="M5 6V4a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
-                </svg>
-                Secure Access
-              </div>
-              <h2 class="form-title">Welcome back</h2>
-              <p class="form-subtitle">Sign in to manage your infrastructure.</p>
+          <div class="form-divider" />
+
+          <div class="form-header">
+            <h2 class="form-title">Welcome back</h2>
+            <p class="form-subtitle">Sign in to your account to continue.</p>
+          </div>
+
+          <v-alert
+            v-if="error"
+            type="error"
+            variant="tonal"
+            closable
+            @click:close="error = ''"
+            class="mb-4"
+            density="compact"
+            title="Authentication failed"
+          >
+            {{ error }}
+          </v-alert>
+
+          <form @submit.prevent="handleLogin">
+            <div class="form-fields">
+              <v-text-field
+                v-model="form.username"
+                label="Username"
+                prepend-inner-icon="mdi-account-circle-outline"
+                required
+                autocomplete="username"
+                variant="outlined"
+                class="login-field"
+              />
+              <v-text-field
+                v-model="form.password"
+                label="Password"
+                prepend-inner-icon="mdi-lock-outline"
+                :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                :type="showPassword ? 'text' : 'password'"
+                required
+                autocomplete="current-password"
+                variant="outlined"
+                class="login-field"
+                @click:append-inner="showPassword = !showPassword"
+              />
             </div>
 
-            <v-alert
-              v-if="error"
-              type="error"
-              variant="tonal"
-              closable
-              @click:close="error = ''"
-              class="mb-4"
-              density="compact"
-              title="Authentication failed"
+            <v-btn
+              type="submit"
+              :loading="loading"
+              block
+              size="large"
+              class="submit-btn mt-4"
             >
-              {{ error }}
-            </v-alert>
+              <template v-if="!loading">
+                Sign in
+                <v-icon end>mdi-arrow-right</v-icon>
+              </template>
+            </v-btn>
+          </form>
 
-            <form @submit.prevent="handleLogin">
-              <div class="form-fields">
-                <v-text-field
-                  v-model="form.username"
-                  label="Username"
-                  prepend-inner-icon="mdi-account-circle-outline"
-                  required
-                  autocomplete="username"
-                  variant="outlined"
-                  color="teal"
-                  class="login-field"
-                />
-                <v-text-field
-                  v-model="form.password"
-                  label="Password"
-                  prepend-inner-icon="mdi-lock-outline"
-                  :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
-                  :type="showPassword ? 'text' : 'password'"
-                  required
-                  autocomplete="current-password"
-                  variant="outlined"
-                  color="teal"
-                  class="login-field"
-                  @click:append-inner="showPassword = !showPassword"
-                />
-              </div>
-
-              <v-btn
-                type="submit"
-                :loading="loading"
-                block
-                size="large"
-                class="submit-btn mt-2"
-              >
-                <template v-if="!loading">
-                  Sign in
-                  <v-icon end>mdi-arrow-right</v-icon>
-                </template>
-              </v-btn>
-            </form>
-
-            <div class="form-footer">
-              <span>&copy; 2026 Tunlify</span>
-              <span class="footer-sep">&middot;</span>
-              <span>All connections encrypted</span>
-            </div>
+          <div class="form-footer">
+            <span class="status-indicator">
+              <span class="status-dot" />
+              All systems operational
+            </span>
+            <span class="footer-sep">&middot;</span>
+            <span>&copy; 2026</span>
           </div>
         </div>
       </div>
@@ -237,30 +196,30 @@ async function handleLogin() {
   pointer-events: none;
 }
 
-.bg-orb--1 {
+.bg-orb--orange {
   width: 640px;
   height: 640px;
   top: -20%;
   left: -10%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.07) 0%, transparent 60%);
   animation: orb-float-a 22s ease-in-out infinite;
 }
 
-.bg-orb--2 {
+.bg-orb--blue {
   width: 520px;
   height: 520px;
   bottom: -15%;
   right: -5%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 60%);
   animation: orb-float-b 26s ease-in-out infinite;
 }
 
-.bg-orb--3 {
+.bg-orb--orange-sm {
   width: 360px;
   height: 360px;
   top: 40%;
   left: 35%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(247, 147, 26, 0.04) 0%, transparent 60%);
   animation: orb-float-a 18s ease-in-out infinite reverse;
 }
 
@@ -293,19 +252,22 @@ async function handleLogin() {
   inset: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.55;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .net-line {
-  stroke: rgba(16, 185, 129, 0.18);
   stroke-width: 1.2;
   stroke-dasharray: 5 7;
+}
+
+.net-line--orange {
+  stroke: rgba(247, 147, 26, 0.18);
   animation: flow 2.5s linear infinite;
 }
 
-.net-line--s {
-  stroke: rgba(6, 182, 212, 0.1);
+.net-line--blue {
+  stroke: rgba(37, 99, 235, 0.1);
   stroke-dasharray: 3 9;
   animation: flow-reverse 3.5s linear infinite;
 }
@@ -320,23 +282,18 @@ async function handleLogin() {
 
 .tunnel-ring {
   fill: none;
-  stroke: rgba(16, 185, 129, 0.07);
   stroke-width: 1;
+  transform-origin: 400px 300px;
 }
 
-.tunnel-ring {
-  transform-origin: 400px 300px;
+.tunnel-ring--orange {
+  stroke: rgba(247, 147, 26, 0.07);
   animation: ring-spin 28s linear infinite;
 }
 
-.tunnel-ring--b {
-  stroke: rgba(6, 182, 212, 0.05);
+.tunnel-ring--blue {
+  stroke: rgba(37, 99, 235, 0.05);
   animation: ring-spin 40s linear infinite reverse;
-}
-
-.tunnel-ring--c {
-  stroke: rgba(16, 185, 129, 0.04);
-  animation: ring-spin 52s linear infinite;
 }
 
 @keyframes ring-spin {
@@ -344,23 +301,27 @@ async function handleLogin() {
 }
 
 .net-node {
-  fill: rgba(16, 185, 129, 0.4);
-  stroke: rgba(16, 185, 129, 0.15);
+  fill-opacity: 0.4;
   stroke-width: 1;
   animation: node-pulse 3s ease-in-out infinite;
 }
 
 .net-node--center {
-  fill: rgba(16, 185, 129, 0.5);
-  stroke: rgba(16, 185, 129, 0.4);
-  stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.35));
+  fill: rgba(247, 147, 26, 0.55);
+  stroke: rgba(247, 147, 26, 0.4);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 12px rgba(247, 147, 26, 0.35));
   animation: node-pulse-center 3s ease-in-out infinite;
 }
 
-.net-node--s {
-  fill: rgba(6, 182, 212, 0.25);
-  stroke: rgba(6, 182, 212, 0.12);
+.net-node--orange {
+  fill: rgba(247, 147, 26, 0.4);
+  stroke: rgba(247, 147, 26, 0.15);
+}
+
+.net-node--blue {
+  fill: rgba(37, 99, 235, 0.25);
+  stroke: rgba(37, 99, 235, 0.12);
 }
 
 @keyframes node-pulse {
@@ -373,31 +334,42 @@ async function handleLogin() {
   50% { opacity: 1; transform: scale(1.15); }
 }
 
-/* ─── Content Layout ─── */
+/* ─── Content ─── */
 
 .login-content {
   position: relative;
   z-index: 1;
   display: flex;
-  min-height: 100vh;
-}
-
-/* ─── Brand Section ─── */
-
-.brand-section {
-  flex: 0 0 45%;
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 64px 56px 64px 72px;
+  min-height: 100vh;
+  padding: 32px;
 }
 
-.brand-header {
-  margin-bottom: 40px;
+/* ─── Form Card ─── */
+
+.form-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(10, 12, 16, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow:
+    0 0 80px -30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* ─── Brand inside card ─── */
+
+.form-brand {
+  margin-bottom: 0;
 }
 
 .brand-logo {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 12px;
 }
@@ -409,156 +381,52 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.15);
-  color: #34D399;
+  background: linear-gradient(135deg, rgba(247, 147, 26, 0.12), rgba(234, 88, 12, 0.08));
+  border: 1px solid rgba(247, 147, 26, 0.15);
+  color: #F59E0B;
+  flex-shrink: 0;
 }
 
-.logo-text {
-  font-family: 'Archivo', sans-serif;
-  font-weight: 800;
-  font-size: 22px;
-  color: #E4E8EE;
-  letter-spacing: -0.02em;
-}
-
-.brand-body {
-  max-width: 460px;
-}
-
-.brand-title {
-  font-family: 'Archivo', sans-serif;
-  font-weight: 900;
-  font-size: 44px;
-  line-height: 1.1;
-  color: #E4E8EE;
-  margin: 0 0 20px;
-  letter-spacing: -0.03em;
-}
-
-.text-highlight {
-  background: linear-gradient(135deg, #10B981 0%, #14B8A6 50%, #06B6D4 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.brand-desc {
-  font-size: 15px;
-  line-height: 1.7;
-  color: #6B7280;
-  margin: 0;
-  font-weight: 400;
-  max-width: 360px;
-}
-
-.brand-footer {
-  margin-top: 56px;
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #6B7280;
-  background: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.1);
-  margin-bottom: 28px;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
-  animation: status-pulse 2.5s ease-in-out infinite;
-}
-
-@keyframes status-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-.brand-metrics {
-  display: flex;
-  gap: 32px;
-}
-
-.metric {
+.logo-text-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.metric-value {
+.logo-wordmark {
   font-family: 'Archivo', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 800;
+  font-size: 20px;
   color: #E4E8EE;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.metric-label {
+.logo-tagline {
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #4B5563;
+  color: #52525B;
 }
 
-/* ─── Form Section ─── */
+/* ─── Divider ─── */
 
-.form-section {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 64px 72px 64px 40px;
+.form-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.1), rgba(37, 99, 235, 0.1), transparent);
+  margin: 24px 0;
 }
 
-.form-card {
-  width: 100%;
-  max-width: 420px;
-  background: rgba(15, 17, 21, 0.65);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow:
-    0 0 60px -20px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
+/* ─── Form Header ─── */
 
 .form-header {
-  margin-bottom: 28px;
-}
-
-.form-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(16, 185, 129, 0.8);
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.12);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .form-title {
   font-family: 'Archivo', sans-serif;
   font-weight: 800;
-  font-size: 26px;
+  font-size: 24px;
   color: #E4E8EE;
   margin: 0 0 6px;
   letter-spacing: -0.02em;
@@ -571,13 +439,15 @@ async function handleLogin() {
   line-height: 1.5;
 }
 
+/* ─── Form Fields ─── */
+
 .form-fields {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-/* Vuetify field overrides */
+/* Vuetify overrides */
 .form-card :deep(.v-field) {
   background: rgba(255, 255, 255, 0.02) !important;
 }
@@ -591,12 +461,12 @@ async function handleLogin() {
 }
 
 .form-card :deep(.v-field--focused .v-field__outline) {
-  color: #10B981 !important;
-  opacity: 0.6;
+  color: #F59E0B !important;
+  opacity: 0.7;
 }
 
 .form-card :deep(.v-field-label--floating) {
-  color: #10B981 !important;
+  color: #F59E0B !important;
 }
 
 .form-card :deep(.v-field .v-icon) {
@@ -604,7 +474,7 @@ async function handleLogin() {
 }
 
 .form-card :deep(.v-field--focused .v-icon) {
-  color: rgba(16, 185, 129, 0.6);
+  color: rgba(247, 147, 26, 0.6);
 }
 
 .form-card :deep(.v-field__input) {
@@ -619,7 +489,8 @@ async function handleLogin() {
   font-weight: 400;
 }
 
-/* Submit Button */
+/* ─── Submit Button ─── */
+
 .submit-btn {
   height: 48px !important;
   font-family: 'Archivo', sans-serif !important;
@@ -628,32 +499,32 @@ async function handleLogin() {
   text-transform: none !important;
   letter-spacing: 0.01em !important;
   border-radius: 12px !important;
-  background: linear-gradient(135deg, #10B981, #059669) !important;
+  background: linear-gradient(135deg, #F59E0B, #EA580C) !important;
   border: none !important;
   color: white !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 0 30px -8px rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 0 30px -8px rgba(247, 147, 26, 0.3) !important;
   overflow: hidden !important;
   position: relative !important;
 }
 
 .submit-btn:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 0 40px -6px rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 0 40px -6px rgba(247, 147, 26, 0.5) !important;
 }
 
 .submit-btn:active {
   transform: translateY(0) scale(0.99) !important;
 }
 
-/* Override Vuetify's default loading overlay */
 .submit-btn :deep(.v-btn__overlay) {
   display: none !important;
 }
 
-/* Form Footer */
+/* ─── Footer ─── */
+
 .form-footer {
-  margin-top: 32px;
+  margin-top: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -663,105 +534,48 @@ async function handleLogin() {
   font-weight: 400;
 }
 
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+  animation: status-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 .footer-sep {
   color: #3F3F46;
 }
 
 /* ─── Responsive ─── */
 
-@media (max-width: 1024px) {
-  .brand-section {
-    padding: 56px 40px 56px 48px;
-  }
-
-  .brand-title {
-    font-size: 36px;
-  }
-
-  .form-section {
-    padding: 56px 48px 56px 32px;
-  }
-}
-
-@media (max-width: 900px) {
-  .login-content {
-    flex-direction: column;
-  }
-
-  .brand-section {
-    flex: none;
-    padding: 48px 32px 32px;
-    min-height: 45vh;
-    justify-content: flex-end;
-  }
-
-  .brand-body {
-    max-width: 100%;
-  }
-
-  .brand-title {
-    font-size: 32px;
-  }
-
-  .brand-desc {
-    max-width: 100%;
-  }
-
-  .brand-footer {
-    margin-top: 32px;
-  }
-
-  .brand-metrics {
-    gap: 24px;
-  }
-
-  .form-section {
-    padding: 24px 32px 48px;
-  }
-
-  .form-card {
-    max-width: 100%;
-    padding: 32px;
-  }
-
-  .network-svg {
-    opacity: 0.3;
-  }
-}
-
 @media (max-width: 480px) {
-  .brand-section {
-    padding: 32px 20px 24px;
-    min-height: 35vh;
-  }
-
-  .brand-title {
-    font-size: 26px;
-  }
-
-  .brand-desc {
-    font-size: 13px;
-  }
-
-  .brand-metrics {
-    gap: 16px;
-  }
-
-  .metric-value {
-    font-size: 14px;
-  }
-
-  .form-section {
-    padding: 16px 20px 40px;
+  .login-content {
+    padding: 16px;
   }
 
   .form-card {
-    padding: 24px 20px;
+    padding: 28px 24px;
     border-radius: 16px;
   }
 
   .form-title {
-    font-size: 22px;
+    font-size: 20px;
+  }
+
+  .network-svg {
+    opacity: 0.3;
   }
 }
 </style>
