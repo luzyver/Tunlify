@@ -104,11 +104,7 @@ async function handleLogin() {
           <div class="form-brand">
             <div class="brand-logo">
               <div class="logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
-                  <path d="M12 2L2 7v10l10 5 10-5V7l-10-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
-                  <path d="M2 7l10 5m0 0l10-5m-10 5v10" stroke="currentColor" stroke-width="1.5" />
-                  <path d="M7 9.5l5-2.5 5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
+                <img src="/icon.png" alt="Tunlify" class="logo-img" />
               </div>
               <div class="logo-text-group">
                 <span class="logo-wordmark">Tunlify</span>
@@ -408,10 +404,15 @@ async function handleLogin() {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(247, 147, 26, 0.15), rgba(234, 88, 12, 0.1));
-  border: 1px solid rgba(247, 147, 26, 0.2);
-  color: #F59E0B;
+  background: linear-gradient(135deg, rgba(247, 147, 26, 0.1), rgba(234, 88, 12, 0.05));
+  border: 1px solid rgba(247, 147, 26, 0.12);
   flex-shrink: 0;
+}
+
+.logo-img {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
 }
 
 .logo-text-group {
