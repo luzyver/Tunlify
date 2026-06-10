@@ -88,7 +88,10 @@ func (h *Notifications) Test(w http.ResponseWriter, r *http.Request) {
 
 func jsonReader(data []byte) *jsonBody { return &jsonBody{data: data} }
 
-type jsonBody struct{ data []byte; i int }
+type jsonBody struct {
+	data []byte
+	i    int
+}
 
 func (b *jsonBody) Read(p []byte) (int, error) {
 	if b.i >= len(b.data) {

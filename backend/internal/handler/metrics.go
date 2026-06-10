@@ -20,10 +20,10 @@ func NewMetrics(cfg *config.Config) *Metrics {
 }
 
 type metricsResponse struct {
-	TotalRequests  int64              `json:"total_requests"`
-	ActiveConns    int64              `json:"active_connections"`
-	ResponseCodes  map[string]int64   `json:"response_codes"`
-	Raw            string             `json:"raw,omitempty"`
+	TotalRequests int64            `json:"total_requests"`
+	ActiveConns   int64            `json:"active_connections"`
+	ResponseCodes map[string]int64 `json:"response_codes"`
+	Raw           string           `json:"raw,omitempty"`
 }
 
 func (h *Metrics) Get(w http.ResponseWriter, r *http.Request) {
